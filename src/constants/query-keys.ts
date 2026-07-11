@@ -1,0 +1,15 @@
+export const QUERY_KEYS = {
+  homeRows: ["home", "rows"] as const,
+  trending: ["home", "trending"] as const,
+  moviesPreview: ["home", "movies-preview"] as const,
+  movieDetail: (slug: string) => ["movie", "detail", slug] as const,
+  movieSearch: (query: string) => ["movie", "search", query] as const,
+  moviePage: ["movie", "page"] as const,
+  shortsFeed: ["shorts", "feed"] as const,
+  plans: ["subscription", "plans"] as const,
+  profile: ["profile", "me"] as const,
+  favorites: ["profile", "favorites"] as const,
+  watchHistory: ["profile", "watch-history"] as const,
+  adminMovies: (page: number) => ["admin", "movies", page] as const,
+  adminMovieDetail: (id: string) => ["admin", "movie", id] as const,
+};

@@ -1,5 +1,6 @@
 "use client";
 
+import { motion } from "framer-motion";
 import { Skeleton } from "@/components/ui/skeleton";
 import { MovieRow } from "@/components/movie/movie-row";
 import { ROUTES } from "@/constants/routes";
@@ -32,7 +33,12 @@ export function HomeView() {
   const heroMovies = rows[0]?.movies.slice(0, 6) ?? [];
 
   return (
-    <div className="space-y-10 pb-16">
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3 }}
+      className="space-y-10 pb-16"
+    >
       {heroMovies.length > 0 && <HeroBanner movies={heroMovies} />}
       <div className="space-y-10">
         {rows.map((row) => (
@@ -41,6 +47,6 @@ export function HomeView() {
         {trending && <TrendingRow movies={trending} />}
         {preview && <AllMoviesSection movies={preview} />}
       </div>
-    </div>
+    </motion.div>
   );
 }

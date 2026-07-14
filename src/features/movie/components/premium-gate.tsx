@@ -1,5 +1,8 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { motion } from "framer-motion";
 import { Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/constants/routes";
@@ -15,7 +18,12 @@ export function PremiumGate({ backdrop }: { backdrop: string }) {
           className="object-cover opacity-30 blur-sm"
         />
       )}
-      <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-black/40 px-4 text-center">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.35, ease: "easeOut" }}
+        className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-black/40 px-4 text-center"
+      >
         <Crown size={40} className="text-brand" />
         <div className="space-y-1">
           <h3 className="text-xl font-bold text-white">Nội Dung Premium</h3>
@@ -26,7 +34,7 @@ export function PremiumGate({ backdrop }: { backdrop: string }) {
         <Link href={ROUTES.subscription}>
           <Button variant="primary">Nâng Cấp Ngay</Button>
         </Link>
-      </div>
+      </motion.div>
     </div>
   );
 }

@@ -1,5 +1,6 @@
 "use client";
 
+import { motion } from "framer-motion";
 import { Star, Clock, Crown } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
@@ -33,7 +34,12 @@ export function MovieDetailView({ slug }: { slug: string }) {
   const canWatch = !movie.isPremium || movie.hasAccess;
 
   return (
-    <div className="space-y-6 px-4 py-8 sm:px-8">
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, ease: "easeOut" }}
+      className="space-y-6 px-4 py-8 sm:px-8"
+    >
       {canWatch ? (
         <VideoPlayer
           src={activeEpisode?.videoUrl ?? movie.videoUrl ?? ""}
@@ -63,16 +69,22 @@ export function MovieDetailView({ slug }: { slug: string }) {
               </span>
             )}
           </div>
-          <div className="flex flex-wrap gap-2">
+          <motion.div
+            className="flex flex-wrap gap-2"
+            initial="hidden"
+            animate="show"
+            variants={{ hidden: {}, show: { transition: { staggerChildren: 0.05 } } }}
+          >
             {movie.genres.map((genre) => (
-              <span
+              <motion.span
                 key={genre}
+                variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0 } }}
                 className="rounded-full border border-white/15 px-3 py-1 text-xs text-white/70"
               >
                 {genre}
-              </span>
+              </motion.span>
             ))}
-          </div>
+          </motion.div>
         </div>
         <Button>Yêu Thích</Button>
       </div>
@@ -85,6 +97,6 @@ export function MovieDetailView({ slug }: { slug: string }) {
           <EpisodeList slug={movie.slug} episodes={movie.episodes} />
         </div>
       )}
-    </div>
+    </motion.div>
   );
 }

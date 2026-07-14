@@ -1,6 +1,7 @@
 "use client";
 
 import { Skeleton } from "@/components/ui/skeleton";
+import { Reveal } from "@/components/common/reveal";
 import { MovieGrid } from "@/components/movie/movie-grid";
 import { useMovieCatalog } from "../hooks/use-movie-catalog";
 
@@ -22,9 +23,11 @@ export function MovieCatalogView() {
 
   return (
     <div className="py-8">
-      <h1 className="mb-6 px-4 text-2xl font-bold text-white sm:px-8">
-        All Movies
-      </h1>
+      <Reveal>
+        <h1 className="mb-6 px-4 text-2xl font-bold text-white sm:px-8">
+          All Movies
+        </h1>
+      </Reveal>
       <MovieGrid
         movies={movies}
         isFetchingMore={isFetchingNextPage}

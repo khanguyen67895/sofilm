@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ROUTES } from "@/constants/routes";
@@ -45,9 +45,18 @@ export function AdminLoginForm() {
         onChange={(e) => setPassword(e.target.value)}
         required
       />
-      {login.isError && (
-        <p className="text-sm text-red-500">Đăng nhập thất bại. Vui lòng thử lại.</p>
-      )}
+      <AnimatePresence>
+        {login.isError && (
+          <motion.p
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="text-sm text-red-500"
+          >
+            Đăng nhập thất bại. Vui lòng thử lại.
+          </motion.p>
+        )}
+      </AnimatePresence>
       <Button type="submit" className="w-full" disabled={login.isPending}>
         {login.isPending ? "Đang đăng nhập..." : "Đăng Nhập"}
       </Button>

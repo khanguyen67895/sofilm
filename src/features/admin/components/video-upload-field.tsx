@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, type ChangeEvent } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { CheckCircle2, UploadCloud } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -44,20 +45,50 @@ export function VideoUploadField({ hasVideo, onUploaded }: VideoUploadFieldProps
         <UploadCloud size={16} />
         {hasVideo ? "Thay Video" : "Tải Video Lên"}
       </Button>
-      {isBusy && <Progress value={status === "completing" ? 100 : progress * 100} />}
-      {status === "done" && (
-        <p className="flex items-center gap-1 text-xs text-green-500">
-          <CheckCircle2 size={14} /> Tải lên thành công
-        </p>
-      )}
-      {status === "error" && (
-        <p className="text-xs text-red-500">Tải video thất bại. Vui lòng thử lại.</p>
-      )}
-      {hasVideo && status === "idle" && (
-        <p className="flex items-center gap-1 text-xs text-white/50">
-          <CheckCircle2 size={14} /> Đã có video
-        </p>
-      )}
+      <AnimatePresence mode="wait">
+        {isBusy ? (
+          <motion.div
+            key="progress"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+          >
+            <Progress value={status === "completing" ? 100 : progress * 100} />
+          </motion.div>
+        ) : status === "done" ? (
+          <motion.p
+            key="done"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="flex items-center gap-1 text-xs text-green-500"
+          >
+            <CheckCircle2 size={14} /> Tải lên thành công
+          </motion.p>
+        ) : status === "error" ? (
+          <motion.p
+            key="error"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="text-xs text-red-500"
+          >
+            Tải video thất bại. Vui lòng thử lại.
+          </motion.p>
+        ) : (
+          hasVideo && (
+            <motion.p
+              key="has-video"
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="flex items-center gap-1 text-xs text-white/50"
+            >
+              <CheckCircle2 size={14} /> Đã có video
+            </motion.p>
+          )
+        )}
+      </AnimatePresence>
     </div>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { VirtuosoGrid } from "react-virtuoso";
+import { AnimatePresence, motion } from "framer-motion";
 import { MovieCard } from "./movie-card";
 import { Spinner } from "@/components/ui/spinner";
 import type { Movie } from "@/types/movie";
@@ -21,11 +22,18 @@ export function MovieGrid({ movies, onEndReached, isFetchingMore }: MovieGridPro
         listClassName="grid grid-cols-2 gap-3 px-4 sm:grid-cols-4 sm:gap-4 sm:px-8 lg:grid-cols-6"
         itemContent={(_, movie) => <MovieCard movie={movie} />}
       />
-      {isFetchingMore && (
-        <div className="flex justify-center py-6">
-          <Spinner />
-        </div>
-      )}
+      <AnimatePresence>
+        {isFetchingMore && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="flex justify-center py-6"
+          >
+            <Spinner />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

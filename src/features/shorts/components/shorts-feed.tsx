@@ -1,5 +1,6 @@
 "use client";
 
+import { motion } from "framer-motion";
 import { Virtuoso } from "react-virtuoso";
 import { Spinner } from "@/components/ui/spinner";
 import { useShortsFeed } from "../hooks/use-shorts-feed";
@@ -10,9 +11,13 @@ export function ShortsFeed() {
 
   if (isLoading || !shorts) {
     return (
-      <div className="flex h-[calc(100dvh-4rem)] items-center justify-center">
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="flex h-[calc(100dvh-4rem)] items-center justify-center"
+      >
         <Spinner />
-      </div>
+      </motion.div>
     );
   }
 

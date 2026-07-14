@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useRef } from "react";
+import { motion } from "framer-motion";
 import { ChevronRight } from "lucide-react";
 import { Reveal } from "@/components/common/reveal";
 import { MovieCard } from "./movie-card";
@@ -45,14 +46,16 @@ export function MovieRow({ row, viewAllHref }: MovieRowProps) {
           ))}
         </div>
 
-        <button
+        <motion.button
           type="button"
           onClick={scrollNext}
           aria-label="Cuộn tiếp"
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
           className="absolute right-2 top-1/2 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-black/70 text-white hover:bg-brand sm:flex"
         >
           <ChevronRight size={20} />
-        </button>
+        </motion.button>
       </Reveal>
     </section>
   );

@@ -12,12 +12,12 @@ export function SubscriptionView() {
 
   return (
     <div className="space-y-8 px-4 py-12 sm:px-8">
-      <div className="text-center">
+      <Reveal className="text-center">
         <h1 className="text-3xl font-extrabold text-white">Chọn Gói VIP</h1>
         <p className="mt-2 text-white/60">
           Mở khoá kho phim và series không giới hạn, chất lượng cao nhất.
         </p>
-      </div>
+      </Reveal>
 
       {isLoading ? (
         <div className="grid gap-6 sm:grid-cols-3">

@@ -2,6 +2,7 @@
 
 import { useSearchParams } from "next/navigation";
 import { useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
@@ -28,21 +29,39 @@ export function SearchView() {
         />
       </div>
 
-      {isFetching && (
-        <div className="flex justify-center py-6">
-          <Spinner />
-        </div>
-      )}
-
-      {!isFetching && movies && movies.length === 0 && query.trim() && (
-        <p className="text-white/50">Không tìm thấy kết quả cho "{query}".</p>
-      )}
-
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4 lg:grid-cols-6">
-        {movies?.map((movie) => (
-          <MovieCard key={movie.id} movie={movie} />
-        ))}
-      </div>
+      <AnimatePresence mode="wait">
+        {isFetching ? (
+          <motion.div
+            key="loading"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="flex justify-center py-6"
+          >
+            <Spinner />
+          </motion.div>
+        ) : movies && movies.length === 0 && query.trim() ? (
+          <motion.p
+            key="empty"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            className="text-white/50"
+          >
+            Không tìm thấy kết quả cho &quot;{query}&quot;.
+          </motion.p>
+        ) : (
+          <motion.div
+            key={query}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.25 }}
+            className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4 lg:grid-cols-6"
+          >
+            {movies?.map((movie) => <MovieCard key={movie.id} movie={movie} />)}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

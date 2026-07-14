@@ -5,8 +5,8 @@ export const SITE_CONFIG = {
 };
 
 export const API_CONFIG = {
-  baseURL: process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080/api",
-  socketURL: process.env.NEXT_PUBLIC_SOCKET_URL ?? "http://localhost:8080",
+  baseURL: process.env.NEXT_PUBLIC_API_URL ?? "http://18.141.246.254",
+  socketURL: process.env.NEXT_PUBLIC_SOCKET_URL ?? "http://18.141.246.254",
   timeout: 15_000,
 };
 

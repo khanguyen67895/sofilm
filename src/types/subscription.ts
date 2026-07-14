@@ -12,5 +12,6 @@ export type PaymentMethod = "momo" | "vnpay" | "zalopay" | "card";
 
 export interface CheckoutPayload {
   planId: string;
-  method: PaymentMethod;
+  provider: PaymentMethod;
+  couponCode?: string;
 }

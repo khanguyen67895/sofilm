@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { Star, Clock, Crown } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
@@ -9,6 +8,7 @@ import { formatDuration, formatYear } from "@/utils/format";
 import { usePlayerStore } from "@/store/player.store";
 import { useMovieDetail } from "../hooks/use-movie-detail";
 import { EpisodeList } from "./episode-list";
+import { PremiumGate } from "./premium-gate";
 
 export function MovieDetailView({ slug }: { slug: string }) {
   const { data: movie, isLoading } = useMovieDetail(slug);
@@ -30,12 +30,18 @@ export function MovieDetailView({ slug }: { slug: string }) {
       ? (movie.episodes?.find((ep) => ep.episodeNumber === currentEpisode) ?? movie.episodes?.[0])
       : movie.episodes?.[0];
 
+  const canWatch = !movie.isPremium || movie.hasAccess;
+
   return (
     <div className="space-y-6 px-4 py-8 sm:px-8">
-      <VideoPlayer
-        src={activeEpisode?.videoUrl ?? movie.videoUrl ?? ""}
-        poster={movie.backdrop}
-      />
+      {canWatch ? (
+        <VideoPlayer
+          src={activeEpisode?.videoUrl ?? movie.videoUrl ?? ""}
+          poster={movie.backdrop}
+        />
+      ) : (
+        <PremiumGate backdrop={movie.backdrop} />
+      )}
 
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="space-y-2">

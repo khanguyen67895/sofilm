@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/constants/routes";
@@ -8,6 +9,13 @@ import { useAuthStore } from "@/store/auth.store";
 
 export function ProfileView() {
   const { user, isAuthenticated, clearSession } = useAuthStore();
+  // `isAuthenticated`/`user` come from a localStorage-persisted store, which
+  // is unavailable during SSR — gate on mount so the client's first render
+  // matches the server's logged-out shape instead of hydration-mismatching.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
+  if (!mounted) return null;
 
   if (!isAuthenticated || !user) {
     return (
@@ -27,8 +35,8 @@ export function ProfileView() {
           {user.name.charAt(0).toUpperCase()}
         </div>
         <div>
-          <p className="text-lg font-semibold text-white">{user.name}</p>
-          <p className="text-sm text-white/50">{user.email}</p>
+          <p className="text-lg font-semibold text-white">{user.name || user.phone}</p>
+          <p className="text-sm text-white/50">{user.email ?? user.phone}</p>
         </div>
       </div>
 

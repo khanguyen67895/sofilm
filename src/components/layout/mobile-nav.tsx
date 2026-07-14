@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import { Home, Search, Clapperboard, Crown, User } from "lucide-react";
 import { cn } from "@/utils/cn";
-import { ROUTES } from "@/constants/routes";
+import { ROUTES, isChromeLessRoute } from "@/constants/routes";
 
 const ITEMS = [
   { href: ROUTES.home, label: "Trang chủ", icon: Home },
@@ -17,6 +17,8 @@ const ITEMS = [
 
 export function MobileNav() {
   const pathname = usePathname();
+
+  if (isChromeLessRoute(pathname)) return null;
 
   return (
     <nav className="fixed right-0 bottom-0 left-0 z-50 flex h-14 items-center justify-around border-t border-white/10 bg-black/90 backdrop-blur-md md:hidden">

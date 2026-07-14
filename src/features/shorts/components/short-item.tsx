@@ -7,6 +7,7 @@ import { Heart, MessageCircle } from "lucide-react";
 import { cn } from "@/utils/cn";
 import { formatViews } from "@/utils/format";
 import { ROUTES } from "@/constants/routes";
+import { movieService } from "@/services/movie/movie.service";
 import type { Short } from "@/types/shorts";
 
 export function ShortItem({ short }: { short: Short }) {
@@ -15,8 +16,18 @@ export function ShortItem({ short }: { short: Short }) {
   const [likes, setLikes] = useState(short.likes);
 
   function toggleLike() {
-    setIsLiked((prev) => !prev);
-    setLikes((prev) => (isLiked ? prev - 1 : prev + 1));
+    const wasLiked = isLiked;
+    setIsLiked(!wasLiked);
+    setLikes((prev) => (wasLiked ? prev - 1 : prev + 1));
+
+    const request = wasLiked
+      ? movieService.unlikeShort(short.id)
+      : movieService.likeShort(short.id);
+
+    request.catch(() => {
+      setIsLiked(wasLiked);
+      setLikes((prev) => (wasLiked ? prev + 1 : prev - 1));
+    });
   }
 
   return (

@@ -1,13 +1,13 @@
 export const ENDPOINTS = {
   auth: {
     login: "/auth/login",
-    register: "/auth/register",
     logout: "/auth/logout",
     refresh: "/auth/refresh",
     me: "/auth/me",
+    otpPhoneRequest: "/auth/otp/phone/request",
+    otpPhoneVerify: "/auth/otp/phone/verify",
   },
   movies: {
-    list: "/movies",
     detail: (slug: string) => `/movies/${slug}`,
     trending: "/movies/trending",
     byCategory: (categorySlug: string) => `/movies/category/${categorySlug}`,
@@ -31,20 +31,26 @@ export const ENDPOINTS = {
   shorts: {
     feed: "/shorts/feed",
     like: (id: string) => `/shorts/${id}/like`,
+    unlike: (id: string) => `/shorts/${id}/like`,
   },
-  subscription: {
-    plans: "/subscription/plans",
-    subscribe: "/subscription/subscribe",
-    current: "/subscription/current",
+  subscriptions: {
+    plans: "/subscriptions/plans",
+    current: "/subscriptions/me",
   },
-  payment: {
-    checkout: "/payment/checkout",
-    history: "/payment/history",
-    verify: (id: string) => `/payment/verify/${id}`,
+  payments: {
+    checkout: "/payments/checkout",
+    history: "/payments/history",
+    verify: (id: string) => `/payments/verify/${id}`,
   },
-  profile: {
-    me: "/profile/me",
-    watchHistory: "/profile/watch-history",
-    favorites: "/profile/favorites",
+  users: {
+    me: "/users/me",
+  },
+  favorites: {
+    list: "/favorites",
+    add: "/favorites",
+    remove: (movieId: string) => `/favorites/${movieId}`,
+  },
+  history: {
+    continueWatching: "/history/continue-watching",
   },
 } as const;

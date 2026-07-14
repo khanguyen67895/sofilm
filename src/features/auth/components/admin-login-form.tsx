@@ -6,20 +6,20 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ROUTES } from "@/constants/routes";
-import { useRegister } from "../hooks/use-register";
+import { useLogin } from "../hooks/use-login";
 
-export function RegisterForm() {
+/** Email/password login for admin accounts (created via `npm run promote-admin`) — consumer login uses PhoneLoginForm instead. */
+export function AdminLoginForm() {
   const router = useRouter();
-  const register = useRegister();
-  const [name, setName] = useState("");
+  const login = useLogin();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    register.mutate(
-      { name, email, password },
-      { onSuccess: () => router.push(ROUTES.home) }
+    login.mutate(
+      { email, password },
+      { onSuccess: () => router.push(ROUTES.adminMovies) }
     );
   }
 
@@ -31,12 +31,6 @@ export function RegisterForm() {
       onSubmit={handleSubmit}
       className="space-y-4"
     >
-      <Input
-        placeholder="Họ tên"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        required
-      />
       <Input
         type="email"
         placeholder="Email"
@@ -51,11 +45,11 @@ export function RegisterForm() {
         onChange={(e) => setPassword(e.target.value)}
         required
       />
-      {register.isError && (
-        <p className="text-sm text-red-500">Đăng ký thất bại. Vui lòng thử lại.</p>
+      {login.isError && (
+        <p className="text-sm text-red-500">Đăng nhập thất bại. Vui lòng thử lại.</p>
       )}
-      <Button type="submit" className="w-full" disabled={register.isPending}>
-        {register.isPending ? "Đang tạo tài khoản..." : "Đăng Ký"}
+      <Button type="submit" className="w-full" disabled={login.isPending}>
+        {login.isPending ? "Đang đăng nhập..." : "Đăng Nhập"}
       </Button>
     </motion.form>
   );

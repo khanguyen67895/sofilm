@@ -1,5 +1,6 @@
 "use client";
 
+import { usePathname } from "next/navigation";
 import { Mail, Phone, MapPin } from "lucide-react";
 import { motion } from "framer-motion";
 import { Logo } from "@/components/common/logo";
@@ -11,6 +12,7 @@ import {
   YoutubeIcon,
 } from "@/components/common/social-icons";
 import { SITE_CONFIG } from "@/constants/config";
+import { isChromeLessRoute } from "@/constants/routes";
 
 const SOCIALS = [
   { icon: MessengerIcon, label: "Messenger", bg: "bg-[#0084FF]", href: "#" },
@@ -26,6 +28,10 @@ const CONTACTS = [
 ];
 
 export function Footer() {
+  const pathname = usePathname();
+
+  if (isChromeLessRoute(pathname)) return null;
+
   return (
     <footer className="relative mt-20 overflow-hidden border-t border-white/5 bg-black">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(255,106,61,0.12),transparent_60%)]" />

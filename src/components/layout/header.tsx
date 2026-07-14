@@ -3,13 +3,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { motion } from "framer-motion";
 import { Search } from "lucide-react";
 import { Logo } from "@/components/common/logo";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/utils/cn";
-import { ROUTES } from "@/constants/routes";
+import { ROUTES, isChromeLessRoute } from "@/constants/routes";
 import { useAuthStore } from "@/store/auth.store";
 
 const NAV_LINKS = [
@@ -24,13 +24,22 @@ export function Header() {
   const pathname = usePathname();
   const router = useRouter();
   const user = useAuthStore((s) => s.user);
+  const isAdmin = useAuthStore((s) => s.isAdmin());
   const [query, setQuery] = useState("");
+  // `user`/`isAdmin` come from a localStorage-persisted store, which is
+  // unavailable during SSR — the server always renders the logged-out shape.
+  // Gate any UI that branches on them behind a mount flag so the client's
+  // first render matches the server, and the real value applies right after.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   function handleSearch(e: FormEvent) {
     e.preventDefault();
     const q = query.trim();
     router.push(q ? `${ROUTES.search}?q=${encodeURIComponent(q)}` : ROUTES.search);
   }
+
+  if (isChromeLessRoute(pathname)) return null;
 
   return (
     <motion.header
@@ -87,6 +96,14 @@ export function Header() {
             </button>
           </form>
 
+          {mounted && isAdmin && (
+            <Link href={ROUTES.adminMovies} className="hidden sm:block">
+              <Button size="md" variant="outline">
+                Admin
+              </Button>
+            </Link>
+          )}
+
           <Link href={ROUTES.subscription} className="hidden sm:block">
             <Button size="md">Upgrade</Button>
           </Link>
@@ -97,7 +114,7 @@ export function Header() {
             className="relative h-11 w-11 shrink-0 overflow-hidden rounded-full bg-stone-300"
           >
             <Image
-              src={user?.avatar || DEFAULT_AVATAR}
+              src={(mounted && user?.avatar) || DEFAULT_AVATAR}
               alt="Avatar"
               fill
               sizes="44px"

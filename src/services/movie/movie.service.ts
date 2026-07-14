@@ -1,5 +1,5 @@
 import { apiClient, ENDPOINTS } from "@/services/api";
-import { MOCK_MOVIES, MOCK_ROWS, MOCK_SHORTS, MOCK_TRENDING } from "@/lib/mock-data";
+import { MOCK_MOVIES, MOCK_ROWS, MOCK_TRENDING } from "@/lib/mock-data";
 import type { ApiResponse, PaginatedResponse } from "@/types/api";
 import type { Episode, Movie, MovieRow } from "@/types/movie";
 import type { Short } from "@/types/shorts";
@@ -32,6 +32,7 @@ export interface BackendMovie {
   rating: number;
   views: number;
   isPremium: boolean;
+  hasAccess?: boolean;
   videoId?: string;
   videoUrl?: string;
   genres?: { name: string }[];
@@ -67,6 +68,7 @@ export function mapMovieResponse(raw: BackendMovie): Movie {
     rating: raw.rating,
     views: raw.views,
     isPremium: raw.isPremium,
+    hasAccess: raw.hasAccess ?? true,
     videoId: raw.videoId,
     videoUrl: raw.videoUrl,
     episodes: episodes.length > 0 ? episodes : undefined,
@@ -117,21 +119,35 @@ export const movieService = {
   },
 
   async getShortsFeed(): Promise<Short[]> {
-    await new Promise((r) => setTimeout(r, 200));
-    return MOCK_SHORTS;
+    const { data } = await apiClient.get<ApiResponse<{ items: Short[] }>>(
+      ENDPOINTS.shorts.feed,
+      { params: { limit: 50 } }
+    );
+    return data.data.items;
+  },
+
+  async likeShort(id: string): Promise<void> {
+    await apiClient.post(ENDPOINTS.shorts.like(id));
+  },
+
+  async unlikeShort(id: string): Promise<void> {
+    await apiClient.delete(ENDPOINTS.shorts.unlike(id));
   },
 
   async getFavorites(): Promise<Movie[]> {
-    const { data } = await apiClient.get<ApiResponse<Movie[]>>(
-      ENDPOINTS.profile.favorites
+    const { data } = await apiClient.get<ApiResponse<BackendMovie[]>>(
+      ENDPOINTS.favorites.list
     );
-    return data.data;
+    return data.data.map(mapMovieResponse);
   },
 
   async getWatchHistory(): Promise<Movie[]> {
-    const { data } = await apiClient.get<ApiResponse<Movie[]>>(
-      ENDPOINTS.profile.watchHistory
-    );
-    return data.data;
+    const { data } = await apiClient.get<
+      ApiResponse<{ items: { movie: BackendMovie | null }[] }>
+    >(ENDPOINTS.history.continueWatching);
+    return data.data.items
+      .map((item) => item.movie)
+      .filter((movie): movie is BackendMovie => movie != null)
+      .map(mapMovieResponse);
   },
 };

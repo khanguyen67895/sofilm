@@ -33,7 +33,7 @@ export function SubscriptionView() {
               plan={plan}
               isPending={checkout.isPending}
               onSelect={(selected) =>
-                checkout.mutate({ planId: selected.id, method: "vnpay" })
+                checkout.mutate({ planId: selected.id, provider: "vnpay" })
               }
             />
           ))}

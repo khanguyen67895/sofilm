@@ -5,6 +5,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { MovieRow } from "@/components/movie/movie-row";
 import { ROUTES } from "@/constants/routes";
 import { useHomeRows } from "../hooks/use-home-rows";
+import { useHeroBanners } from "../hooks/use-hero-banners";
 import { useTrending } from "../hooks/use-trending";
 import { useMoviesPreview } from "../hooks/use-movies-preview";
 import { HeroBanner } from "./hero-banner";
@@ -13,6 +14,7 @@ import { AllMoviesSection } from "./all-movies-section";
 
 export function HomeView() {
   const { data: rows, isLoading: isRowsLoading } = useHomeRows();
+  const { data: heroBanners } = useHeroBanners();
   const { data: trending } = useTrending();
   const { data: preview } = useMoviesPreview();
 
@@ -30,7 +32,8 @@ export function HomeView() {
     );
   }
 
-  const heroMovies = rows[0]?.movies.slice(0, 6) ?? [];
+  const heroMovies =
+    heroBanners && heroBanners.length > 0 ? heroBanners : (rows[0]?.movies.slice(0, 6) ?? []);
 
   return (
     <motion.div

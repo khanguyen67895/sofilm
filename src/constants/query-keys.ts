@@ -12,4 +12,12 @@ export const QUERY_KEYS = {
   watchHistory: ["profile", "watch-history"] as const,
   adminMovies: (page: number) => ["admin", "movies", page] as const,
   adminMovieDetail: (id: string) => ["admin", "movie", id] as const,
+  heroBanners: ["home", "banners"] as const,
+  adminBanners: ["admin", "banners"] as const,
+  similarMovies: (slug: string) => ["movie", "similar", slug] as const,
+  reviewSummary: (movieId: string) => ["reviews", "summary", movieId] as const,
+  reviews: (movieId: string) => ["reviews", "list", movieId] as const,
+  genres: ["genres"] as const,
+  catalogPage: (page: number, genreSlug?: string) =>
+    ["movie", "catalog-page", page, genreSlug ?? "all"] as const,
 };

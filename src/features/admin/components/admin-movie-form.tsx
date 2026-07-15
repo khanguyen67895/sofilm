@@ -7,7 +7,7 @@ import { ROUTES } from "@/constants/routes";
 import type { Movie, MovieType } from "@/types/movie";
 import { useCreateMovie } from "../hooks/use-create-movie";
 import { useUpdateMovie } from "../hooks/use-update-movie";
-import { AdminMovieFields } from "./admin-movie-fields";
+import { AdminMovieFields, type AdminMovieFieldErrors } from "./admin-movie-fields";
 import { AdminMovieVideoSection } from "./admin-movie-video-section";
 
 interface AdminMovieFormProps {
@@ -31,11 +31,33 @@ export function AdminMovieForm({ mode, movie }: AdminMovieFormProps) {
   const [isPremium, setIsPremium] = useState(movie?.isPremium ?? false);
   const [videoId, setVideoId] = useState(movie?.videoId ?? "");
   const [hasVideo, setHasVideo] = useState(Boolean(movie?.videoUrl));
+  const [errors, setErrors] = useState<AdminMovieFieldErrors>({});
+  const [videoError, setVideoError] = useState<string>();
 
   const isPending = createMovie.isPending || updateMovie.isPending;
 
+  function validate(): boolean {
+    const nextErrors: AdminMovieFieldErrors = {};
+    if (!title.trim()) nextErrors.title = "Bắt buộc phải nhập tên phim.";
+    if (!poster.trim()) nextErrors.poster = "Bắt buộc phải có ảnh poster.";
+    if (!backdrop.trim()) nextErrors.backdrop = "Bắt buộc phải có ảnh backdrop.";
+    if (!releaseDate) nextErrors.releaseDate = "Bắt buộc phải chọn ngày phát hành.";
+    if (type === "MOVIE" && !duration.trim()) nextErrors.duration = "Bắt buộc phải nhập thời lượng.";
+    setErrors(nextErrors);
+
+    const nextVideoError =
+      mode === "create" && type === "MOVIE" && !hasVideo
+        ? "Bắt buộc phải tải video lên trước khi lưu."
+        : undefined;
+    setVideoError(nextVideoError);
+
+    return Object.keys(nextErrors).length === 0 && !nextVideoError;
+  }
+
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
+    if (!validate()) return;
+
     const payload = {
       title,
       slug: slug || undefined,
@@ -59,7 +81,7 @@ export function AdminMovieForm({ mode, movie }: AdminMovieFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-6" noValidate>
       <AdminMovieFields
         title={title}
         onTitleChange={(e) => setTitle(e.target.value)}
@@ -79,18 +101,23 @@ export function AdminMovieForm({ mode, movie }: AdminMovieFormProps) {
         onDurationChange={(e) => setDuration(e.target.value)}
         isPremium={isPremium}
         onIsPremiumChange={(e) => setIsPremium(e.target.checked)}
+        errors={errors}
       />
 
-      <AdminMovieVideoSection
-        type={type}
-        mode={mode}
-        movie={movie}
-        hasVideo={hasVideo}
-        onVideoUploaded={({ videoId: newVideoId }) => {
-          setVideoId(newVideoId);
-          setHasVideo(true);
-        }}
-      />
+      <div>
+        <AdminMovieVideoSection
+          type={type}
+          mode={mode}
+          movie={movie}
+          hasVideo={hasVideo}
+          onVideoUploaded={({ videoId: newVideoId }) => {
+            setVideoId(newVideoId);
+            setHasVideo(true);
+            setVideoError(undefined);
+          }}
+        />
+        {videoError && <p className="mt-2 text-xs text-red-500">{videoError}</p>}
+      </div>
 
       <Button type="submit" disabled={isPending}>
         {isPending ? "Đang lưu..." : mode === "create" ? "Tạo Phim" : "Lưu Thay Đổi"}

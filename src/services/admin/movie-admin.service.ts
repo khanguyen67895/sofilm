@@ -9,6 +9,7 @@ export interface AdminMovieListItem {
   title: string;
   type: MovieType;
   poster?: string;
+  backdrop?: string;
   isPremium: boolean;
   createdAt: string;
 }

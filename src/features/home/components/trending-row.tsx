@@ -37,7 +37,7 @@ export function TrendingRow({ movies }: { movies: Movie[] }) {
             <Link
               key={movie.id}
               href={ROUTES.movie(movie.slug)}
-              className="group relative w-32 shrink-0 sm:w-40"
+              className="group relative w-32 shrink-0 sm:w-53"
             >
               <div className="relative aspect-2/3 overflow-hidden rounded-lg bg-white/5">
                 <Image
@@ -48,8 +48,8 @@ export function TrendingRow({ movies }: { movies: Movie[] }) {
                   className="object-cover transition-transform duration-300 group-hover:scale-110"
                 />
                 <span
-                  className="absolute -bottom-2 -left-1 text-6xl font-black text-white/90 sm:text-7xl"
-                  style={{ WebkitTextStroke: "2px black" }}
+                  className="font-rank absolute -bottom-2 left-2 text-[70px] leading-normal font-normal text-white"
+                  style={{ textShadow: "0 1px 20px #FFF" }}
                 >
                   {index + 1}
                 </span>

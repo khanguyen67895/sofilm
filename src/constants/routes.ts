@@ -14,9 +14,14 @@ export const ROUTES = {
   adminMovies: "/admin/movies",
   adminMovieNew: "/admin/movies/new",
   adminMovieEdit: (id: string) => `/admin/movies/${id}/edit`,
+  adminBanners: "/admin/banners",
+  adminBannerNew: "/admin/banners/new",
+  adminBannerEdit: (id: string) => `/admin/banners/${id}/edit`,
 } as const;
 
-/** Full-bleed auth screens (phone/OTP login, admin login) render their own layout — no Header/Footer/MobileNav. */
+/** Full-bleed auth screens (phone/OTP login) and the entire admin section render their
+ * own layout (AdminHeader/AdminSidebar or a bare centered form) — no public
+ * Header/Footer/MobileNav. */
 export function isChromeLessRoute(pathname: string): boolean {
-  return pathname.startsWith(ROUTES.login) || pathname === ROUTES.adminLogin;
+  return pathname.startsWith(ROUTES.login) || pathname.startsWith(ROUTES.admin);
 }

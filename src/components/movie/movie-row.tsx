@@ -37,10 +37,10 @@ export function MovieRow({ row, viewAllHref }: MovieRowProps) {
       <Reveal delay={0.1} className="relative">
         <div
           ref={scrollRef}
-          className="flex gap-3 overflow-x-auto scroll-smooth px-4 pb-2 sm:px-8 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          className="flex gap-6 overflow-x-auto scroll-smooth px-4 pt-6 pb-4 sm:px-8 scrollbar-none [&::-webkit-scrollbar]:hidden"
         >
           {row.movies.map((movie) => (
-            <div key={movie.id} className="w-32 shrink-0 sm:w-40">
+            <div key={movie.id} className="w-55 shrink-0">
               <MovieCard movie={movie} />
             </div>
           ))}

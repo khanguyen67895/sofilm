@@ -1,22 +1,17 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { AnimatePresence, motion } from "framer-motion";
+import { ROUTES } from "@/constants/routes";
+import { RouteFade } from "./route-fade";
 
 export function PageTransition({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
 
-  return (
-    <AnimatePresence mode="wait" initial={false}>
-      <motion.div
-        key={pathname}
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -12 }}
-        transition={{ duration: 0.25, ease: "easeInOut" }}
-      >
-        {children}
-      </motion.div>
-    </AnimatePresence>
-  );
+  // Admin routes render their own persistent chrome (AdminSidebar/AdminHeader) via a
+  // nested layout, and apply their own scoped RouteFade around just the page content
+  // (see AdminLayout). Wrapping the whole subtree here too would key the sidebar/header
+  // into this AnimatePresence and remount them on every admin navigation.
+  if (pathname.startsWith(ROUTES.admin)) return <>{children}</>;
+
+  return <RouteFade>{children}</RouteFade>;
 }

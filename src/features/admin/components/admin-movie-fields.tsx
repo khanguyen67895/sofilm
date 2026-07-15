@@ -1,8 +1,20 @@
 "use client";
 
 import { type ChangeEvent } from "react";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select } from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 import type { MovieType } from "@/types/movie";
+
+export interface AdminMovieFieldErrors {
+  title?: string;
+  poster?: string;
+  backdrop?: string;
+  releaseDate?: string;
+  duration?: string;
+}
 
 interface AdminMovieFieldsProps {
   title: string;
@@ -23,6 +35,7 @@ interface AdminMovieFieldsProps {
   onDurationChange: (e: ChangeEvent<HTMLInputElement>) => void;
   isPremium: boolean;
   onIsPremiumChange: (e: ChangeEvent<HTMLInputElement>) => void;
+  errors: AdminMovieFieldErrors;
 }
 
 export function AdminMovieFields({
@@ -44,47 +57,74 @@ export function AdminMovieFields({
   onDurationChange,
   isPremium,
   onIsPremiumChange,
+  errors,
 }: AdminMovieFieldsProps) {
   return (
     <div className="grid gap-4 sm:grid-cols-2">
-      <Input placeholder="Tên phim" value={title} onChange={onTitleChange} required />
-      <Input placeholder="Slug (tuỳ chọn)" value={slug} onChange={onSlugChange} />
-      <Input
-        placeholder="URL Poster"
-        value={poster}
-        onChange={onPosterChange}
-        className="sm:col-span-2"
-      />
-      <Input
-        placeholder="URL Backdrop"
-        value={backdrop}
-        onChange={onBackdropChange}
-        className="sm:col-span-2"
-      />
-      <textarea
-        placeholder="Mô tả"
-        value={description}
-        onChange={onDescriptionChange}
-        rows={4}
-        className="h-auto w-full rounded-md border border-white/15 bg-white/5 px-3 py-2 text-sm text-white transition-colors outline-none placeholder:text-white/40 focus:border-red-500 sm:col-span-2"
-      />
-      <select
-        value={type}
-        onChange={onTypeChange}
-        className="h-10 rounded-md border border-white/15 bg-white/5 px-3 text-sm text-white outline-none focus:border-red-500"
-      >
-        <option value="MOVIE">Phim Lẻ</option>
-        <option value="SERIES">Phim Bộ</option>
-      </select>
-      <Input type="date" value={releaseDate} onChange={onReleaseDateChange} />
-      <Input
-        type="number"
-        placeholder="Thời lượng (phút)"
-        value={duration}
-        onChange={onDurationChange}
-      />
+      <div>
+        <Label required>Tên phim</Label>
+        <Input value={title} onChange={onTitleChange} aria-invalid={Boolean(errors.title)} />
+        {errors.title && <p className="mt-1 text-xs text-red-500">{errors.title}</p>}
+      </div>
+
+      <div>
+        <Label>Slug (tuỳ chọn)</Label>
+        <Input value={slug} onChange={onSlugChange} />
+      </div>
+
+      <div className="sm:col-span-2">
+        <Label required>URL Poster</Label>
+        <Input value={poster} onChange={onPosterChange} aria-invalid={Boolean(errors.poster)} />
+        {errors.poster && <p className="mt-1 text-xs text-red-500">{errors.poster}</p>}
+      </div>
+
+      <div className="sm:col-span-2">
+        <Label required>URL Backdrop</Label>
+        <Input
+          value={backdrop}
+          onChange={onBackdropChange}
+          aria-invalid={Boolean(errors.backdrop)}
+        />
+        {errors.backdrop && <p className="mt-1 text-xs text-red-500">{errors.backdrop}</p>}
+      </div>
+
+      <div className="sm:col-span-2">
+        <Label>Mô tả</Label>
+        <Textarea value={description} onChange={onDescriptionChange} rows={4} />
+      </div>
+
+      <div>
+        <Label>Loại</Label>
+        <Select value={type} onChange={onTypeChange}>
+          <option value="MOVIE">Phim Lẻ</option>
+          <option value="SERIES">Phim Bộ</option>
+        </Select>
+      </div>
+
+      <div>
+        <Label required>Ngày phát hành</Label>
+        <Input
+          type="date"
+          value={releaseDate}
+          onChange={onReleaseDateChange}
+          aria-invalid={Boolean(errors.releaseDate)}
+        />
+        {errors.releaseDate && <p className="mt-1 text-xs text-red-500">{errors.releaseDate}</p>}
+      </div>
+
+      <div>
+        <Label required={type === "MOVIE"}>Thời lượng (phút)</Label>
+        <Input
+          type="number"
+          value={duration}
+          onChange={onDurationChange}
+          aria-invalid={Boolean(errors.duration)}
+        />
+        {errors.duration && <p className="mt-1 text-xs text-red-500">{errors.duration}</p>}
+      </div>
+
       <label className="flex items-center gap-2 text-sm text-white/80">
-        <input type="checkbox" checked={isPremium} onChange={onIsPremiumChange} />
+        <Checkbox checked={isPremium} onChange={onIsPremiumChange} />
         Nội dung Premium
       </label>
     </div>

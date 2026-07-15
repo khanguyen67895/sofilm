@@ -12,16 +12,33 @@ export const ENDPOINTS = {
     trending: "/movies/trending",
     byCategory: (categorySlug: string) => `/movies/category/${categorySlug}`,
     search: "/movies/search",
+    recommend: (slug: string) => `/movies/${slug}/recommend`,
     create: "/movies",
     update: (id: string) => `/movies/${id}`,
     adminList: "/movies/admin/list",
     adminDetail: (id: string) => `/movies/by-id/${id}`,
+  },
+  reviews: {
+    list: (movieId: string) => `/movies/${movieId}/reviews`,
+    summary: (movieId: string) => `/movies/${movieId}/reviews/summary`,
+    submit: (movieId: string) => `/movies/${movieId}/reviews`,
+    like: (movieId: string, reviewId: string) => `/movies/${movieId}/reviews/${reviewId}/like`,
   },
   episodes: {
     list: (movieId: string) => `/movies/${movieId}/episodes`,
     create: (movieId: string) => `/movies/${movieId}/episodes`,
     update: (movieId: string, episodeId: string) => `/movies/${movieId}/episodes/${episodeId}`,
     remove: (movieId: string, episodeId: string) => `/movies/${movieId}/episodes/${episodeId}`,
+  },
+  genres: {
+    list: "/genres",
+  },
+  banners: {
+    active: "/banners",
+    adminList: "/banners/admin/list",
+    create: "/banners",
+    update: (id: string) => `/banners/${id}`,
+    remove: (id: string) => `/banners/${id}`,
   },
   videos: {
     uploadUrl: "/videos/upload-url",

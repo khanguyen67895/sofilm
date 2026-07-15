@@ -32,6 +32,7 @@ export interface BackendMovie {
   rating: number;
   views: number;
   isPremium: boolean;
+  isFavorite?: boolean;
   hasAccess?: boolean;
   videoId?: string;
   videoUrl?: string;
@@ -68,6 +69,7 @@ export function mapMovieResponse(raw: BackendMovie): Movie {
     rating: raw.rating,
     views: raw.views,
     isPremium: raw.isPremium,
+    isFavorite: raw.isFavorite ?? false,
     hasAccess: raw.hasAccess ?? true,
     videoId: raw.videoId,
     videoUrl: raw.videoUrl,
@@ -93,6 +95,14 @@ export const movieService = {
     return mapMovieResponse(data.data);
   },
 
+  async getSimilar(slug: string, limit = 12): Promise<Movie[]> {
+    const { data } = await apiClient.get<ApiResponse<BackendMovie[]>>(
+      ENDPOINTS.movies.recommend(slug),
+      { params: { limit } }
+    );
+    return data.data.map(mapMovieResponse);
+  },
+
   async search(query: string): Promise<Movie[]> {
     // const { data } = await apiClient.get<ApiResponse<Movie[]>>(ENDPOINTS.movies.search, { params: { q: query } });
     // return data.data;
@@ -102,12 +112,22 @@ export const movieService = {
     return MOCK_MOVIES.filter((m) => m.title.toLowerCase().includes(q));
   },
 
-  async getPage(page: number, pageSize = 20): Promise<PaginatedResponse<Movie>> {
+  /** 1-indexed. `genreBucket` deterministically splits the mock pool into even
+   * slices (mock movies don't carry the real backend's genre taxonomy yet) so
+   * every genre filter pill shows a real, non-empty page rather than nothing. */
+  async getPage(
+    page: number,
+    pageSize = 24,
+    genreBucket?: { index: number; count: number }
+  ): Promise<PaginatedResponse<Movie>> {
     await new Promise((r) => setTimeout(r, 200));
-    const pool = [...MOCK_MOVIES, ...MOCK_MOVIES, ...MOCK_MOVIES].map(
+    let pool = [...MOCK_MOVIES, ...MOCK_MOVIES, ...MOCK_MOVIES].map(
       (m, i) => ({ ...m, id: `${m.id}-${i}`, slug: `${m.slug}-${i}` })
     );
-    const start = page * pageSize;
+    if (genreBucket) {
+      pool = pool.filter((_, i) => i % genreBucket.count === genreBucket.index);
+    }
+    const start = (page - 1) * pageSize;
     const items = pool.slice(start, start + pageSize);
     return {
       items,
@@ -139,6 +159,14 @@ export const movieService = {
       ENDPOINTS.favorites.list
     );
     return data.data.map(mapMovieResponse);
+  },
+
+  async addFavorite(movieId: string): Promise<void> {
+    await apiClient.post(ENDPOINTS.favorites.add, { movieId });
+  },
+
+  async removeFavorite(movieId: string): Promise<void> {
+    await apiClient.delete(ENDPOINTS.favorites.remove(movieId));
   },
 
   async getWatchHistory(): Promise<Movie[]> {

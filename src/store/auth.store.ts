@@ -28,6 +28,9 @@ export const useAuthStore = create<AuthState>()(
       },
       isAdmin: () => get().user?.roles?.includes("ADMIN") ?? false,
     }),
-    { name: "sofilm-auth", partialize: (state) => ({ user: state.user }) }
+    {
+      name: "sofilm-auth",
+      partialize: (state) => ({ user: state.user, isAuthenticated: state.isAuthenticated }),
+    }
   )
 );

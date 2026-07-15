@@ -3,8 +3,14 @@
 import { motion, type HTMLMotionProps } from "framer-motion";
 import { cn } from "@/utils/cn";
 
+const PRIMARY_STYLE: React.CSSProperties = {
+  background: "linear-gradient(90deg, #FF7C4D 0%, #FF4B00 100%)",
+  boxShadow:
+    "0 2px 10.2px rgba(232,90,44,0.35), 0 8px 15.3px rgba(232,90,44,0.15), inset 0 -1px 0.5px rgba(232,90,44,0.10), inset 0 1px 0.5px rgba(255,255,255,0.20)",
+};
+
 const VARIANTS = {
-  primary: "btn-glass btn-glass-primary text-white",
+  primary: "btn-glass text-white",
   secondary: "btn-glass btn-glass-secondary text-white",
   outline: "border border-white/25 text-white hover:bg-white/10",
   ghost: "bg-transparent text-white/80 hover:bg-white/10 hover:text-white",
@@ -25,6 +31,7 @@ export function Button({
   variant = "primary",
   size = "md",
   className,
+  style,
   ...props
 }: ButtonProps) {
   return (
@@ -38,6 +45,7 @@ export function Button({
         SIZES[size],
         className
       )}
+      style={variant === "primary" ? { ...PRIMARY_STYLE, ...style } : style}
       {...props}
     />
   );

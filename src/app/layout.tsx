@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Unbounded } from "next/font/google";
+import { Geist, Geist_Mono, Merienda, Unbounded } from "next/font/google";
 import "./globals.css";
 import { AppProviders } from "@/providers/app-providers";
 import { Header } from "@/components/layout/header";
@@ -24,6 +24,12 @@ const unbounded = Unbounded({
   weight: ["300", "400", "500", "600", "700"],
 });
 
+const merienda = Merienda({
+  variable: "--font-merienda",
+  subsets: ["latin"],
+  weight: ["400"],
+});
+
 export const metadata: Metadata = {
   title: SITE_CONFIG.name,
   description: SITE_CONFIG.description,
@@ -38,7 +44,7 @@ export default function RootLayout({
     <html
       lang="vi"
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} ${unbounded.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${unbounded.variable} ${merienda.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-black">
         <AppProviders>

@@ -1,15 +1,20 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Star, Clock, Crown } from "lucide-react";
+import { Clock, Crown } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Button } from "@/components/ui/button";
+import { RatingStarIcon } from "@/components/common/rating-star-icon";
 import { VideoPlayer } from "@/components/player/video-player";
 import { formatDuration, formatYear } from "@/utils/format";
+import { cn } from "@/utils/cn";
 import { usePlayerStore } from "@/store/player.store";
 import { useMovieDetail } from "../hooks/use-movie-detail";
-import { EpisodeList } from "./episode-list";
+import { EpisodeSidebar } from "./episode-sidebar";
 import { PremiumGate } from "./premium-gate";
+import { LikeShareBar } from "./like-share-bar";
+import { RatingReviewsCard } from "./rating-reviews-card";
+import { CommentSection } from "./comment-section";
+import { SimilarMoviesSection } from "./similar-movies-section";
 
 export function MovieDetailView({ slug }: { slug: string }) {
   const { data: movie, isLoading } = useMovieDetail(slug);
@@ -32,32 +37,36 @@ export function MovieDetailView({ slug }: { slug: string }) {
       : movie.episodes?.[0];
 
   const canWatch = !movie.isPremium || movie.hasAccess;
+  const hasEpisodes = Boolean(movie.episodes && movie.episodes.length > 0);
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: "easeOut" }}
-      className="space-y-6 px-4 py-8 sm:px-8"
+      className="space-y-8 px-4 py-8 sm:px-8"
     >
-      {canWatch ? (
-        <VideoPlayer
-          src={activeEpisode?.videoUrl ?? movie.videoUrl ?? ""}
-          poster={movie.backdrop}
-        />
-      ) : (
-        <PremiumGate backdrop={movie.backdrop} />
-      )}
+      <div className={cn("grid gap-4", hasEpisodes && "lg:grid-cols-[1fr_300px]")}>
+        {canWatch ? (
+          <VideoPlayer
+            src={activeEpisode?.videoUrl ?? movie.videoUrl ?? ""}
+            poster={movie.backdrop}
+          />
+        ) : (
+          <PremiumGate backdrop={movie.backdrop} />
+        )}
+
+        {hasEpisodes && movie.episodes && (
+          <EpisodeSidebar slug={movie.slug} title={movie.title} episodes={movie.episodes} />
+        )}
+      </div>
 
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="space-y-2">
-          <h1 className="text-2xl font-bold text-white sm:text-3xl">
-            {movie.title}
-          </h1>
+          <h1 className="text-2xl font-bold text-white sm:text-3xl">{movie.title}</h1>
           <div className="flex flex-wrap items-center gap-3 text-sm text-white/60">
             <span className="flex items-center gap-1">
-              <Star size={14} className="fill-yellow-400 text-yellow-400" />
-              {movie.rating}
+              <RatingStarIcon width={14} height={13} /> {movie.rating}
             </span>
             <span className="flex items-center gap-1">
               <Clock size={14} /> {formatDuration(movie.duration)}
@@ -86,17 +95,16 @@ export function MovieDetailView({ slug }: { slug: string }) {
             ))}
           </motion.div>
         </div>
-        <Button>Yêu Thích</Button>
+        <LikeShareBar movieId={movie.id} isFavorite={movie.isFavorite} title={movie.title} />
       </div>
 
       <p className="max-w-3xl text-white/70">{movie.description}</p>
 
-      {movie.episodes && movie.episodes.length > 0 && (
-        <div className="space-y-3">
-          <h2 className="text-lg font-semibold text-white">Danh Sách Tập</h2>
-          <EpisodeList slug={movie.slug} episodes={movie.episodes} />
-        </div>
-      )}
+      <RatingReviewsCard movieId={movie.id} />
+
+      <CommentSection movieId={movie.id} />
+
+      <SimilarMoviesSection slug={movie.slug} />
     </motion.div>
   );
 }

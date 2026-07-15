@@ -14,31 +14,8 @@ interface HeroControlsProps {
 
 export function HeroControls({ movies, activeIndex, onGoTo }: HeroControlsProps) {
   return (
-    <div className="absolute inset-x-4 bottom-6 flex items-center gap-4 sm:inset-x-8">
-      <div className="flex items-center gap-1">
-        <motion.button
-          type="button"
-          onClick={() => onGoTo(activeIndex - 1)}
-          aria-label="Phim trước"
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-          className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20"
-        >
-          <ChevronLeft size={16} />
-        </motion.button>
-        <motion.button
-          type="button"
-          onClick={() => onGoTo(activeIndex + 1)}
-          aria-label="Phim tiếp theo"
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-          className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20"
-        >
-          <ChevronRight size={16} />
-        </motion.button>
-      </div>
-
-      <div className="scrollbar-none hidden flex-1 gap-2 overflow-x-auto sm:flex">
+    <div className="absolute right-4 bottom-10 flex w-[calc(100%-2rem)] max-w-md flex-col items-end gap-3 sm:right-8 sm:bottom-12 sm:w-auto">
+      <div className="scrollbar-none flex w-full justify-end gap-2 overflow-x-auto">
         {movies.map((movie, index) => (
           <button
             key={movie.id}
@@ -61,7 +38,30 @@ export function HeroControls({ movies, activeIndex, onGoTo }: HeroControlsProps)
         ))}
       </div>
 
-      <div className="hidden items-center gap-3 sm:flex">
+      <div className="flex items-center gap-3">
+        <div className="flex items-center gap-1">
+          <motion.button
+            type="button"
+            onClick={() => onGoTo(activeIndex - 1)}
+            aria-label="Phim trước"
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20"
+          >
+            <ChevronLeft size={16} />
+          </motion.button>
+          <motion.button
+            type="button"
+            onClick={() => onGoTo(activeIndex + 1)}
+            aria-label="Phim tiếp theo"
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20"
+          >
+            <ChevronRight size={16} />
+          </motion.button>
+        </div>
+
         <div className="h-1 w-24 overflow-hidden rounded-full bg-white/20">
           <div
             className="h-full bg-brand transition-all duration-300"

@@ -18,7 +18,7 @@ export function AllMoviesSection({ movies }: { movies: Movie[] }) {
       </Reveal>
       <Reveal delay={0.2} className="flex justify-center pt-2">
         <Link href={ROUTES.category}>
-          <Button variant="outline">View All</Button>
+          <Button variant="primary">View All</Button>
         </Link>
       </Reveal>
     </section>

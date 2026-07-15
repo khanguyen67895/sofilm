@@ -1,4 +1,7 @@
 export * from "./logo";
 export * from "./theme-toggle";
 export * from "./social-icons";
+export * from "./contact-icons";
+export * from "./favorite-icons";
+export * from "./rating-star-icon";
 export * from "./reveal";

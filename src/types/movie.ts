@@ -25,6 +25,7 @@ export interface Movie {
   rating: number;
   views: number;
   isPremium: boolean;
+  isFavorite?: boolean;
   /** Server-verified: true if the caller may play this movie (always true for
    * non-premium movies). When false, videoUrl/episode videoUrls are omitted. */
   hasAccess?: boolean;

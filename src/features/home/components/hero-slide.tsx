@@ -20,7 +20,20 @@ export function HeroSlide({ movie }: { movie: Movie }) {
           transition={{ duration: 0.4 }}
           className="absolute inset-0"
         >
-          <Image src={movie.backdrop} alt={movie.title} fill priority className="object-cover" />
+          {movie.videoUrl ? (
+            <video
+              key={movie.videoUrl}
+              src={movie.videoUrl}
+              poster={movie.backdrop}
+              autoPlay
+              muted
+              loop
+              playsInline
+              className="h-full w-full object-cover"
+            />
+          ) : (
+            <Image src={movie.backdrop} alt={movie.title} fill priority className="object-cover" />
+          )}
         </motion.div>
       </AnimatePresence>
 
@@ -32,7 +45,7 @@ export function HeroSlide({ movie }: { movie: Movie }) {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className="absolute bottom-32 left-4 max-w-xl space-y-4 sm:bottom-28 sm:left-8"
+        className="absolute bottom-32 left-4 max-w-sm space-y-4 sm:bottom-28 sm:left-8 sm:max-w-md lg:max-w-lg"
       >
         <h1 className="text-3xl leading-tight font-extrabold text-white uppercase sm:text-5xl">
           {movie.title}

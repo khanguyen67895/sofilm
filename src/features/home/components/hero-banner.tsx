@@ -16,7 +16,7 @@ export function HeroBanner({ movies }: { movies: Movie[] }) {
   if (!active) return null;
 
   return (
-    <div className="relative h-[62vh] min-h-95 w-full overflow-hidden">
+    <div className="relative -mt-20 h-[calc(62vh+5rem)] min-h-115 w-full overflow-hidden">
       <HeroSlide movie={active} />
       <HeroControls movies={movies} activeIndex={activeIndex} onGoTo={goTo} />
     </div>

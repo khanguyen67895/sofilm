@@ -1,30 +1,25 @@
 "use client";
 
+import Image from "next/image";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Mail, Phone, MapPin } from "lucide-react";
 import { motion } from "framer-motion";
-import { Logo } from "@/components/common/logo";
+import { MailIcon, MapPinIcon, PhoneIcon } from "@/components/common/contact-icons";
 import { Reveal } from "@/components/common/reveal";
-import {
-  FacebookIcon,
-  MessengerIcon,
-  TiktokIcon,
-  YoutubeIcon,
-} from "@/components/common/social-icons";
 import { SITE_CONFIG } from "@/constants/config";
-import { isChromeLessRoute } from "@/constants/routes";
+import { ROUTES, isChromeLessRoute } from "@/constants/routes";
 
 const SOCIALS = [
-  { icon: MessengerIcon, label: "Messenger", bg: "bg-[#0084FF]", href: "#" },
-  { icon: YoutubeIcon, label: "YouTube", bg: "bg-[#FF0000]", href: "#" },
-  { icon: TiktokIcon, label: "TikTok", bg: "bg-black border border-white/20", href: "#" },
-  { icon: FacebookIcon, label: "Facebook", bg: "bg-[#1877F2]", href: "#" },
+  { icon: "/image/ic_mes.png", label: "Messenger", bg: "bg-[#0084FF]", href: "#" },
+  { icon: "/image/ic_you.png", label: "YouTube", bg: "bg-[#FF0000]", href: "#" },
+  { icon: "/image/ic_tik.png", label: "TikTok", bg: "bg-black border border-white/20", href: "#" },
+  { icon: "/image/ic_face.png", label: "Facebook", bg: "bg-[#1877F2]", href: "#" },
 ];
 
 const CONTACTS = [
-  { icon: Mail, text: "hello@sofilm.com" },
-  { icon: Phone, text: "0335 456 789" },
-  { icon: MapPin, text: "42 Nguyen Phuoc Lan St., Da Nang" },
+  { icon: MailIcon, text: "hello@sofilm.com" },
+  { icon: PhoneIcon, text: "0335 456 789" },
+  { icon: MapPinIcon, text: "42 Nguyen Phuoc Lan St., Da Nang" },
 ];
 
 export function Footer() {
@@ -34,40 +29,56 @@ export function Footer() {
 
   return (
     <footer className="relative mt-20 overflow-hidden border-t border-white/5 bg-black">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,rgba(255,106,61,0.12),transparent_60%)]" />
+      <Image
+        src="/image/ic_bg_footer.png"
+        alt=""
+        fill
+        sizes="100vw"
+        className="pointer-events-none absolute inset-0 object-cover object-bottom-left opacity-25"
+      />
 
-      <Reveal className="relative mx-auto flex max-w-6xl flex-col items-center gap-8 px-4 py-14 text-center sm:px-8">
-        <Logo />
+      <Reveal className="relative mx-auto flex max-w-6xl flex-col gap-8 px-4 py-14 sm:px-8">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <Link href={ROUTES.home} aria-label={SITE_CONFIG.name}>
+            <Image
+              src="/image/ic_logo.png"
+              alt={SITE_CONFIG.name}
+              width={168}
+              height={42}
+              className="h-9 w-auto"
+            />
+          </Link>
 
-        <div className="flex items-center gap-4">
-          {SOCIALS.map(({ icon: Icon, label, bg, href }) => (
-            <motion.a
-              key={label}
-              href={href}
-              aria-label={label}
-              whileHover={{ scale: 1.15, y: -2 }}
-              whileTap={{ scale: 0.95 }}
-              className={`flex h-10 w-10 items-center justify-center rounded-full text-white ${bg}`}
-            >
-              <Icon width={18} height={18} />
-            </motion.a>
-          ))}
+          <div className="flex items-center gap-4">
+            {SOCIALS.map(({ icon: Icon, label, bg, href }) => (
+              <motion.a
+                key={label}
+                href={href}
+                aria-label={label}
+                whileHover={{ scale: 1.15, y: -2 }}
+                whileTap={{ scale: 0.95 }}
+                className={`relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full text-white ${bg}`}
+              >
+                <Image src={Icon} alt="" fill sizes="40px" className="object-contain" />
+              </motion.a>
+            ))}
+          </div>
         </div>
 
-        <div className="flex flex-col flex-wrap items-center justify-center gap-3 sm:flex-row sm:gap-4">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
           {CONTACTS.map(({ icon: Icon, text }) => (
             <span
               key={text}
-              className="flex items-center gap-2 rounded-full bg-white/5 px-5 py-3 text-sm text-white/70"
+              className="flex items-center justify-center gap-2 rounded-2xl bg-white/5 px-5 py-3 text-base text-white/70"
             >
-              <Icon size={15} className="text-brand" />
+              <Icon width={24} height={24} className="shrink-0 text-white" />
               {text}
             </span>
           ))}
         </div>
       </Reveal>
 
-      <div className="relative border-t border-white/5 py-6 text-center text-xs text-white/40">
+      <div className="relative pb-6 text-center text-sm text-white/40">
         © {new Date().getFullYear()} {SITE_CONFIG.name.toUpperCase()} all rights reserved.
       </div>
     </footer>

@@ -56,10 +56,4 @@ export const videoService = {
     );
     return data.data;
   },
-
-  /** Re-enqueues processing for an already-uploaded video (e.g. to regenerate
-   * its thumbnail) — poll `getById` afterwards for the result. */
-  async generateThumbnail(videoId: string): Promise<void> {
-    await apiClient.post(ENDPOINTS.videos.generateThumbnail(videoId));
-  },
 };

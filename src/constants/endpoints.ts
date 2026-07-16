@@ -49,7 +49,9 @@ export const ENDPOINTS = {
     uploadUrl: "/videos/upload-url",
     complete: (id: string) => `/videos/${id}/complete`,
     detail: (id: string) => `/videos/${id}`,
-    generateThumbnail: (id: string) => `/videos/${id}/generate-thumbnail`,
+  },
+  images: {
+    uploadUrl: "/images/upload-url",
   },
   shorts: {
     feed: "/shorts/feed",

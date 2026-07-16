@@ -45,8 +45,8 @@ export function AdminMovieForm({ mode, movie }: AdminMovieFormProps) {
   const isPending = isSubmitting || createMovie.isPending || updateMovie.isPending;
 
   // A standalone MOVIE needs its video attached (create-time only — editing
-  // usually just touches metadata) and, once uploaded, a generated thumbnail
-  // (it's now the only source for poster/backdrop, replacing manual URLs).
+  // usually just touches metadata) and an uploaded thumbnail image (it's now
+  // the only source for poster/backdrop, replacing manual URLs).
   const videoMissing = mode === "create" && type === "MOVIE" && !hasVideo;
   const thumbnailMissing = type === "MOVIE" && !thumbnailUrl;
   // A series with zero episodes is a dead end for viewers — required at
@@ -58,12 +58,8 @@ export function AdminMovieForm({ mode, movie }: AdminMovieFormProps) {
     const nextErrors: AdminMovieFieldErrors = {};
     if (!title.trim()) nextErrors.title = "Bắt buộc phải nhập tên phim.";
     if (type === "SERIES") {
-      if (!poster.trim()) nextErrors.poster = "Bắt buộc phải có ảnh poster.";
-      else if (!isValidImageSrc(poster.trim()))
-        nextErrors.poster = "URL poster không hợp lệ (phải bắt đầu bằng http:// hoặc https://).";
-      if (!backdrop.trim()) nextErrors.backdrop = "Bắt buộc phải có ảnh backdrop.";
-      else if (!isValidImageSrc(backdrop.trim()))
-        nextErrors.backdrop = "URL backdrop không hợp lệ (phải bắt đầu bằng http:// hoặc https://).";
+      if (!isValidImageSrc(poster)) nextErrors.poster = "Bắt buộc phải tải ảnh poster lên.";
+      if (!isValidImageSrc(backdrop)) nextErrors.backdrop = "Bắt buộc phải tải ảnh backdrop lên.";
     }
     if (!releaseDate) nextErrors.releaseDate = "Bắt buộc phải chọn ngày phát hành.";
     if (type === "MOVIE" && !duration.trim()) nextErrors.duration = "Bắt buộc phải nhập thời lượng.";
@@ -120,9 +116,9 @@ export function AdminMovieForm({ mode, movie }: AdminMovieFormProps) {
         slug={slug}
         onSlugChange={(e) => setSlug(e.target.value)}
         poster={poster}
-        onPosterChange={(e) => setPoster(e.target.value)}
+        onPosterUploaded={setPoster}
         backdrop={backdrop}
-        onBackdropChange={(e) => setBackdrop(e.target.value)}
+        onBackdropUploaded={setBackdrop}
         description={description}
         onDescriptionChange={(e) => setDescription(e.target.value)}
         type={type}
@@ -144,14 +140,13 @@ export function AdminMovieForm({ mode, movie }: AdminMovieFormProps) {
           type={type}
           mode={mode}
           movie={movie}
-          videoId={videoId}
           hasVideo={hasVideo}
           thumbnailUrl={thumbnailUrl}
           onVideoUploaded={({ videoId: newVideoId }) => {
             setVideoId(newVideoId);
             setHasVideo(true);
           }}
-          onThumbnailGenerated={setThumbnailUrl}
+          onThumbnailUploaded={setThumbnailUrl}
           queuedEpisodes={queuedEpisodes}
           onQueuedEpisodesChange={setQueuedEpisodes}
         />
@@ -162,7 +157,7 @@ export function AdminMovieForm({ mode, movie }: AdminMovieFormProps) {
         )}
         {!videoMissing && thumbnailMissing && (
           <p className="mt-2 text-xs text-red-500">
-            Bắt buộc phải tạo thumbnail từ video trước khi lưu.
+            Bắt buộc phải tải thumbnail lên trước khi lưu.
           </p>
         )}
         {episodesMissing && (

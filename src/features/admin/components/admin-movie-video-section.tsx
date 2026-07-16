@@ -10,11 +10,10 @@ interface AdminMovieVideoSectionProps {
   type: MovieType;
   mode: "create" | "edit";
   movie?: Movie;
-  videoId: string;
   hasVideo: boolean;
   thumbnailUrl?: string;
   onVideoUploaded: (result: { videoId: string; videoUrl?: string }) => void;
-  onThumbnailGenerated: (url: string) => void;
+  onThumbnailUploaded: (url: string) => void;
   queuedEpisodes: QueuedEpisode[];
   onQueuedEpisodesChange: (episodes: QueuedEpisode[]) => void;
 }
@@ -23,11 +22,10 @@ export function AdminMovieVideoSection({
   type,
   mode,
   movie,
-  videoId,
   hasVideo,
   thumbnailUrl,
   onVideoUploaded,
-  onThumbnailGenerated,
+  onThumbnailUploaded,
   queuedEpisodes,
   onQueuedEpisodesChange,
 }: AdminMovieVideoSectionProps) {
@@ -45,11 +43,10 @@ export function AdminMovieVideoSection({
             Video
           </h3>
           <AdminThumbnailField
-            videoId={videoId}
             hasVideo={hasVideo}
             thumbnailUrl={thumbnailUrl}
             onVideoUploaded={onVideoUploaded}
-            onThumbnailGenerated={onThumbnailGenerated}
+            onThumbnailUploaded={onThumbnailUploaded}
           />
         </motion.div>
       ) : (

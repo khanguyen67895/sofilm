@@ -26,7 +26,8 @@ function ShortRow({ short }: { short: AdminShortItem }) {
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-medium text-white">{short.title}</p>
         <p className="text-xs text-white/50">
-          Phim: {short.movieSlug} · {short.likes} lượt thích · {short.comments} bình luận
+          {short.movieSlug ? `Phim: ${short.movieSlug} · ` : ""}
+          {short.likes} lượt thích · {short.comments} bình luận
           {!short.isActive && " · Đã ẩn"}
         </p>
       </div>

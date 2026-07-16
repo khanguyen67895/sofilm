@@ -1,24 +1,24 @@
 "use client";
 
 import { useState } from "react";
-import type { Movie } from "@/types/movie";
+import type { HeroItem } from "@/types/movie";
 import { HeroSlide } from "./hero-slide";
 import { HeroControls } from "./hero-controls";
 
-export function HeroBanner({ movies }: { movies: Movie[] }) {
+export function HeroBanner({ items }: { items: HeroItem[] }) {
   const [activeIndex, setActiveIndex] = useState(0);
-  const active = movies[activeIndex];
+  const active = items[activeIndex];
 
   function goTo(index: number) {
-    setActiveIndex((index + movies.length) % movies.length);
+    setActiveIndex((index + items.length) % items.length);
   }
 
   if (!active) return null;
 
   return (
     <div className="relative -mt-20 h-[calc(62vh+5rem)] min-h-115 w-full overflow-hidden">
-      <HeroSlide movie={active} />
-      <HeroControls movies={movies} activeIndex={activeIndex} onGoTo={goTo} />
+      <HeroSlide item={active} />
+      <HeroControls items={items} activeIndex={activeIndex} onGoTo={goTo} />
     </div>
   );
 }

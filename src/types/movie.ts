@@ -40,3 +40,17 @@ export interface MovieRow {
   title: string;
   movies: Movie[];
 }
+
+/** What the homepage hero slider actually needs to render — a `Movie`
+ * satisfies this structurally, but a hero banner not linked to any movie
+ * (just a standalone video/title) does too, since every field here is
+ * optional except id/title. */
+export interface HeroItem {
+  id: string;
+  slug?: string;
+  title: string;
+  description?: string;
+  poster?: string;
+  backdrop?: string;
+  videoUrl?: string;
+}

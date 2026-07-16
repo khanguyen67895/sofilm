@@ -3,7 +3,7 @@ export interface Short {
   title: string;
   videoUrl: string;
   thumbnail: string;
-  movieSlug: string;
+  movieSlug?: string;
   likes: number;
   comments: number;
   isLiked: boolean;
@@ -14,7 +14,7 @@ export interface AdminShortItem {
   title: string;
   videoUrl: string;
   thumbnail: string;
-  movieSlug: string;
+  movieSlug?: string;
   likes: number;
   comments: number;
   isActive: boolean;
@@ -24,5 +24,5 @@ export interface AdminShortItem {
 export interface CreateShortPayload {
   title: string;
   videoId: string;
-  movieSlug: string;
+  movieSlug?: string;
 }

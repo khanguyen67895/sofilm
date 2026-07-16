@@ -1,37 +1,27 @@
 import { useQuery } from "@tanstack/react-query";
 import { bannerService } from "@/services/banner/banner.service";
 import { QUERY_KEYS } from "@/constants/query-keys";
-import type { Movie } from "@/types/movie";
+import type { HeroItem } from "@/types/movie";
 
-/** Only banners linked to a movie can feed the hero slider (it needs slug/description/etc.
- * to render the Watch Now / More Info actions) — image-only promo banners are skipped here. */
+/** A banner not linked to any movie still autoplays its own uploaded video
+ * in the hero — it just renders without the Watch Now / More Info actions
+ * (HeroSlide hides those when `slug` is absent). */
 export function useHeroBanners() {
   return useQuery({
     queryKey: QUERY_KEYS.heroBanners,
-    queryFn: async (): Promise<Movie[]> => {
+    queryFn: async (): Promise<HeroItem[]> => {
       const banners = await bannerService.getActive();
-      return banners
-        .filter((banner) => banner.movie)
-        .map((banner) => {
-          const movie = banner.movie!;
-          return {
-            id: movie.id,
-            slug: movie.slug,
-            title: movie.title,
-            description: movie.description ?? "",
-            poster: movie.poster ?? "",
-            backdrop: banner.imageUrl || movie?.backdrop || "",
-            type: "MOVIE",
-            genres: [],
-            genreIds: [],
-            releaseDate: "",
-            duration: 0,
-            rating: 0,
-            views: 0,
-            isPremium: false,
-            videoUrl: banner.videoUrl ?? movie.videoUrl,
-          } satisfies Movie;
-        });
+      return banners.map(
+        (banner): HeroItem => ({
+          id: banner.id,
+          slug: banner.movie?.slug,
+          title: banner.movie?.title ?? banner.title ?? "",
+          description: banner.movie?.description,
+          poster: banner.movie?.poster,
+          backdrop: banner.imageUrl || banner.movie?.backdrop,
+          videoUrl: banner.videoUrl ?? banner.movie?.videoUrl,
+        })
+      );
     },
   });
 }

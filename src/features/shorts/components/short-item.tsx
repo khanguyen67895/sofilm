@@ -97,7 +97,9 @@ export function ShortItem({ short }: { short: Short }) {
   }
 
   async function handleShare() {
-    const url = `${window.location.origin}${ROUTES.movie(short.movieSlug)}`;
+    const url = short.movieSlug
+      ? `${window.location.origin}${ROUTES.movie(short.movieSlug)}`
+      : window.location.href;
     if (navigator.share) {
       navigator.share({ title: short.title, url }).catch(() => {});
       return;
@@ -178,9 +180,13 @@ export function ShortItem({ short }: { short: Short }) {
       </button>
 
       <div className="absolute inset-x-0 bottom-0 bg-linear-to-t from-black/90 to-transparent p-4 pb-8">
-        <Link href={ROUTES.movie(short.movieSlug)} className="text-sm font-semibold text-white">
-          {short.title}
-        </Link>
+        {short.movieSlug ? (
+          <Link href={ROUTES.movie(short.movieSlug)} className="text-sm font-semibold text-white">
+            {short.title}
+          </Link>
+        ) : (
+          <p className="text-sm font-semibold text-white">{short.title}</p>
+        )}
       </div>
 
       <div className="absolute right-3 bottom-24 flex flex-col items-center gap-5">

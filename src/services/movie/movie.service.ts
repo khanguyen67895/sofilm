@@ -125,6 +125,13 @@ export const movieService = {
     return data.data.map(mapMovieResponse);
   },
 
+  async getLatest(limit = 10): Promise<Movie[]> {
+    const { data } = await apiClient.get<ApiResponse<BackendMovie[]>>(ENDPOINTS.movies.latest, {
+      params: { limit },
+    });
+    return data.data.map(mapMovieResponse);
+  },
+
   async getBySlug(slug: string): Promise<Movie | undefined> {
     const { data } = await apiClient.get<ApiResponse<BackendMovie>>(
       ENDPOINTS.movies.detail(slug)

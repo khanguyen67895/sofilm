@@ -8,6 +8,7 @@ import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import type { MovieType } from "@/types/movie";
 import type { Genre } from "@/types/genre";
+import { ImageUploadField } from "./image-upload-field";
 
 export interface AdminMovieFieldErrors {
   title?: string;
@@ -24,9 +25,9 @@ interface AdminMovieFieldsProps {
   slug: string;
   onSlugChange: (e: ChangeEvent<HTMLInputElement>) => void;
   poster: string;
-  onPosterChange: (e: ChangeEvent<HTMLInputElement>) => void;
+  onPosterUploaded: (url: string) => void;
   backdrop: string;
-  onBackdropChange: (e: ChangeEvent<HTMLInputElement>) => void;
+  onBackdropUploaded: (url: string) => void;
   description: string;
   onDescriptionChange: (e: ChangeEvent<HTMLTextAreaElement>) => void;
   type: MovieType;
@@ -49,9 +50,9 @@ export function AdminMovieFields({
   slug,
   onSlugChange,
   poster,
-  onPosterChange,
+  onPosterUploaded,
   backdrop,
-  onBackdropChange,
+  onBackdropUploaded,
   description,
   onDescriptionChange,
   type,
@@ -83,21 +84,17 @@ export function AdminMovieFields({
       {type === "SERIES" && (
         <>
           <div className="sm:col-span-2">
-            <Label required>URL Poster</Label>
-            <Input
-              value={poster}
-              onChange={onPosterChange}
-              aria-invalid={Boolean(errors.poster)}
-            />
+            <Label required>Poster</Label>
+            <ImageUploadField label="Poster" previewUrl={poster} onUploaded={onPosterUploaded} />
             {errors.poster && <p className="mt-1 text-xs text-red-500">{errors.poster}</p>}
           </div>
 
           <div className="sm:col-span-2">
-            <Label required>URL Backdrop</Label>
-            <Input
-              value={backdrop}
-              onChange={onBackdropChange}
-              aria-invalid={Boolean(errors.backdrop)}
+            <Label required>Backdrop</Label>
+            <ImageUploadField
+              label="Backdrop"
+              previewUrl={backdrop}
+              onUploaded={onBackdropUploaded}
             />
             {errors.backdrop && <p className="mt-1 text-xs text-red-500">{errors.backdrop}</p>}
           </div>

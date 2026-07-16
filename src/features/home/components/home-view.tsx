@@ -8,6 +8,7 @@ import { ROUTES } from "@/constants/routes";
 import { useHomeRows } from "../hooks/use-home-rows";
 import { useHeroBanners } from "../hooks/use-hero-banners";
 import { useTrending } from "../hooks/use-trending";
+import { useLatestMovies } from "../hooks/use-latest-movies";
 import { useMoviesPreview } from "../hooks/use-movies-preview";
 import { HeroBanner } from "./hero-banner";
 import { TrendingRow } from "./trending-row";
@@ -16,6 +17,7 @@ import { AllMoviesSection } from "./all-movies-section";
 export function HomeView() {
   const { data: rows, isLoading: isRowsLoading, isError: isRowsError, refetch } = useHomeRows();
   const { data: heroBanners } = useHeroBanners();
+  const { data: latestMovies } = useLatestMovies(10);
   const { data: trending } = useTrending();
   const { data: preview } = useMoviesPreview();
 
@@ -48,14 +50,14 @@ export function HomeView() {
     );
   }
 
-  const heroMovies =
-    heroBanners && heroBanners.length > 0 ? heroBanners : (rows[0]?.movies.slice(0, 6) ?? []);
+  const heroItems =
+    heroBanners && heroBanners.length > 0 ? heroBanners : (latestMovies ?? []);
   const nonEmptyRows = rows.filter((row) => row.movies.length > 0);
   const hasTrending = Boolean(trending && trending.length > 0);
   const hasPreview = Boolean(preview && preview.length > 0);
 
   if (
-    heroMovies.length === 0 &&
+    heroItems.length === 0 &&
     nonEmptyRows.length === 0 &&
     !hasTrending &&
     !hasPreview
@@ -75,7 +77,7 @@ export function HomeView() {
       transition={{ duration: 0.3 }}
       className="space-y-10 pb-16"
     >
-      {heroMovies.length > 0 && <HeroBanner movies={heroMovies} />}
+      {heroItems.length > 0 && <HeroBanner items={heroItems} />}
       <div className="space-y-10">
         {nonEmptyRows.map((row) => (
           <MovieRow key={row.id} row={row} viewAllHref={ROUTES.category} />

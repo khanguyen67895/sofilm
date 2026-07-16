@@ -5,22 +5,22 @@ import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { PLACEHOLDER_IMAGE } from "@/constants/config";
 import { cn } from "@/utils/cn";
-import type { Movie } from "@/types/movie";
+import type { HeroItem } from "@/types/movie";
 import { resolveImageSrc } from "@/utils/image";
 
 interface HeroControlsProps {
-  movies: Movie[];
+  items: HeroItem[];
   activeIndex: number;
   onGoTo: (index: number) => void;
 }
 
-export function HeroControls({ movies, activeIndex, onGoTo }: HeroControlsProps) {
+export function HeroControls({ items, activeIndex, onGoTo }: HeroControlsProps) {
   return (
     <div className="absolute right-4 bottom-10 flex w-[calc(100%-2rem)] max-w-md flex-col items-end gap-3 sm:right-8 sm:bottom-12 sm:w-auto">
       <div className="scrollbar-none flex w-full justify-end gap-2 overflow-x-auto">
-        {movies.map((movie, index) => (
+        {items.map((item, index) => (
           <button
-            key={movie.id}
+            key={item.id}
             type="button"
             onClick={() => onGoTo(index)}
             className={cn(
@@ -29,8 +29,8 @@ export function HeroControls({ movies, activeIndex, onGoTo }: HeroControlsProps)
             )}
           >
             <Image
-              src={resolveImageSrc(movie.poster, PLACEHOLDER_IMAGE)}
-              alt={movie.title}
+              src={resolveImageSrc(item.poster || item.backdrop, PLACEHOLDER_IMAGE)}
+              alt={item.title}
               fill
               sizes="56px"
               className="object-cover"
@@ -73,7 +73,7 @@ export function HeroControls({ movies, activeIndex, onGoTo }: HeroControlsProps)
         <div className="h-1 w-24 overflow-hidden rounded-full bg-white/20">
           <div
             className="h-full bg-brand transition-all duration-300"
-            style={{ width: `${((activeIndex + 1) / movies.length) * 100}%` }}
+            style={{ width: `${((activeIndex + 1) / items.length) * 100}%` }}
           />
         </div>
         <span className="text-sm font-semibold text-white/70">

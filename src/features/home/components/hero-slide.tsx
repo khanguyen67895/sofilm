@@ -7,27 +7,27 @@ import { Info, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PLACEHOLDER_IMAGE } from "@/constants/config";
 import { ROUTES } from "@/constants/routes";
-import type { Movie } from "@/types/movie";
+import type { HeroItem } from "@/types/movie";
 import { resolveImageSrc } from "@/utils/image";
 
-export function HeroSlide({ movie }: { movie: Movie }) {
-  const backdropSrc = resolveImageSrc(movie?.backdrop, PLACEHOLDER_IMAGE);
+export function HeroSlide({ item }: { item: HeroItem }) {
+  const backdropSrc = resolveImageSrc(item.backdrop, PLACEHOLDER_IMAGE);
 
   return (
     <>
       <AnimatePresence mode="wait">
         <motion.div
-          key={movie.id}
+          key={item.id}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.4 }}
           className="absolute inset-0"
         >
-          {movie.videoUrl ? (
+          {item.videoUrl ? (
             <video
-              key={movie.videoUrl}
-              src={movie.videoUrl}
+              key={item.videoUrl}
+              src={item.videoUrl}
               poster={backdropSrc}
               autoPlay
               muted
@@ -38,7 +38,7 @@ export function HeroSlide({ movie }: { movie: Movie }) {
           ) : (
             <Image
               src={backdropSrc}
-              alt={movie.title}
+              alt={item.title}
               fill
               priority
               sizes="100vw"
@@ -53,28 +53,32 @@ export function HeroSlide({ movie }: { movie: Movie }) {
       <div className="absolute inset-0 bg-linear-to-r from-black/85 via-black/20 to-transparent" />
 
       <motion.div
-        key={`${movie.id}-content`}
+        key={`${item.id}-content`}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
         className="absolute bottom-32 left-4 max-w-sm space-y-4 sm:bottom-28 sm:left-8 sm:max-w-md lg:max-w-lg"
       >
         <h1 className="text-3xl leading-tight font-extrabold text-white uppercase sm:text-5xl">
-          {movie.title}
+          {item.title}
         </h1>
-        <p className="line-clamp-3 text-sm text-white/80 sm:text-base">{movie.description}</p>
-        <div className="flex gap-3">
-          <Link href={ROUTES.watch(movie.slug)}>
-            <Button size="lg">
-              <Play size={18} /> Watch Now
-            </Button>
-          </Link>
-          <Link href={ROUTES.movie(movie.slug)}>
-            <Button variant="secondary" size="lg">
-              <Info size={18} /> More Info
-            </Button>
-          </Link>
-        </div>
+        {item.description && (
+          <p className="line-clamp-3 text-sm text-white/80 sm:text-base">{item.description}</p>
+        )}
+        {item.slug && (
+          <div className="flex gap-3">
+            <Link href={ROUTES.watch(item.slug)}>
+              <Button size="lg">
+                <Play size={18} /> Watch Now
+              </Button>
+            </Link>
+            <Link href={ROUTES.movie(item.slug)}>
+              <Button variant="secondary" size="lg">
+                <Info size={18} /> More Info
+              </Button>
+            </Link>
+          </div>
+        )}
       </motion.div>
     </>
   );

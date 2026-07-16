@@ -1,6 +1,7 @@
 export const QUERY_KEYS = {
   homeRows: ["home", "rows"] as const,
   trending: ["home", "trending"] as const,
+  latestMovies: ["home", "latest-movies"] as const,
   moviesPreview: ["home", "movies-preview"] as const,
   movieDetail: (slug: string) => ["movie", "detail", slug] as const,
   movieSearch: (query: string) => ["movie", "search", query] as const,

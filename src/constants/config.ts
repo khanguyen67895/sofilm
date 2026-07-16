@@ -12,3 +12,9 @@ export const API_CONFIG = {
 
 export const AUTH_TOKEN_KEY = "sofilm_access_token";
 export const REFRESH_TOKEN_KEY = "sofilm_refresh_token";
+
+/** Fallback for any poster/backdrop/thumbnail field that can come back empty
+ * from the API — next/image throws ("Failed to construct 'URL': Invalid URL")
+ * if given an empty-string src, so every such field must fall back to this
+ * instead of rendering the raw value directly. */
+export const PLACEHOLDER_IMAGE = "/image/no-image.svg";

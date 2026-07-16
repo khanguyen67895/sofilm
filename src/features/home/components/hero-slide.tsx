@@ -5,10 +5,14 @@ import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { Info, Play } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { PLACEHOLDER_IMAGE } from "@/constants/config";
 import { ROUTES } from "@/constants/routes";
 import type { Movie } from "@/types/movie";
+import { resolveImageSrc } from "@/utils/image";
 
 export function HeroSlide({ movie }: { movie: Movie }) {
+  const backdropSrc = resolveImageSrc(movie?.backdrop, PLACEHOLDER_IMAGE);
+
   return (
     <>
       <AnimatePresence mode="wait">
@@ -24,7 +28,7 @@ export function HeroSlide({ movie }: { movie: Movie }) {
             <video
               key={movie.videoUrl}
               src={movie.videoUrl}
-              poster={movie.backdrop}
+              poster={backdropSrc}
               autoPlay
               muted
               loop
@@ -32,7 +36,15 @@ export function HeroSlide({ movie }: { movie: Movie }) {
               className="h-full w-full object-cover"
             />
           ) : (
-            <Image src={movie.backdrop} alt={movie.title} fill priority className="object-cover" />
+            <Image
+              src={backdropSrc}
+              alt={movie.title}
+              fill
+              priority
+              sizes="100vw"
+              quality={90}
+              className="object-cover"
+            />
           )}
         </motion.div>
       </AnimatePresence>

@@ -5,18 +5,9 @@ import { Heart, MessageCircle, Share2 } from "lucide-react";
 import { Avatar } from "@/components/ui/avatar";
 import { RatingStarIcon } from "@/components/common/rating-star-icon";
 import { cn } from "@/utils/cn";
+import { formatRelativeDate } from "@/utils/format";
 import { useToggleReviewLike } from "../hooks/use-toggle-review-like";
 import type { Review } from "@/types/review";
-
-function formatRelativeDate(iso: string): string {
-  const days = Math.floor((Date.now() - new Date(iso).getTime()) / (1000 * 60 * 60 * 24));
-  if (days <= 0) return "Hôm nay";
-  if (days === 1) return "1 ngày trước";
-  if (days < 30) return `${days} ngày trước`;
-  const months = Math.floor(days / 30);
-  if (months < 12) return `${months} tháng trước`;
-  return `${Math.floor(months / 12)} năm trước`;
-}
 
 interface CommentItemProps {
   movieId: string;

@@ -60,4 +60,14 @@ body {
     );
     background-blend-mode: plus-lighter;
   }
+
+  /* Frosted-glass card shell — subscription plan cards. */
+  .card-glass {
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: linear-gradient(
+      80deg,
+      rgba(0, 0, 0, 0.16) 25.25%,
+      rgba(83, 84, 108, 0.16) 98.05%
+    );
+  }
 }

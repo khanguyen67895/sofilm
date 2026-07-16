@@ -1,5 +1,19 @@
 import axios, { AxiosError, type InternalAxiosRequestConfig } from "axios";
 import { API_CONFIG, AUTH_TOKEN_KEY, REFRESH_TOKEN_KEY } from "@/constants/config";
+import { ENDPOINTS } from "@/constants/endpoints";
+
+/** Unauthenticated auth endpoints — a 401 from these means "wrong credentials"
+ * or "invalid/expired token", not "session expired". They must never trigger
+ * the refresh-token flow or the hard redirect below, otherwise a wrong
+ * password on the login screen itself bounces the user off their own login
+ * form before the inline error can render. */
+const SKIP_REFRESH_PATHS: string[] = [
+  ENDPOINTS.auth.login,
+  ENDPOINTS.auth.register,
+  ENDPOINTS.auth.refresh,
+  ENDPOINTS.auth.otpPhoneRequest,
+  ENDPOINTS.auth.otpPhoneVerify,
+];
 
 export const apiClient = axios.create({
   baseURL: API_CONFIG.baseURL,
@@ -25,11 +39,24 @@ apiClient.interceptors.response.use(
       _retry?: boolean;
     };
 
-    if (error.response?.status !== 401 || originalRequest?._retry) {
+    if (
+      error.response?.status !== 401 ||
+      originalRequest?._retry ||
+      SKIP_REFRESH_PATHS.includes(originalRequest?.url ?? "")
+    ) {
       return Promise.reject(error);
     }
 
     if (typeof window === "undefined") return Promise.reject(error);
+
+    // Already on a login screen — let that screen's own error handling show
+    // the 401 inline instead of hard-reloading it out from under the user.
+    const onLoginScreen =
+      window.location.pathname.startsWith("/auth/") ||
+      window.location.pathname.startsWith("/admin/login");
+    if (onLoginScreen) {
+      return Promise.reject(error);
+    }
 
     if (isRefreshing) {
       return new Promise((resolve) => {
@@ -58,7 +85,9 @@ apiClient.interceptors.response.use(
     } catch (refreshError) {
       localStorage.removeItem(AUTH_TOKEN_KEY);
       localStorage.removeItem(REFRESH_TOKEN_KEY);
-      window.location.href = "/auth/login";
+      window.location.href = window.location.pathname.startsWith("/admin")
+        ? "/admin/login"
+        : "/auth/login";
       return Promise.reject(refreshError);
     } finally {
       isRefreshing = false;

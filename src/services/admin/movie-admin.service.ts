@@ -33,6 +33,7 @@ export interface MoviePayload {
   duration?: number;
   isPremium?: boolean;
   videoId?: string;
+  genreIds: string[];
 }
 
 export interface EpisodePayload {
@@ -90,5 +91,9 @@ export const movieAdminService = {
 
   async deleteEpisode(movieId: string, episodeId: string): Promise<void> {
     await apiClient.delete(ENDPOINTS.episodes.remove(movieId, episodeId));
+  },
+
+  async deleteMovie(id: string): Promise<void> {
+    await apiClient.delete(ENDPOINTS.movies.remove(id));
   },
 };

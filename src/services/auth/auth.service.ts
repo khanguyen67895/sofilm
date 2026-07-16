@@ -3,6 +3,7 @@ import type {
   AuthIdentity,
   AuthTokens,
   LoginPayload,
+  RegisterPayload,
   RequestPhoneOtpPayload,
   VerifyPhoneOtpPayload,
   User,
@@ -13,6 +14,14 @@ export const authService = {
   async login(payload: LoginPayload) {
     const { data } = await apiClient.post<ApiResponse<{ user: User } & AuthTokens>>(
       ENDPOINTS.auth.login,
+      payload
+    );
+    return data.data;
+  },
+
+  async register(payload: RegisterPayload) {
+    const { data } = await apiClient.post<ApiResponse<{ user: User } & AuthTokens>>(
+      ENDPOINTS.auth.register,
       payload
     );
     return data.data;

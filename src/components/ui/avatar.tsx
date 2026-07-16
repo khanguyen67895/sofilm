@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { cn } from "@/utils/cn";
+import { isValidImageSrc } from "@/utils/image";
 
 interface AvatarProps {
   src?: string;
@@ -19,7 +20,7 @@ export function Avatar({ src, name, size = 40, className }: AvatarProps) {
         className
       )}
     >
-      {src ? (
+      {isValidImageSrc(src) ? (
         <Image src={src} alt={name ?? ""} fill sizes={`${size}px`} className="object-cover" />
       ) : (
         <span className="flex h-full w-full items-center justify-center font-medium">

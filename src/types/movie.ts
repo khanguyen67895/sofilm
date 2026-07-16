@@ -20,6 +20,7 @@ export interface Movie {
   backdrop: string;
   type: MovieType;
   genres: string[];
+  genreIds: string[];
   releaseDate: string;
   duration: number;
   rating: number;

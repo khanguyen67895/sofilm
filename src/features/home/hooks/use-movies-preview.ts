@@ -5,7 +5,7 @@ import { QUERY_KEYS } from "@/constants/query-keys";
 export function useMoviesPreview() {
   return useQuery({
     queryKey: QUERY_KEYS.moviesPreview,
-    queryFn: () => movieService.getPage(0, 18),
+    queryFn: () => movieService.getPage(1, 18),
     select: (data) => data.items,
   });
 }

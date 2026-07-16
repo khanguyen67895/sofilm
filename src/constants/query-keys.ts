@@ -6,7 +6,7 @@ export const QUERY_KEYS = {
   movieSearch: (query: string) => ["movie", "search", query] as const,
   moviePage: ["movie", "page"] as const,
   shortsFeed: ["shorts", "feed"] as const,
-  plans: ["subscription", "plans"] as const,
+  invoice: (invoiceId: string) => ["subscription", "invoice", invoiceId] as const,
   profile: ["profile", "me"] as const,
   favorites: ["profile", "favorites"] as const,
   watchHistory: ["profile", "watch-history"] as const,
@@ -14,10 +14,12 @@ export const QUERY_KEYS = {
   adminMovieDetail: (id: string) => ["admin", "movie", id] as const,
   heroBanners: ["home", "banners"] as const,
   adminBanners: ["admin", "banners"] as const,
+  adminShorts: (page: number) => ["admin", "shorts", page] as const,
   similarMovies: (slug: string) => ["movie", "similar", slug] as const,
   reviewSummary: (movieId: string) => ["reviews", "summary", movieId] as const,
   reviews: (movieId: string) => ["reviews", "list", movieId] as const,
   genres: ["genres"] as const,
+  notifications: ["notifications"] as const,
   catalogPage: (page: number, genreSlug?: string) =>
     ["movie", "catalog-page", page, genreSlug ?? "all"] as const,
 };

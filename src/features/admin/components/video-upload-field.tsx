@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, type ChangeEvent } from "react";
+import { useRef, useState, type ChangeEvent } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { CheckCircle2, UploadCloud } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -10,15 +10,62 @@ import { useVideoUpload } from "../hooks/use-video-upload";
 interface VideoUploadFieldProps {
   hasVideo: boolean;
   onUploaded: (result: { videoId: string; videoUrl?: string }) => void;
+  /** Rejects the file client-side (before spending any upload bandwidth) if
+   * its duration exceeds this — used to cap Shorts at ~90s. */
+  maxDurationSeconds?: number;
 }
 
-export function VideoUploadField({ hasVideo, onUploaded }: VideoUploadFieldProps) {
+function readVideoDuration(file: File): Promise<number> {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const video = document.createElement("video");
+    video.preload = "metadata";
+    video.onloadedmetadata = () => {
+      URL.revokeObjectURL(url);
+      resolve(video.duration);
+    };
+    video.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error("Không đọc được thời lượng video."));
+    };
+    video.src = url;
+  });
+}
+
+function formatMaxDuration(seconds: number): string {
+  const m = Math.floor(seconds / 60);
+  const s = seconds % 60;
+  if (m <= 0) return `${s} giây`;
+  if (s === 0) return `${m} phút`;
+  return `${m} phút ${s} giây`;
+}
+
+export function VideoUploadField({ hasVideo, onUploaded, maxDurationSeconds }: VideoUploadFieldProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const { upload, progress, status } = useVideoUpload();
+  const [durationError, setDurationError] = useState<string>();
 
   async function handleChange(e: ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
+    setDurationError(undefined);
+
+    if (maxDurationSeconds) {
+      try {
+        const duration = await readVideoDuration(file);
+        if (duration > maxDurationSeconds) {
+          setDurationError(
+            `Video phải ngắn hơn ${formatMaxDuration(maxDurationSeconds)} (video này dài ${Math.round(duration)} giây).`
+          );
+          e.target.value = "";
+          return;
+        }
+      } catch {
+        // Duration unreadable client-side (unsupported codec, etc.) — don't
+        // block the upload over a check we can't actually perform.
+      }
+    }
+
     const result = await upload(file);
     onUploaded(result);
     e.target.value = "";
@@ -46,7 +93,17 @@ export function VideoUploadField({ hasVideo, onUploaded }: VideoUploadFieldProps
         {hasVideo ? "Thay Video" : "Tải Video Lên"}
       </Button>
       <AnimatePresence mode="wait">
-        {isBusy ? (
+        {durationError ? (
+          <motion.p
+            key="duration-error"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            className="text-xs text-red-500"
+          >
+            {durationError}
+          </motion.p>
+        ) : isBusy ? (
           <motion.div
             key="progress"
             initial={{ opacity: 0, height: 0 }}

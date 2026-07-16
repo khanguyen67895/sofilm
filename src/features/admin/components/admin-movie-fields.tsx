@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import type { MovieType } from "@/types/movie";
+import type { Genre } from "@/types/genre";
 
 export interface AdminMovieFieldErrors {
   title?: string;
@@ -14,6 +15,7 @@ export interface AdminMovieFieldErrors {
   backdrop?: string;
   releaseDate?: string;
   duration?: string;
+  genreId?: string;
 }
 
 interface AdminMovieFieldsProps {
@@ -35,6 +37,9 @@ interface AdminMovieFieldsProps {
   onDurationChange: (e: ChangeEvent<HTMLInputElement>) => void;
   isPremium: boolean;
   onIsPremiumChange: (e: ChangeEvent<HTMLInputElement>) => void;
+  genres: Genre[];
+  genreId: string;
+  onGenreIdChange: (e: ChangeEvent<HTMLSelectElement>) => void;
   errors: AdminMovieFieldErrors;
 }
 
@@ -57,6 +62,9 @@ export function AdminMovieFields({
   onDurationChange,
   isPremium,
   onIsPremiumChange,
+  genres,
+  genreId,
+  onGenreIdChange,
   errors,
 }: AdminMovieFieldsProps) {
   return (
@@ -72,21 +80,29 @@ export function AdminMovieFields({
         <Input value={slug} onChange={onSlugChange} />
       </div>
 
-      <div className="sm:col-span-2">
-        <Label required>URL Poster</Label>
-        <Input value={poster} onChange={onPosterChange} aria-invalid={Boolean(errors.poster)} />
-        {errors.poster && <p className="mt-1 text-xs text-red-500">{errors.poster}</p>}
-      </div>
+      {type === "SERIES" && (
+        <>
+          <div className="sm:col-span-2">
+            <Label required>URL Poster</Label>
+            <Input
+              value={poster}
+              onChange={onPosterChange}
+              aria-invalid={Boolean(errors.poster)}
+            />
+            {errors.poster && <p className="mt-1 text-xs text-red-500">{errors.poster}</p>}
+          </div>
 
-      <div className="sm:col-span-2">
-        <Label required>URL Backdrop</Label>
-        <Input
-          value={backdrop}
-          onChange={onBackdropChange}
-          aria-invalid={Boolean(errors.backdrop)}
-        />
-        {errors.backdrop && <p className="mt-1 text-xs text-red-500">{errors.backdrop}</p>}
-      </div>
+          <div className="sm:col-span-2">
+            <Label required>URL Backdrop</Label>
+            <Input
+              value={backdrop}
+              onChange={onBackdropChange}
+              aria-invalid={Boolean(errors.backdrop)}
+            />
+            {errors.backdrop && <p className="mt-1 text-xs text-red-500">{errors.backdrop}</p>}
+          </div>
+        </>
+      )}
 
       <div className="sm:col-span-2">
         <Label>Mô tả</Label>
@@ -99,6 +115,29 @@ export function AdminMovieFields({
           <option value="MOVIE">Phim Lẻ</option>
           <option value="SERIES">Phim Bộ</option>
         </Select>
+      </div>
+
+      <div>
+        <Label required>Thể loại (Category)</Label>
+        <Select
+          value={genreId}
+          onChange={onGenreIdChange}
+          aria-invalid={Boolean(errors.genreId)}
+          disabled={genres.length === 0}
+        >
+          <option value="">-- Chọn thể loại --</option>
+          {genres.map((genre) => (
+            <option key={genre.id} value={genre.id}>
+              {genre.name}
+            </option>
+          ))}
+        </Select>
+        {errors.genreId && <p className="mt-1 text-xs text-red-500">{errors.genreId}</p>}
+        {genres.length === 0 && (
+          <p className="mt-1 text-xs text-white/40">
+            Chưa có thể loại nào trong hệ thống — hãy tạo thể loại trước khi tạo phim.
+          </p>
+        )}
       </div>
 
       <div>

@@ -17,6 +17,7 @@ export interface VideoDetail {
   id: string;
   status: "UPLOADING" | "QUEUED" | "PROCESSING" | "READY" | "FAILED";
   hlsMasterPlaylistUrl?: string;
+  thumbnailUrl?: string;
 }
 
 export const videoService = {
@@ -47,5 +48,18 @@ export const videoService = {
       ENDPOINTS.videos.complete(videoId)
     );
     return data.data;
+  },
+
+  async getById(videoId: string): Promise<VideoDetail> {
+    const { data } = await apiClient.get<ApiResponse<VideoDetail>>(
+      ENDPOINTS.videos.detail(videoId)
+    );
+    return data.data;
+  },
+
+  /** Re-enqueues processing for an already-uploaded video (e.g. to regenerate
+   * its thumbnail) — poll `getById` afterwards for the result. */
+  async generateThumbnail(videoId: string): Promise<void> {
+    await apiClient.post(ENDPOINTS.videos.generateThumbnail(videoId));
   },
 };

@@ -20,15 +20,16 @@ export function useHeroBanners() {
             title: movie.title,
             description: movie.description ?? "",
             poster: movie.poster ?? "",
-            backdrop: banner.imageUrl || movie.backdrop || "",
+            backdrop: banner.imageUrl || movie?.backdrop || "",
             type: "MOVIE",
             genres: [],
+            genreIds: [],
             releaseDate: "",
             duration: 0,
             rating: 0,
             views: 0,
             isPremium: false,
-            videoUrl: movie.videoUrl,
+            videoUrl: banner.videoUrl ?? movie.videoUrl,
           } satisfies Movie;
         });
     },

@@ -6,6 +6,7 @@ interface PlayerState {
   isPlaying: boolean;
   volume: number;
   play: (slug: string, episode?: number) => void;
+  resume: () => void;
   pause: () => void;
   setVolume: (volume: number) => void;
   reset: () => void;
@@ -18,6 +19,10 @@ export const usePlayerStore = create<PlayerState>((set) => ({
   volume: 1,
   play: (slug, episode = 1) =>
     set({ currentMovieSlug: slug, currentEpisode: episode, isPlaying: true }),
+  // Local play/pause toggle on an already-open player — unlike `play`, this must
+  // NOT touch currentMovieSlug/currentEpisode, otherwise resuming playback on the
+  // detail page resets `activeEpisode` back to episode 1 (see MovieDetailView).
+  resume: () => set({ isPlaying: true }),
   pause: () => set({ isPlaying: false }),
   setVolume: (volume) => set({ volume }),
   reset: () =>

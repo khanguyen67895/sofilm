@@ -3,22 +3,33 @@
 import { AnimatePresence, motion } from "framer-motion";
 import type { Movie, MovieType } from "@/types/movie";
 import { AdminEpisodeManager } from "./admin-episode-manager";
-import { VideoUploadField } from "./video-upload-field";
+import { AdminEpisodeQueueBuilder, type QueuedEpisode } from "./admin-episode-queue-builder";
+import { AdminThumbnailField } from "./admin-thumbnail-field";
 
 interface AdminMovieVideoSectionProps {
   type: MovieType;
   mode: "create" | "edit";
   movie?: Movie;
+  videoId: string;
   hasVideo: boolean;
+  thumbnailUrl?: string;
   onVideoUploaded: (result: { videoId: string; videoUrl?: string }) => void;
+  onThumbnailGenerated: (url: string) => void;
+  queuedEpisodes: QueuedEpisode[];
+  onQueuedEpisodesChange: (episodes: QueuedEpisode[]) => void;
 }
 
 export function AdminMovieVideoSection({
   type,
   mode,
   movie,
+  videoId,
   hasVideo,
+  thumbnailUrl,
   onVideoUploaded,
+  onThumbnailGenerated,
+  queuedEpisodes,
+  onQueuedEpisodesChange,
 }: AdminMovieVideoSectionProps) {
   return (
     <AnimatePresence mode="wait">
@@ -33,7 +44,13 @@ export function AdminMovieVideoSection({
           <h3 className="font-heading mb-2 text-sm tracking-wide text-white/80 uppercase">
             Video
           </h3>
-          <VideoUploadField hasVideo={hasVideo} onUploaded={onVideoUploaded} />
+          <AdminThumbnailField
+            videoId={videoId}
+            hasVideo={hasVideo}
+            thumbnailUrl={thumbnailUrl}
+            onVideoUploaded={onVideoUploaded}
+            onThumbnailGenerated={onThumbnailGenerated}
+          />
         </motion.div>
       ) : (
         <motion.div
@@ -46,7 +63,7 @@ export function AdminMovieVideoSection({
           {mode === "edit" && movie ? (
             <AdminEpisodeManager movieId={movie.id} episodes={movie.episodes ?? []} />
           ) : (
-            <p className="text-sm text-white/50">Lưu phim trước, sau đó thêm các tập.</p>
+            <AdminEpisodeQueueBuilder episodes={queuedEpisodes} onChange={onQueuedEpisodesChange} />
           )}
         </motion.div>
       )}

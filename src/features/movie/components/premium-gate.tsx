@@ -6,11 +6,12 @@ import { motion } from "framer-motion";
 import { Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/constants/routes";
+import { isValidImageSrc } from "@/utils/image";
 
 export function PremiumGate({ backdrop }: { backdrop: string }) {
   return (
-    <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-black">
-      {backdrop && (
+    <div className="relative h-156.75 w-full overflow-hidden rounded-xl bg-black">
+      {isValidImageSrc(backdrop) && (
         <Image
           src={backdrop}
           alt=""

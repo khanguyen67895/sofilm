@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { Skeleton } from "@/components/ui/skeleton";
+import { EmptyState } from "@/components/common/empty-state";
 import { MovieRow } from "@/components/movie/movie-row";
 import { ROUTES } from "@/constants/routes";
 import { useHomeRows } from "../hooks/use-home-rows";
@@ -13,10 +14,25 @@ import { TrendingRow } from "./trending-row";
 import { AllMoviesSection } from "./all-movies-section";
 
 export function HomeView() {
-  const { data: rows, isLoading: isRowsLoading } = useHomeRows();
+  const { data: rows, isLoading: isRowsLoading, isError: isRowsError, refetch } = useHomeRows();
   const { data: heroBanners } = useHeroBanners();
   const { data: trending } = useTrending();
   const { data: preview } = useMoviesPreview();
+
+  if (isRowsError) {
+    return (
+      <div className="flex flex-col items-center gap-3 px-4 py-24 text-center">
+        <p className="text-white/70">Không thể tải dữ liệu trang chủ.</p>
+        <button
+          type="button"
+          onClick={() => refetch()}
+          className="text-sm font-medium text-brand hover:underline"
+        >
+          Thử lại
+        </button>
+      </div>
+    );
+  }
 
   if (isRowsLoading || !rows) {
     return (
@@ -34,6 +50,23 @@ export function HomeView() {
 
   const heroMovies =
     heroBanners && heroBanners.length > 0 ? heroBanners : (rows[0]?.movies.slice(0, 6) ?? []);
+  const nonEmptyRows = rows.filter((row) => row.movies.length > 0);
+  const hasTrending = Boolean(trending && trending.length > 0);
+  const hasPreview = Boolean(preview && preview.length > 0);
+
+  if (
+    heroMovies.length === 0 &&
+    nonEmptyRows.length === 0 &&
+    !hasTrending &&
+    !hasPreview
+  ) {
+    return (
+      <EmptyState
+        title="Chưa có phim nào"
+        description="Phim mới đang được tải lên, quay lại sau bạn nhé!"
+      />
+    );
+  }
 
   return (
     <motion.div
@@ -44,11 +77,11 @@ export function HomeView() {
     >
       {heroMovies.length > 0 && <HeroBanner movies={heroMovies} />}
       <div className="space-y-10">
-        {rows.map((row) => (
+        {nonEmptyRows.map((row) => (
           <MovieRow key={row.id} row={row} viewAllHref={ROUTES.category} />
         ))}
-        {trending && <TrendingRow movies={trending} />}
-        {preview && <AllMoviesSection movies={preview} />}
+        {hasTrending && <TrendingRow movies={trending!} />}
+        {hasPreview && <AllMoviesSection movies={preview!} />}
       </div>
     </motion.div>
   );

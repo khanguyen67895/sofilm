@@ -12,6 +12,7 @@ import type { Banner } from "@/types/banner";
 import { useAdminMovies } from "../hooks/use-admin-movies";
 import { useCreateBanner } from "../hooks/use-create-banner";
 import { useUpdateBanner } from "../hooks/use-update-banner";
+import { VideoUploadField } from "./video-upload-field";
 
 interface AdminBannerFormProps {
   mode: "create" | "edit";
@@ -25,26 +26,21 @@ export function AdminBannerForm({ mode, banner }: AdminBannerFormProps) {
   const updateBanner = useUpdateBanner(banner?.id ?? "");
 
   const [movieId, setMovieId] = useState(banner?.movie?.id ?? "");
-  const [imageUrl, setImageUrl] = useState(banner?.imageUrl ?? "");
   const [title, setTitle] = useState(banner?.title ?? "");
   const [order, setOrder] = useState(banner ? String(banner.order) : "0");
   const [isActive, setIsActive] = useState(banner?.isActive ?? true);
-  const [errors, setErrors] = useState<{ movieId?: string; imageUrl?: string }>({});
+  const [videoId, setVideoId] = useState(banner?.videoId ?? "");
+  const [hasVideo, setHasVideo] = useState(Boolean(banner?.videoId));
+  const [errors, setErrors] = useState<{ movieId?: string }>({});
 
   const isPending = createBanner.isPending || updateBanner.isPending;
-
-  function handleMovieChange(id: string) {
-    setMovieId(id);
-    const movie = moviePage?.items.find((m) => m.id === id);
-    if (movie?.backdrop && !imageUrl) setImageUrl(movie.backdrop);
-  }
+  const videoMissing = !hasVideo;
 
   function validate(): boolean {
     const nextErrors: typeof errors = {};
     if (!movieId) nextErrors.movieId = "Vui lòng chọn phim cho banner này.";
-    if (!imageUrl.trim()) nextErrors.imageUrl = "Bắt buộc phải có ảnh banner.";
     setErrors(nextErrors);
-    return Object.keys(nextErrors).length === 0;
+    return Object.keys(nextErrors).length === 0 && !videoMissing;
   }
 
   function handleSubmit(e: FormEvent) {
@@ -53,8 +49,8 @@ export function AdminBannerForm({ mode, banner }: AdminBannerFormProps) {
 
     const payload = {
       movieId,
-      imageUrl: imageUrl.trim(),
       title: title.trim() || undefined,
+      videoId,
       order: Number(order) || 0,
       isActive,
     };
@@ -71,12 +67,12 @@ export function AdminBannerForm({ mode, banner }: AdminBannerFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-xl space-y-5">
+    <form onSubmit={handleSubmit} noValidate className="max-w-xl space-y-5">
       <div>
         <Label required>Phim</Label>
         <Select
           value={movieId}
-          onChange={(e) => handleMovieChange(e.target.value)}
+          onChange={(e) => setMovieId(e.target.value)}
           aria-invalid={Boolean(errors.movieId)}
         >
           <option value="">— Chọn phim —</option>
@@ -90,14 +86,22 @@ export function AdminBannerForm({ mode, banner }: AdminBannerFormProps) {
       </div>
 
       <div>
-        <Label required>URL Ảnh Banner</Label>
-        <Input
-          value={imageUrl}
-          onChange={(e) => setImageUrl(e.target.value)}
-          placeholder="https://..."
-          aria-invalid={Boolean(errors.imageUrl)}
+        <Label required>Video Hero</Label>
+        <p className="mb-2 text-xs text-white/50">
+          Hero trang chủ tự động phát video này — giống trailer.
+        </p>
+        <VideoUploadField
+          hasVideo={hasVideo}
+          onUploaded={({ videoId: newVideoId }) => {
+            setVideoId(newVideoId);
+            setHasVideo(true);
+          }}
         />
-        {errors.imageUrl && <p className="mt-1 text-xs text-red-500">{errors.imageUrl}</p>}
+        {videoMissing && (
+          <p className="mt-2 text-xs text-red-500">
+            Bắt buộc phải tải video lên trước khi tạo banner.
+          </p>
+        )}
       </div>
 
       <div>
@@ -115,7 +119,7 @@ export function AdminBannerForm({ mode, banner }: AdminBannerFormProps) {
         Đang hiển thị trên trang chủ
       </label>
 
-      <Button type="submit" disabled={isPending}>
+      <Button type="submit" disabled={isPending || videoMissing}>
         {isPending ? "Đang lưu..." : mode === "create" ? "Tạo Banner" : "Lưu Thay Đổi"}
       </Button>
     </form>

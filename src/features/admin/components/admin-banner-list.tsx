@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ROUTES } from "@/constants/routes";
 import type { Banner } from "@/types/banner";
+import { isValidImageSrc } from "@/utils/image";
 import { useAdminBanners } from "../hooks/use-admin-banners";
 import { useDeleteBanner } from "../hooks/use-delete-banner";
 import { useUpdateBanner } from "../hooks/use-update-banner";
@@ -18,8 +19,13 @@ function BannerRow({ banner }: { banner: Banner }) {
   return (
     <div className="flex items-center gap-4 border-b border-white/10 px-4 py-3 last:border-b-0">
       <div className="relative h-12 w-20 shrink-0 overflow-hidden rounded bg-white/5">
-        {banner.imageUrl && (
-          <Image src={banner.imageUrl} alt={banner.title ?? ""} fill className="object-cover" />
+        {isValidImageSrc(banner.imageUrl ?? banner.movie?.backdrop) && (
+          <Image
+            src={(banner.imageUrl ?? banner.movie?.backdrop) as string}
+            alt={banner.title ?? ""}
+            fill
+            className="object-cover"
+          />
         )}
       </div>
       <div className="min-w-0 flex-1">

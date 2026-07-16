@@ -1,6 +1,7 @@
 export const ENDPOINTS = {
   auth: {
     login: "/auth/login",
+    register: "/auth/register",
     logout: "/auth/logout",
     refresh: "/auth/refresh",
     me: "/auth/me",
@@ -8,13 +9,17 @@ export const ENDPOINTS = {
     otpPhoneVerify: "/auth/otp/phone/verify",
   },
   movies: {
+    list: "/movies",
     detail: (slug: string) => `/movies/${slug}`,
     trending: "/movies/trending",
+    latest: "/movies/latest",
+    topView: "/movies/top-view",
     byCategory: (categorySlug: string) => `/movies/category/${categorySlug}`,
     search: "/movies/search",
     recommend: (slug: string) => `/movies/${slug}/recommend`,
     create: "/movies",
     update: (id: string) => `/movies/${id}`,
+    remove: (id: string) => `/movies/${id}`,
     adminList: "/movies/admin/list",
     adminDetail: (id: string) => `/movies/by-id/${id}`,
   },
@@ -44,11 +49,15 @@ export const ENDPOINTS = {
     uploadUrl: "/videos/upload-url",
     complete: (id: string) => `/videos/${id}/complete`,
     detail: (id: string) => `/videos/${id}`,
+    generateThumbnail: (id: string) => `/videos/${id}/generate-thumbnail`,
   },
   shorts: {
     feed: "/shorts/feed",
     like: (id: string) => `/shorts/${id}/like`,
     unlike: (id: string) => `/shorts/${id}/like`,
+    create: "/shorts",
+    adminList: "/shorts/admin/list",
+    remove: (id: string) => `/shorts/${id}`,
   },
   subscriptions: {
     plans: "/subscriptions/plans",
@@ -58,6 +67,7 @@ export const ENDPOINTS = {
     checkout: "/payments/checkout",
     history: "/payments/history",
     verify: (id: string) => `/payments/verify/${id}`,
+    confirm: (invoiceId: string) => `/payments/confirm/${invoiceId}`,
   },
   users: {
     me: "/users/me",
@@ -69,5 +79,8 @@ export const ENDPOINTS = {
   },
   history: {
     continueWatching: "/history/continue-watching",
+  },
+  notifications: {
+    list: "/notifications",
   },
 } as const;

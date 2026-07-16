@@ -4,8 +4,11 @@ export const ROUTES = {
   search: "/search",
   shorts: "/shorts",
   subscription: "/subscription",
+  subscriptionCheckout: (planId: string) => `/subscription/checkout?planId=${planId}`,
+  subscriptionSuccess: (invoiceId: string) => `/subscription/success?invoiceId=${invoiceId}`,
   profile: "/profile",
   login: "/auth/login",
+  register: "/auth/register",
   adminLogin: "/admin/login",
   movie: (slug: string) => `/movie/${slug}`,
   watch: (slug: string, episode?: number) =>
@@ -17,11 +20,17 @@ export const ROUTES = {
   adminBanners: "/admin/banners",
   adminBannerNew: "/admin/banners/new",
   adminBannerEdit: (id: string) => `/admin/banners/${id}/edit`,
+  adminShorts: "/admin/shorts",
+  adminShortNew: "/admin/shorts/new",
 } as const;
 
-/** Full-bleed auth screens (phone/OTP login) and the entire admin section render their
- * own layout (AdminHeader/AdminSidebar or a bare centered form) — no public
- * Header/Footer/MobileNav. */
+/** Full-bleed screens that render their own layout — no public Header/Footer/MobileNav:
+ * auth (login/register), the entire admin section, and Shorts (edge-to-edge full-viewport
+ * video feed like TikTok/Reels, with its own minimal floating back control). */
 export function isChromeLessRoute(pathname: string): boolean {
-  return pathname.startsWith(ROUTES.login) || pathname.startsWith(ROUTES.admin);
+  return (
+    pathname.startsWith("/auth/") ||
+    pathname.startsWith(ROUTES.admin) ||
+    pathname.startsWith(ROUTES.shorts)
+  );
 }

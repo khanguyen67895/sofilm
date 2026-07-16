@@ -3,8 +3,10 @@
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { PLACEHOLDER_IMAGE } from "@/constants/config";
 import { cn } from "@/utils/cn";
 import type { Movie } from "@/types/movie";
+import { resolveImageSrc } from "@/utils/image";
 
 interface HeroControlsProps {
   movies: Movie[];
@@ -26,7 +28,13 @@ export function HeroControls({ movies, activeIndex, onGoTo }: HeroControlsProps)
               index !== activeIndex && "opacity-60 hover:opacity-100"
             )}
           >
-            <Image src={movie.poster} alt={movie.title} fill sizes="56px" className="object-cover" />
+            <Image
+              src={resolveImageSrc(movie.poster, PLACEHOLDER_IMAGE)}
+              alt={movie.title}
+              fill
+              sizes="56px"
+              className="object-cover"
+            />
             {index === activeIndex && (
               <motion.div
                 layoutId="hero-thumb-ring"

@@ -1,8 +1,5 @@
 export function formatDuration(minutes: number): string {
-  const h = Math.floor(minutes / 60);
-  const m = minutes % 60;
-  if (h <= 0) return `${m}m`;
-  return `${h}h ${m}m`;
+  return `${minutes} phút`;
 }
 
 export function formatViews(views: number): string {
@@ -21,4 +18,28 @@ export function formatCurrency(amount: number, currency = "VND"): string {
     currency,
     maximumFractionDigits: 0,
   }).format(amount);
+}
+
+/** Plans are stored as a raw day count — this maps the common cases back to
+ * the billing-cycle label admins actually mean ("/month", "/year"). */
+export function formatBillingCycle(durationDays: number): string {
+  if (durationDays >= 360) return "/year";
+  if (durationDays >= 28) return "/month";
+  return `/${durationDays} days`;
+}
+
+export function formatCountdown(totalSeconds: number): string {
+  const m = Math.floor(Math.max(0, totalSeconds) / 60);
+  const s = Math.max(0, totalSeconds) % 60;
+  return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+}
+
+export function formatRelativeDate(iso: string): string {
+  const days = Math.floor((Date.now() - new Date(iso).getTime()) / (1000 * 60 * 60 * 24));
+  if (days <= 0) return "Hôm nay";
+  if (days === 1) return "1 ngày trước";
+  if (days < 30) return `${days} ngày trước`;
+  const months = Math.floor(days / 30);
+  if (months < 12) return `${months} tháng trước`;
+  return `${Math.floor(months / 12)} năm trước`;
 }

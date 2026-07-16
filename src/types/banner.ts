@@ -1,7 +1,12 @@
 export interface Banner {
   id: string;
-  imageUrl: string;
+  /** Legacy static-image banners only — new banners are video-only (videoId). */
+  imageUrl?: string;
   title?: string;
+  videoId?: string;
+  /** Resolved server-side — the banner's own uploaded video if set, else the
+   * linked movie's video. Autoplays as the hero background when present. */
+  videoUrl?: string;
   movie?: {
     id: string;
     slug: string;
@@ -20,9 +25,9 @@ export interface Banner {
 }
 
 export interface BannerPayload {
-  imageUrl: string;
   title?: string;
   movieId?: string;
+  videoId: string;
   order?: number;
   isActive?: boolean;
   startAt?: string;

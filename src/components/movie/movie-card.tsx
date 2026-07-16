@@ -6,9 +6,11 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { FavoriteIcon, UnfavoriteIcon } from "@/components/common/favorite-icons";
 import { RatingStarIcon } from "@/components/common/rating-star-icon";
+import { PLACEHOLDER_IMAGE } from "@/constants/config";
 import { ROUTES } from "@/constants/routes";
 import { movieService } from "@/services/movie/movie.service";
 import type { Movie } from "@/types/movie";
+import { resolveImageSrc } from "@/utils/image";
 
 export function MovieCard({ movie }: { movie: Movie }) {
   const [isFavorite, setIsFavorite] = useState(Boolean(movie.isFavorite));
@@ -45,10 +47,11 @@ export function MovieCard({ movie }: { movie: Movie }) {
       <Link href={ROUTES.movie(movie.slug)} className="block">
         <div className="relative aspect-2/3 overflow-hidden rounded-lg bg-white/5">
           <Image
-            src={movie.poster}
+            src={resolveImageSrc(movie.poster, PLACEHOLDER_IMAGE)}
             alt={movie.title}
             fill
-            sizes="(max-width: 768px) 40vw, 200px"
+            sizes="(max-width: 640px) 160px, 220px"
+            quality={90}
             className="object-cover transition-transform duration-300 group-hover:scale-110"
           />
           <motion.button

@@ -25,6 +25,13 @@ export interface LoginPayload {
   password: string;
 }
 
+export interface RegisterPayload {
+  username: string;
+  email: string;
+  phone: string;
+  password: string;
+}
+
 export interface RequestPhoneOtpPayload {
   phone: string;
 }

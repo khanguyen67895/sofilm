@@ -14,7 +14,20 @@ const apiHostname = (() => {
 
 const nextConfig: NextConfig = {
   images: {
+    // Next.js 16 only serves quality=75 unless explicitly allow-listed —
+    // posters/backdrops are large, hover-scaled hero images, so 75 alone
+    // reads soft. 90 is used for those; 75 stays as the default elsewhere.
+    qualities: [75, 90],
+    // Admin-entered poster/backdrop/banner URLs are free text (no host
+    // allowlist realistically covers "whatever an admin pastes from a search
+    // engine while testing"), and this is an ADMIN-only, role-gated surface —
+    // not public UGC — so trade next/image's per-host allowlist for "never
+    // crashes the page over an unconfigured host" instead of maintaining an
+    // ever-growing list. The specific hosts below stay as documentation of
+    // known-good sources.
     remotePatterns: [
+      { protocol: "https", hostname: "**" },
+      { protocol: "http", hostname: "**" },
       { protocol: "https", hostname: "picsum.photos" },
       { protocol: "https", hostname: "image.tmdb.org" },
       { protocol: "http", hostname: "localhost", port: "9000" },

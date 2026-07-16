@@ -1,44 +1,38 @@
 "use client";
 
-import { Skeleton } from "@/components/ui/skeleton";
+import { useRouter } from "next/navigation";
 import { Reveal } from "@/components/common/reveal";
-import { usePlans } from "../hooks/use-plans";
-import { useCheckout } from "../hooks/use-checkout";
+import { ROUTES } from "@/constants/routes";
+import type { SubscriptionPlan } from "@/types/subscription";
+import { PLANS } from "../constants";
 import { PlanCard } from "./plan-card";
 
 export function SubscriptionView() {
-  const { data: plans, isLoading } = usePlans();
-  const checkout = useCheckout();
+  const router = useRouter();
+
+  function selectPlan(plan: SubscriptionPlan) {
+    router.push(ROUTES.subscriptionCheckout(plan.id));
+  }
 
   return (
     <div className="space-y-8 px-4 py-12 sm:px-8">
       <Reveal className="text-center">
-        <h1 className="text-3xl font-extrabold text-white">Chọn Gói VIP</h1>
+        <h1 className="text-3xl font-extrabold text-white">Choose the Plan That Fits You</h1>
         <p className="mt-2 text-white/60">
-          Mở khoá kho phim và series không giới hạn, chất lượng cao nhất.
+          Upgrade to Premium for unlimited streaming, an ad-free experience, and stunning 4K
+          quality.
         </p>
       </Reveal>
 
-      {isLoading ? (
-        <div className="grid gap-6 sm:grid-cols-3">
-          {Array.from({ length: 3 }).map((_, i) => (
-            <Skeleton key={i} className="h-72 w-full" />
-          ))}
-        </div>
-      ) : (
-        <Reveal className="grid gap-6 sm:grid-cols-3">
-          {plans?.map((plan) => (
-            <PlanCard
-              key={plan.id}
-              plan={plan}
-              isPending={checkout.isPending}
-              onSelect={(selected) =>
-                checkout.mutate({ planId: selected.id, provider: "vnpay" })
-              }
-            />
-          ))}
-        </Reveal>
-      )}
+      <Reveal className="grid gap-6 sm:grid-cols-3">
+        {PLANS.map((plan) => (
+          <PlanCard key={plan.id} plan={plan} onSelect={selectPlan} />
+        ))}
+      </Reveal>
+
+      <p className="text-center text-sm text-white/40">
+        Secure payments via Stripe, VNPay, and MoMo. Cancel anytime.
+      </p>
     </div>
   );
 }

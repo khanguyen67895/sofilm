@@ -15,7 +15,11 @@ export function AdminLayout({ children }: { children: ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <div className="relative flex min-h-screen overflow-hidden bg-black">
+    // overflow-hidden here would break `position: sticky` on AdminSidebar/
+    // AdminHeader below (an ancestor with overflow != visible redefines the
+    // scroll container sticky positions against) — the two `fixed` background
+    // layers don't need it, they're viewport-positioned regardless.
+    <div className="relative flex min-h-screen bg-black">
       <Image
         src="/image/ic_bg_login.png"
         alt=""

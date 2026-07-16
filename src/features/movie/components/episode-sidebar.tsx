@@ -2,24 +2,39 @@
 
 import Image from "next/image";
 import { motion } from "framer-motion";
+import { X } from "lucide-react";
 import { cn } from "@/utils/cn";
+import { PLACEHOLDER_IMAGE } from "@/constants/config";
+import { formatDuration } from "@/utils/format";
 import { usePlayerStore } from "@/store/player.store";
 import type { Episode } from "@/types/movie";
+import { resolveImageSrc } from "@/utils/image";
 
 interface EpisodeSidebarProps {
   slug: string;
   title: string;
   episodes: Episode[];
+  onClose?: () => void;
 }
 
-export function EpisodeSidebar({ slug, title, episodes }: EpisodeSidebarProps) {
+export function EpisodeSidebar({ slug, title, episodes, onClose }: EpisodeSidebarProps) {
   const currentEpisode = usePlayerStore((s) => s.currentEpisode);
   const play = usePlayerStore((s) => s.play);
 
   return (
-    <div className="flex h-full max-h-125 flex-col rounded-lg bg-white/5 lg:max-h-full">
-      <div className="border-b border-white/10 px-4 py-3">
+    <div className="flex h-156.75 flex-col self-start rounded-lg bg-white/5 lg:sticky lg:top-8">
+      <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
         <h3 className="text-sm font-semibold text-white">Danh Sách Tập</h3>
+        {onClose && (
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Đóng danh sách tập"
+            className="text-white/50 hover:text-white"
+          >
+            <X size={16} />
+          </button>
+        )}
       </div>
       <div className="scrollbar-none flex-1 space-y-1 overflow-y-auto p-2">
         {episodes.map((ep) => {
@@ -41,8 +56,17 @@ export function EpisodeSidebar({ slug, title, episodes }: EpisodeSidebarProps) {
                   isActive && "ring-2 ring-brand"
                 )}
               >
-                {ep.thumbnail && (
-                  <Image src={ep.thumbnail} alt={ep.title} fill sizes="64px" className="object-cover" />
+                <Image
+                  src={resolveImageSrc(ep.thumbnail, PLACEHOLDER_IMAGE)}
+                  alt={ep.title}
+                  fill
+                  sizes="64px"
+                  className="object-cover"
+                />
+                {ep.duration > 0 && (
+                  <span className="absolute bottom-0.5 left-0.5 rounded bg-black/70 px-1 text-[9px] leading-tight text-white">
+                    {formatDuration(ep.duration)}
+                  </span>
                 )}
               </div>
               <span

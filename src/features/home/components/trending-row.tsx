@@ -6,8 +6,10 @@ import { useRef } from "react";
 import { motion } from "framer-motion";
 import { ChevronRight } from "lucide-react";
 import { Reveal } from "@/components/common/reveal";
+import { PLACEHOLDER_IMAGE } from "@/constants/config";
 import { ROUTES } from "@/constants/routes";
 import type { Movie } from "@/types/movie";
+import { resolveImageSrc } from "@/utils/image";
 
 export function TrendingRow({ movies }: { movies: Movie[] }) {
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -37,14 +39,15 @@ export function TrendingRow({ movies }: { movies: Movie[] }) {
             <Link
               key={movie.id}
               href={ROUTES.movie(movie.slug)}
-              className="group relative w-32 shrink-0 sm:w-53"
+              className="group relative w-40 shrink-0 sm:w-55"
             >
               <div className="relative aspect-2/3 overflow-hidden rounded-lg bg-white/5">
                 <Image
-                  src={movie.poster}
+                  src={resolveImageSrc(movie.poster, PLACEHOLDER_IMAGE)}
                   alt={movie.title}
                   fill
-                  sizes="(max-width: 768px) 40vw, 200px"
+                  sizes="(max-width: 640px) 160px, 220px"
+                  quality={90}
                   className="object-cover transition-transform duration-300 group-hover:scale-110"
                 />
                 <span

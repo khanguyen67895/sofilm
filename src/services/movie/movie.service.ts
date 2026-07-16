@@ -1,12 +1,8 @@
 import { apiClient, ENDPOINTS } from "@/services/api";
-import { MOCK_MOVIES, MOCK_ROWS, MOCK_TRENDING } from "@/lib/mock-data";
+import { useAuthStore } from "@/store/auth.store";
 import type { ApiResponse, PaginatedResponse } from "@/types/api";
 import type { Episode, Movie, MovieRow } from "@/types/movie";
 import type { Short } from "@/types/shorts";
-
-// NOTE: reads are backed by mock data for now so the UI works without a
-// backend. Swap the body for the commented apiClient call once the real
-// API is available — the function signatures already match it.
 
 export interface BackendEpisode {
   id: string;
@@ -36,8 +32,18 @@ export interface BackendMovie {
   hasAccess?: boolean;
   videoId?: string;
   videoUrl?: string;
-  genres?: { name: string }[];
+  genres?: { id: string; name: string }[];
   seasons?: { episodes: BackendEpisode[] }[];
+}
+
+/** Shape returned by the backend's shared `paginate()` helper — uses `limit`,
+ * not `pageSize` like the frontend's own `PaginatedResponse`. */
+interface BackendPage<T> {
+  items: T[];
+  page: number;
+  limit: number;
+  total: number;
+  hasMore: boolean;
 }
 
 export function mapMovieResponse(raw: BackendMovie): Movie {
@@ -64,6 +70,7 @@ export function mapMovieResponse(raw: BackendMovie): Movie {
     backdrop: raw.backdrop ?? "",
     type: raw.type,
     genres: (raw.genres ?? []).map((g) => g.name),
+    genreIds: (raw.genres ?? []).map((g) => g.id),
     releaseDate: raw.releaseDate ?? "",
     duration: raw.duration ?? 0,
     rating: raw.rating,
@@ -78,14 +85,44 @@ export function mapMovieResponse(raw: BackendMovie): Movie {
 }
 
 export const movieService = {
+  /** Composes the homepage's rows from real endpoints — "Continue Watching" only
+   * appears for a signed-in viewer with history, so it's fetched conditionally. */
   async getHomeRows(): Promise<MovieRow[]> {
-    await new Promise((r) => setTimeout(r, 250));
-    return MOCK_ROWS;
+    const isAuthenticated = useAuthStore.getState().isAuthenticated;
+
+    const [latestRes, topViewRes, continueWatching] = await Promise.all([
+      apiClient.get<ApiResponse<BackendMovie[]>>(ENDPOINTS.movies.latest, {
+        params: { limit: 20 },
+      }),
+      apiClient.get<ApiResponse<BackendMovie[]>>(ENDPOINTS.movies.topView, {
+        params: { limit: 20 },
+      }),
+      isAuthenticated ? movieService.getWatchHistory().catch(() => []) : Promise.resolve([]),
+    ]);
+
+    const rows: MovieRow[] = [];
+    if (continueWatching.length > 0) {
+      rows.push({ id: "continue-watching", title: "Continue Watching", movies: continueWatching });
+    }
+    rows.push({
+      id: "new-releases",
+      title: "New Releases",
+      movies: latestRes.data.data.map(mapMovieResponse),
+    });
+    rows.push({
+      id: "top-rated",
+      title: "Top Rated",
+      movies: topViewRes.data.data.map(mapMovieResponse),
+    });
+
+    return rows;
   },
 
-  async getTrending(): Promise<Movie[]> {
-    await new Promise((r) => setTimeout(r, 200));
-    return MOCK_TRENDING;
+  async getTrending(limit = 20): Promise<Movie[]> {
+    const { data } = await apiClient.get<ApiResponse<BackendMovie[]>>(ENDPOINTS.movies.trending, {
+      params: { limit },
+    });
+    return data.data.map(mapMovieResponse);
   },
 
   async getBySlug(slug: string): Promise<Movie | undefined> {
@@ -104,37 +141,27 @@ export const movieService = {
   },
 
   async search(query: string): Promise<Movie[]> {
-    // const { data } = await apiClient.get<ApiResponse<Movie[]>>(ENDPOINTS.movies.search, { params: { q: query } });
-    // return data.data;
-    await new Promise((r) => setTimeout(r, 200));
-    const q = query.trim().toLowerCase();
-    if (!q) return [];
-    return MOCK_MOVIES.filter((m) => m.title.toLowerCase().includes(q));
+    if (!query.trim()) return [];
+    const { data } = await apiClient.get<ApiResponse<BackendPage<BackendMovie>>>(
+      ENDPOINTS.movies.search,
+      { params: { q: query } }
+    );
+    return data.data.items.map(mapMovieResponse);
   },
 
-  /** 1-indexed. `genreBucket` deterministically splits the mock pool into even
-   * slices (mock movies don't carry the real backend's genre taxonomy yet) so
-   * every genre filter pill shows a real, non-empty page rather than nothing. */
-  async getPage(
-    page: number,
-    pageSize = 24,
-    genreBucket?: { index: number; count: number }
-  ): Promise<PaginatedResponse<Movie>> {
-    await new Promise((r) => setTimeout(r, 200));
-    let pool = [...MOCK_MOVIES, ...MOCK_MOVIES, ...MOCK_MOVIES].map(
-      (m, i) => ({ ...m, id: `${m.id}-${i}`, slug: `${m.slug}-${i}` })
+  /** 1-indexed. `genreSlug` filters via the backend's genre-slug join. */
+  async getPage(page: number, pageSize = 24, genreSlug?: string): Promise<PaginatedResponse<Movie>> {
+    const { data } = await apiClient.get<ApiResponse<BackendPage<BackendMovie>>>(
+      ENDPOINTS.movies.list,
+      { params: { page, limit: pageSize, genre: genreSlug } }
     );
-    if (genreBucket) {
-      pool = pool.filter((_, i) => i % genreBucket.count === genreBucket.index);
-    }
-    const start = (page - 1) * pageSize;
-    const items = pool.slice(start, start + pageSize);
+    const backendPage = data.data;
     return {
-      items,
-      page,
-      pageSize,
-      total: pool.length,
-      hasMore: start + pageSize < pool.length,
+      items: backendPage.items.map(mapMovieResponse),
+      page: backendPage.page,
+      pageSize: backendPage.limit,
+      total: backendPage.total,
+      hasMore: backendPage.hasMore,
     };
   },
 

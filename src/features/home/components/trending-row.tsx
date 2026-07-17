@@ -7,12 +7,14 @@ import { motion } from "framer-motion";
 import { Reveal } from "@/components/common/reveal";
 import { PLACEHOLDER_IMAGE } from "@/constants/config";
 import { ROUTES } from "@/constants/routes";
+import { useMediaQuery } from "@/hooks/use-media-query";
 import type { Movie } from "@/types/movie";
 import { resolveImageSrc } from "@/utils/image";
 import { ChevronRight } from "lucide-react";
 
 export function TrendingRow({ movies }: { movies: Movie[] }) {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const isDesktop = useMediaQuery("(min-width: 640px)");
 
   function scrollNext() {
     scrollRef.current?.scrollBy({ left: 480, behavior: "smooth" });
@@ -22,12 +24,27 @@ export function TrendingRow({ movies }: { movies: Movie[] }) {
     <section className="space-y-3">
       <Reveal className="flex items-center justify-between px-4 sm:px-8">
         <h2 className="text-lg font-semibold text-white">Top Trending Movies</h2>
-        <Link
-          href={ROUTES.category}
-          className="flex items-center gap-1 text-sm font-medium text-white/60 hover:text-white"
-        >
-          View All <ChevronRight size={14} />
-        </Link>
+        {/* Desktop: navigates to the full catalog. Mobile: there's no
+         * separate floating scroll button there (removed below), so this
+         * same circle just scrolls the row instead. */}
+        {isDesktop ? (
+          <Link
+            href={ROUTES.category}
+            aria-label="Xem tất cả"
+            className="flex h-8 w-8 items-center justify-center rounded-full border border-white/30 text-white/70 transition-colors hover:border-white hover:text-white"
+          >
+            <ChevronRight size={16} />
+          </Link>
+        ) : (
+          <button
+            type="button"
+            onClick={scrollNext}
+            aria-label="Cuộn tiếp"
+            className="flex h-8 w-8 items-center justify-center rounded-full border border-white/30 text-white/70 transition-colors hover:border-white hover:text-white"
+          >
+            <ChevronRight size={16} />
+          </button>
+        )}
       </Reveal>
 
       <Reveal delay={0.1} className="relative">
@@ -70,7 +87,7 @@ export function TrendingRow({ movies }: { movies: Movie[] }) {
           aria-label="Cuộn tiếp"
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
-          className="absolute top-1/2 right-8"
+          className="absolute top-1/2 right-8 hidden sm:block"
         >
           <Image src="/image/ic_right.png" alt="" width={48} height={48} />
         </motion.button>

@@ -24,6 +24,7 @@ export interface Movie {
   releaseDate: string;
   duration: number;
   rating: number;
+  reviewsCount: number;
   views: number;
   isPremium: boolean;
   isFavorite?: boolean;

@@ -26,6 +26,7 @@ export interface BackendMovie {
   releaseDate?: string;
   duration?: number;
   rating: number;
+  reviewsCount: number;
   views: number;
   isPremium: boolean;
   isFavorite?: boolean;
@@ -74,6 +75,7 @@ export function mapMovieResponse(raw: BackendMovie): Movie {
     releaseDate: raw.releaseDate ?? "",
     duration: raw.duration ?? 0,
     rating: raw.rating,
+    reviewsCount: raw.reviewsCount ?? 0,
     views: raw.views,
     isPremium: raw.isPremium,
     isFavorite: raw.isFavorite ?? false,

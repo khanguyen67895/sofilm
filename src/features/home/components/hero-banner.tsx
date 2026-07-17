@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useMediaQuery } from "@/hooks/use-media-query";
 import type { HeroItem } from "@/types/movie";
 import { HeroCards } from "./hero-cards";
+import { HeroMobileOverlay } from "./hero-mobile-overlay";
 import { HeroSlide } from "./hero-slide";
 import { HeroControls } from "./hero-controls";
 
@@ -13,6 +15,7 @@ export const HERO_AUTOPLAY_MS = 7000;
 export function HeroBanner({ items }: { items: HeroItem[] }) {
   const [activeIndex, setActiveIndex] = useState(0);
   const active = items[activeIndex];
+  const isDesktop = useMediaQuery("(min-width: 640px)");
 
   function goTo(index: number) {
     setActiveIndex((index + items.length) % items.length);
@@ -31,9 +34,15 @@ export function HeroBanner({ items }: { items: HeroItem[] }) {
 
   return (
     <div className="relative -mt-20 h-215 w-full overflow-hidden">
-      <HeroCards items={items} activeIndex={activeIndex} onGoTo={goTo} />
-      <HeroSlide item={active} />
-      <HeroControls activeIndex={activeIndex} onGoTo={goTo} />
+      {isDesktop ? (
+        <>
+          <HeroCards items={items} activeIndex={activeIndex} onGoTo={goTo} />
+          <HeroSlide item={active} />
+          <HeroControls activeIndex={activeIndex} onGoTo={goTo} />
+        </>
+      ) : (
+        <HeroMobileOverlay items={items} activeIndex={activeIndex} onGoTo={goTo} />
+      )}
     </div>
   );
 }

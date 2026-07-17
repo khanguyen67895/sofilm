@@ -10,7 +10,7 @@ import { isValidImageSrc } from "@/utils/image";
 
 export function PremiumGate({ backdrop }: { backdrop: string }) {
   return (
-    <div className="relative h-156.75 w-full overflow-hidden rounded-xl bg-black">
+    <div className="relative h-65 w-full overflow-hidden rounded-xl bg-black sm:h-156.75">
       {isValidImageSrc(backdrop) && (
         <Image
           src={backdrop}

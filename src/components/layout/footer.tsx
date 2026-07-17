@@ -27,6 +27,19 @@ export function Footer() {
 
   if (isChromeLessRoute(pathname)) return null;
 
+  const socialLinks = SOCIALS.map(({ icon: Icon, label, bg, href }) => (
+    <motion.a
+      key={label}
+      href={href}
+      aria-label={label}
+      whileHover={{ scale: 1.15, y: -2 }}
+      whileTap={{ scale: 0.95 }}
+      className={`relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full text-white ${bg}`}
+    >
+      <Image src={Icon} alt="" fill sizes="40px" className="object-contain" />
+    </motion.a>
+  ));
+
   return (
     <footer className="relative mt-20 overflow-hidden border-t border-white/5 bg-black">
       <Image
@@ -38,7 +51,10 @@ export function Footer() {
       />
 
       <Reveal className="relative mx-auto flex max-w-6xl flex-col gap-8 px-4 py-14 sm:px-8">
-        <div className="flex flex-wrap items-center justify-between gap-4">
+        {/* Logo + socials share one row on desktop; on mobile the logo sits
+         * alone up top and the socials move below the contacts instead, to
+         * match the app's own mobile design (not squeezed into the same row). */}
+        <div className="flex flex-col items-center gap-6 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
           <Link href={ROUTES.home} aria-label={SITE_CONFIG.name}>
             <Image
               src="/image/ic_logo.png"
@@ -49,20 +65,7 @@ export function Footer() {
             />
           </Link>
 
-          <div className="flex items-center gap-4">
-            {SOCIALS.map(({ icon: Icon, label, bg, href }) => (
-              <motion.a
-                key={label}
-                href={href}
-                aria-label={label}
-                whileHover={{ scale: 1.15, y: -2 }}
-                whileTap={{ scale: 0.95 }}
-                className={`relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full text-white ${bg}`}
-              >
-                <Image src={Icon} alt="" fill sizes="40px" className="object-contain" />
-              </motion.a>
-            ))}
-          </div>
+          <div className="hidden items-center gap-4 sm:flex">{socialLinks}</div>
         </div>
 
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
@@ -76,6 +79,8 @@ export function Footer() {
             </span>
           ))}
         </div>
+
+        <div className="flex items-center justify-center gap-4 sm:hidden">{socialLinks}</div>
       </Reveal>
 
       <div className="relative pb-6 text-center text-sm text-white/40">

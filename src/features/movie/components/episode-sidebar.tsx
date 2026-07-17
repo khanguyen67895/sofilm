@@ -22,7 +22,7 @@ export function EpisodeSidebar({ slug, title, episodes, onClose }: EpisodeSideba
   const play = usePlayerStore((s) => s.play);
 
   return (
-    <div className="flex h-156.75 flex-col self-start rounded-lg bg-white/5 lg:sticky lg:top-8">
+    <div className="flex h-98.25 flex-col self-start rounded-lg border border-white/15 bg-black/40 backdrop-blur-xl lg:h-156.75 lg:sticky lg:top-8">
       <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
         <h3 className="text-sm font-semibold text-white">Danh Sách Tập</h3>
         {onClose && (

@@ -24,7 +24,7 @@ export const ROUTES = {
   adminShortNew: "/admin/shorts/new",
 } as const;
 
-/** Full-bleed screens that render their own layout — no public Header/Footer/MobileNav:
+/** Full-bleed screens that render their own layout — no public Header/Footer:
  * auth (login/register), the entire admin section, and Shorts (edge-to-edge full-viewport
  * video feed like TikTok/Reels, with its own minimal floating back control). */
 export function isChromeLessRoute(pathname: string): boolean {

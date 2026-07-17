@@ -80,7 +80,7 @@ export function VideoPlayer({ src, poster }: VideoPlayerProps) {
   return (
     <div
       ref={containerRef}
-      className="group relative h-156.75 w-full overflow-hidden rounded-lg bg-black"
+      className="group relative h-65 w-full overflow-hidden rounded-lg bg-black sm:h-156.75"
     >
       <video
         ref={videoRef}

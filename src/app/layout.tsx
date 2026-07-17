@@ -4,7 +4,6 @@ import "./globals.css";
 import { AppProviders } from "@/providers/app-providers";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
-import { MobileNav } from "@/components/layout/mobile-nav";
 import { PageTransition } from "@/components/layout/page-transition";
 import { SITE_CONFIG } from "@/constants/config";
 
@@ -49,11 +48,10 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col bg-black">
         <AppProviders>
           <Header />
-          <main className="flex-1 pb-14 md:pb-0">
+          <main className="flex-1">
             <PageTransition>{children}</PageTransition>
           </main>
           <Footer />
-          <MobileNav />
         </AppProviders>
       </body>
     </html>

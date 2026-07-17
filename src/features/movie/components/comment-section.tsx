@@ -35,24 +35,30 @@ export function CommentSection({ movieId }: { movieId: string }) {
   );
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 py-6">
       <h2 className="text-lg font-semibold text-white">Comment ({summary?.commentsCount ?? 0})</h2>
 
-      <div className="flex items-center gap-3">
+      <div className="flex p-4 rounded-3xl bg-[rgba(242,242,242,0.10)] items-center gap-3">
         <Avatar src={user?.avatar} name={user?.name} size={36} />
-        <input
-          ref={inputRef}
-          value={comment}
-          onChange={(e) => setComment(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") handlePost();
-          }}
-          placeholder="Write a comment..."
-          className="h-11 flex-1 rounded-full border border-white/15 bg-white/5 px-4 text-sm text-white outline-none placeholder:text-white/40 focus:border-brand"
-        />
-        <Button size="sm" onClick={handlePost} disabled={!comment.trim() || submitReview.isPending}>
-          Post
-        </Button>
+        <div className="flex h-11 min-w-0 flex-1 items-center gap-2 rounded-2xl border border-white/15 bg-white/5 py-2 pr-1.5 pl-4 focus-within:border-brand">
+          <input
+            ref={inputRef}
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handlePost();
+            }}
+            placeholder="Write a comment..."
+            className="h-full min-w-0 flex-1 bg-transparent text-base text-white outline-none placeholder:text-white/40"
+          />
+          <Button
+            size="sm"
+            onClick={handlePost}
+            disabled={!comment.trim() || submitReview.isPending}
+          >
+            Post
+          </Button>
+        </div>
       </div>
       {postError}
 

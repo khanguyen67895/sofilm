@@ -50,14 +50,14 @@ export function NotificationBell() {
   }
 
   return (
-    <div ref={containerRef} className="relative hidden shrink-0 sm:block">
+    <div ref={containerRef} className="relative shrink-0">
       <button
         type="button"
         onClick={toggleOpen}
         aria-label="Thông báo"
         className="relative block"
       >
-        <NotificationIcon width={46} height={46} />
+        <NotificationIcon width={46} height={46} className="h-8 w-8 sm:h-11.5 sm:w-11.5" />
         {hasUnread && (
           <span className="absolute top-2 right-2 h-2.5 w-2.5 rounded-full bg-brand ring-2 ring-black" />
         )}
@@ -70,7 +70,7 @@ export function NotificationBell() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.15 }}
-            className="absolute right-0 z-50 mt-2 w-96 max-w-[90vw] overflow-hidden rounded-xl border border-brand/40 bg-black/95 shadow-2xl backdrop-blur-xl"
+            className="fixed inset-x-4 top-20 z-50 overflow-hidden rounded-xl border border-brand/40 bg-black/95 shadow-2xl backdrop-blur-xl sm:absolute sm:inset-x-auto sm:top-auto sm:right-0 sm:mt-2 sm:w-96 sm:max-w-[90vw]"
           >
             <div className="border-b border-white/10 px-4 py-3">
               <h3 className="font-heading text-sm font-semibold text-white uppercase">

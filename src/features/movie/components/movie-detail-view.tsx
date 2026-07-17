@@ -12,6 +12,7 @@ import { PLACEHOLDER_IMAGE } from "@/constants/config";
 import { formatDuration, formatYear } from "@/utils/format";
 import { cn } from "@/utils/cn";
 import { resolveImageSrc } from "@/utils/image";
+import { useMediaQuery } from "@/hooks/use-media-query";
 import { usePlayerStore } from "@/store/player.store";
 import { useMovieDetail } from "../hooks/use-movie-detail";
 import { EpisodeSidebar } from "./episode-sidebar";
@@ -26,6 +27,10 @@ export function MovieDetailView({ slug }: { slug: string }) {
   const currentMovieSlug = usePlayerStore((s) => s.currentMovieSlug);
   const currentEpisode = usePlayerStore((s) => s.currentEpisode);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  // Below `lg`, the episode list isn't a floating sidebar next to the video —
+  // it's an inline card stacked between the description and Rating & Reviews
+  // (see render below), matching the mobile design.
+  const isDesktopLayout = useMediaQuery("(min-width: 1024px)");
 
   if (isError) {
     return <ErrorState title="Không thể tải thông tin phim." onRetry={() => refetch()} />;
@@ -58,7 +63,10 @@ export function MovieDetailView({ slug }: { slug: string }) {
       className="space-y-8 px-4 py-8 sm:px-8"
     >
       <div
-        className={cn("grid gap-4", hasEpisodes && isSidebarOpen && "lg:grid-cols-[1fr_300px]")}
+        className={cn(
+          "grid grid-cols-1 gap-4",
+          hasEpisodes && isSidebarOpen && isDesktopLayout && "lg:grid-cols-[1fr_300px]"
+        )}
       >
         {/* Left column — video and everything under it stay confined to the
          * player's own width instead of spanning the full page, so the
@@ -78,7 +86,7 @@ export function MovieDetailView({ slug }: { slug: string }) {
                   poster={resolveImageSrc(movie?.backdrop, PLACEHOLDER_IMAGE)}
                 />
               ) : (
-                <div className="flex h-156.75 w-full items-center justify-center rounded-lg bg-black">
+                <div className="flex h-65 w-full items-center justify-center rounded-lg bg-black sm:h-156.75">
                   <EmptyState
                     title="Chưa có video"
                     description="Nội dung đang được cập nhật, quay lại sau bạn nhé!"
@@ -100,10 +108,11 @@ export function MovieDetailView({ slug }: { slug: string }) {
             )}
           </div>
 
-          <div className="flex flex-wrap items-start justify-between gap-4">
-            <div className="space-y-2">
-              <h1 className="text-2xl font-bold text-white sm:text-3xl">{movie.title}</h1>
-              <div className="flex flex-wrap items-center gap-3 text-sm text-white/60">
+          <div className="space-y-3">
+            <h1 className="text-2xl font-bold text-white sm:text-3xl">{movie.title}</h1>
+
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div className="flex min-w-0 flex-wrap items-center gap-3 text-sm text-white/60">
                 <span className="flex items-center gap-1">
                   <RatingStarIcon width={14} height={13} /> {movie.rating}
                 </span>
@@ -117,36 +126,50 @@ export function MovieDetailView({ slug }: { slug: string }) {
                   </span>
                 )}
               </div>
-              <motion.div
-                className="flex flex-wrap gap-2"
-                initial="hidden"
-                animate="show"
-                variants={{ hidden: {}, show: { transition: { staggerChildren: 0.05 } } }}
-              >
-                {movie.genres.map((genre) => (
-                  <motion.span
-                    key={genre}
-                    variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0 } }}
-                    className="rounded-md bg-white/10 px-3 py-1 text-xs font-medium text-white/80"
-                  >
-                    {genre}
-                  </motion.span>
-                ))}
-              </motion.div>
+              <div className="shrink-0">
+                <LikeShareBar movie={movie} />
+              </div>
             </div>
-            <LikeShareBar movie={movie} />
+
+            <motion.div
+              className="flex flex-wrap gap-2"
+              initial="hidden"
+              animate="show"
+              variants={{ hidden: {}, show: { transition: { staggerChildren: 0.05 } } }}
+            >
+              {movie.genres.map((genre) => (
+                <motion.span
+                  key={genre}
+                  variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0 } }}
+                  className="rounded-md bg-white/10 px-3 py-1 text-xs font-medium text-white/80"
+                >
+                  {genre}
+                </motion.span>
+              ))}
+            </motion.div>
           </div>
 
           <p className="text-white/70">{movie.description}</p>
+
+          {/* Below `lg`, the episode list renders inline here (between the
+           * description and Rating & Reviews) instead of as a sidebar. */}
+          {!isDesktopLayout && hasEpisodes && isSidebarOpen && movie.episodes && (
+            <EpisodeSidebar
+              slug={movie.slug}
+              title={movie.title}
+              episodes={movie.episodes}
+              onClose={() => setIsSidebarOpen(false)}
+            />
+          )}
 
           <RatingReviewsCard movieId={movie.id} />
 
           <CommentSection movieId={movie.id} />
         </div>
 
-        {/* Right column — episode sidebar only, naturally shorter than the
-         * left column's full content stack. */}
-        {hasEpisodes && isSidebarOpen && movie.episodes && (
+        {/* Right column (`lg` and up only) — episode sidebar, naturally
+         * shorter than the left column's full content stack. */}
+        {isDesktopLayout && hasEpisodes && isSidebarOpen && movie.episodes && (
           <EpisodeSidebar
             slug={movie.slug}
             title={movie.title}

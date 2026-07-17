@@ -23,6 +23,14 @@
   --foreground: #171717;
 }
 
+html,
+body {
+  /* Safety net — a single misbehaving element (fixed width, absolute
+   * positioning gone wrong) shouldn't be able to force the whole page to
+   * scroll horizontally on mobile. */
+  overflow-x: hidden;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);

@@ -32,7 +32,7 @@ export function RatingReviewsCard({ movieId }: { movieId: string }) {
   const roundedAverage = Math.round(average);
 
   return (
-    <div className="grid gap-6 rounded-xl bg-white/5 p-6 sm:grid-cols-[1fr_1.5fr_auto]">
+    <div className="grid grid-cols-1 gap-6 rounded-xl bg-white/5 p-6 sm:grid-cols-[1fr_1.5fr_auto]">
       <div>
         <h3 className="mb-3 text-lg font-semibold text-white">Rating & Reviews</h3>
         <p className="text-5xl font-bold text-white">{average.toFixed(1)}</p>

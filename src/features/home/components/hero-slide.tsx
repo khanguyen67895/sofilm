@@ -19,11 +19,12 @@ const ITEM_VARIANTS = {
   show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" as const } },
 };
 
-/** The backdrop/poster image itself lives in `HeroCards` now (it's the
- * element that morphs between full-bleed and thumbnail). This component only
- * owns what sits *on top* of that stage for the active item: an optional
- * video layer that fades in once the card has settled, the darkening
- * gradients, and the staggered title/description/CTA text. */
+/** Desktop-only — mobile uses `HeroMobileOverlay` instead (see HeroBanner).
+ * The backdrop/poster image itself lives in `HeroCards` (it's the element
+ * that morphs between full-bleed and thumbnail). This component only owns
+ * what sits *on top* of that stage for the active item: an optional video
+ * layer that fades in once the card has settled, the darkening gradients,
+ * and the staggered title/description/CTA text. */
 export function HeroSlide({ item }: { item: HeroItem }) {
   return (
     <>
@@ -50,19 +51,16 @@ export function HeroSlide({ item }: { item: HeroItem }) {
         variants={CONTENT_VARIANTS}
         initial="hidden"
         animate="show"
-        className="absolute bottom-32 left-4 z-20 max-w-sm space-y-4 sm:bottom-28 sm:left-8 sm:max-w-md lg:max-w-lg"
+        className="absolute bottom-28 left-8 z-20 max-w-md space-y-4 lg:max-w-lg"
       >
         <motion.h1
           variants={ITEM_VARIANTS}
-          className="text-3xl leading-tight font-extrabold text-white uppercase sm:text-5xl"
+          className="text-5xl leading-tight font-extrabold text-white uppercase"
         >
           {item.title}
         </motion.h1>
         {item.description && (
-          <motion.p
-            variants={ITEM_VARIANTS}
-            className="line-clamp-3 text-sm text-white/80 sm:text-base"
-          >
+          <motion.p variants={ITEM_VARIANTS} className="line-clamp-3 text-base text-white/80">
             {item.description}
           </motion.p>
         )}

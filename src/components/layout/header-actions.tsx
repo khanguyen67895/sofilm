@@ -17,14 +17,16 @@ export function HeaderActions({ avatar }: { avatar?: string }) {
     <>
       <NotificationBell />
 
-      <Link href={ROUTES.subscription} className="hidden sm:block">
-        <Button size="md">Upgrade</Button>
+      <Link href={ROUTES.subscription}>
+        <Button size="md" className="h-9 px-4 text-[11px] sm:h-11 sm:px-6 sm:text-sm">
+          Upgrade
+        </Button>
       </Link>
 
       <Link
         href={ROUTES.profile}
         aria-label="Tài khoản"
-        className="relative h-11 w-11 shrink-0 overflow-hidden rounded-full bg-stone-300"
+        className="relative hidden h-11 w-11 shrink-0 overflow-hidden rounded-full bg-stone-300 sm:block"
       >
         <AnimatePresence>
           <motion.div

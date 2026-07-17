@@ -1,6 +1,8 @@
 import axios, { AxiosError, type InternalAxiosRequestConfig } from "axios";
 import { API_CONFIG, AUTH_TOKEN_KEY, REFRESH_TOKEN_KEY } from "@/constants/config";
 import { ENDPOINTS } from "@/constants/endpoints";
+import type { ApiResponse } from "@/types/api";
+import type { AuthTokens } from "@/types/user";
 
 /** Unauthenticated auth endpoints — a 401 from these means "wrong credentials"
  * or "invalid/expired token", not "session expired". They must never trigger
@@ -71,12 +73,13 @@ apiClient.interceptors.response.use(
       const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
       if (!refreshToken) throw error;
 
-      const { data } = await axios.post(`${API_CONFIG.baseURL}/auth/refresh`, {
-        refreshToken,
-      });
+      const { data } = await axios.post<ApiResponse<AuthTokens>>(
+        `${API_CONFIG.baseURL}/auth/refresh`,
+        { refreshToken }
+      );
 
-      localStorage.setItem(AUTH_TOKEN_KEY, data.accessToken);
-      localStorage.setItem(REFRESH_TOKEN_KEY, data.refreshToken);
+      localStorage.setItem(AUTH_TOKEN_KEY, data.data.accessToken);
+      localStorage.setItem(REFRESH_TOKEN_KEY, data.data.refreshToken);
 
       pendingQueue.forEach((resolve) => resolve());
       pendingQueue = [];

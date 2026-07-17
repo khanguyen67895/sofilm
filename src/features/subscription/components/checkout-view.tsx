@@ -167,7 +167,7 @@ export function CheckoutView() {
         })}
       </Reveal>
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_360px]">
         <Reveal delay={0.1} className="space-y-3">
           <h2 className="text-lg font-semibold text-white">Choose a payment method</h2>
           {PAYMENT_METHODS.map((method) => {

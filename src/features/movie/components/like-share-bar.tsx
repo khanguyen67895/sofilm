@@ -25,14 +25,15 @@ export function LikeShareBar({ movie }: { movie: Movie }) {
       <Button
         variant="outline"
         size="sm"
+        className="w-9 px-0 sm:w-auto sm:px-4"
         onClick={() => toggleFavorite.mutate({ movie, isFavorite: liked })}
       >
         <Heart size={16} className={cn(liked && "fill-brand text-brand")} />
-        Like
+        <span className="hidden sm:inline">Like</span>
       </Button>
-      <Button variant="outline" size="sm" onClick={share}>
+      <Button variant="outline" size="sm" className="w-9 px-0 sm:w-auto sm:px-4" onClick={share}>
         <Share2 size={16} />
-        Share
+        <span className="hidden sm:inline">Share</span>
       </Button>
       {toggleFavorite.isError && (
         <span className="text-xs text-red-500">Thao tác thất bại, vui lòng thử lại.</span>

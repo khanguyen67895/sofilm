@@ -19,7 +19,8 @@ interface HeroCardsProps {
   onGoTo: (index: number) => void;
 }
 
-/** One persistent `motion.div` per item, mapped in stable array order — only
+/** Desktop-only — mobile uses `HeroMobileOverlay` instead (see HeroBanner).
+ * One persistent `motion.div` per item, mapped in stable array order — only
  * its position/size (full-bleed vs thumbnail slot) changes between renders.
  * Framer's `layout` prop diffs that automatically into a FLIP transform, so
  * the active card visibly shrinks into its thumbnail slot and the newly

@@ -16,9 +16,9 @@ export function useHeroBanners() {
           id: banner.id,
           slug: banner.movie?.slug,
           title: banner.movie?.title ?? banner.title ?? "",
-          description: banner.movie?.description,
+          description: banner.content || banner.movie?.description,
           poster: banner.movie?.poster,
-          backdrop: banner.imageUrl || banner.movie?.backdrop,
+          backdrop: banner.thumbnailUrl || banner.imageUrl || banner.movie?.backdrop,
           videoUrl: banner.videoUrl ?? banner.movie?.videoUrl,
         })
       );

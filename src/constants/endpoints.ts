@@ -13,7 +13,7 @@ export const ENDPOINTS = {
     detail: (slug: string) => `/movies/${slug}`,
     trending: "/movies/trending",
     latest: "/movies/latest",
-    topView: "/movies/top-view",
+    topRated: "/movies/top-rated",
     byCategory: (categorySlug: string) => `/movies/category/${categorySlug}`,
     search: "/movies/search",
     recommend: (slug: string) => `/movies/${slug}/recommend`,

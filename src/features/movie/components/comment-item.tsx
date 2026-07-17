@@ -71,6 +71,9 @@ export function CommentItem({ movieId, review, onReply }: CommentItemProps) {
           <button type="button" className="flex items-center gap-1 hover:text-white">
             <Share2 size={13} /> Share
           </button>
+          {toggleLike.isError && (
+            <span className="text-red-500">Thao tác thất bại, vui lòng thử lại.</span>
+          )}
         </div>
       </div>
     </div>

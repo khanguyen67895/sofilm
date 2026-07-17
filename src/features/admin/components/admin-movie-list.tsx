@@ -7,6 +7,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { PlusCircle, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ErrorState } from "@/components/common/error-state";
 import { PLACEHOLDER_IMAGE } from "@/constants/config";
 import { ROUTES } from "@/constants/routes";
 import { resolveImageSrc } from "@/utils/image";
@@ -20,7 +21,7 @@ const ROW_VARIANTS = {
 
 export function AdminMovieList() {
   const [page, setPage] = useState(1);
-  const { data, isLoading } = useAdminMovies(page);
+  const { data, isLoading, isError, refetch } = useAdminMovies(page);
   const deleteMovie = useDeleteMovie();
 
   function handleDelete(e: React.MouseEvent, id: string, title: string) {
@@ -42,7 +43,13 @@ export function AdminMovieList() {
         </Link>
       </div>
 
-      {isLoading ? (
+      {deleteMovie.isError && (
+        <p className="text-xs text-red-500">Xoá phim thất bại. Vui lòng thử lại.</p>
+      )}
+
+      {isError ? (
+        <ErrorState title="Không thể tải danh sách phim." onRetry={() => refetch()} />
+      ) : isLoading ? (
         <div className="space-y-2">
           {Array.from({ length: 6 }).map((_, i) => (
             <Skeleton key={i} className="h-16 w-full" />

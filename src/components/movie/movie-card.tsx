@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -8,25 +7,19 @@ import { FavoriteIcon, UnfavoriteIcon } from "@/components/common/favorite-icons
 import { RatingStarIcon } from "@/components/common/rating-star-icon";
 import { PLACEHOLDER_IMAGE } from "@/constants/config";
 import { ROUTES } from "@/constants/routes";
-import { movieService } from "@/services/movie/movie.service";
+import { useFavoriteIds } from "@/hooks/use-favorite-ids";
+import { useToggleFavorite } from "@/hooks/use-toggle-favorite";
 import type { Movie } from "@/types/movie";
 import { resolveImageSrc } from "@/utils/image";
 
 export function MovieCard({ movie }: { movie: Movie }) {
-  const [isFavorite, setIsFavorite] = useState(Boolean(movie.isFavorite));
+  const isFavorite = Boolean(useFavoriteIds().data?.has(movie.id));
+  const toggleFavorite = useToggleFavorite();
 
-  function toggleFavorite(e: React.MouseEvent) {
+  function handleToggleFavorite(e: React.MouseEvent) {
     e.preventDefault();
     e.stopPropagation();
-
-    const wasFavorite = isFavorite;
-    setIsFavorite(!wasFavorite);
-
-    const request = wasFavorite
-      ? movieService.removeFavorite(movie.id)
-      : movieService.addFavorite(movie.id);
-
-    request.catch(() => setIsFavorite(wasFavorite));
+    toggleFavorite.mutate({ movie, isFavorite });
   }
 
   return (
@@ -56,7 +49,7 @@ export function MovieCard({ movie }: { movie: Movie }) {
           />
           <motion.button
             type="button"
-            onClick={toggleFavorite}
+            onClick={handleToggleFavorite}
             aria-label={isFavorite ? "Bỏ yêu thích" : "Yêu thích"}
             whileTap={{ scale: 0.8 }}
             className="absolute top-2 right-2"

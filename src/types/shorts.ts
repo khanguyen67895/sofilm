@@ -1,6 +1,7 @@
 export interface Short {
   id: string;
   title: string;
+  content?: string;
   videoUrl: string;
   thumbnail: string;
   movieSlug?: string;
@@ -12,6 +13,7 @@ export interface Short {
 export interface AdminShortItem {
   id: string;
   title: string;
+  content?: string;
   videoUrl: string;
   thumbnail: string;
   movieSlug?: string;
@@ -24,5 +26,7 @@ export interface AdminShortItem {
 export interface CreateShortPayload {
   title: string;
   videoId: string;
+  content?: string;
+  thumbnailUrl?: string;
   movieSlug?: string;
 }

@@ -12,7 +12,7 @@ import { useSearchMovies } from "../hooks/use-search-movies";
 export function SearchView() {
   const searchParams = useSearchParams();
   const [query, setQuery] = useState(searchParams.get("q") ?? "");
-  const { data: movies, isFetching } = useSearchMovies(query);
+  const { data: movies, isFetching, isError, refetch } = useSearchMovies(query);
 
   return (
     <div className="space-y-6 px-4 py-8 sm:px-8">
@@ -39,6 +39,23 @@ export function SearchView() {
             className="flex justify-center py-6"
           >
             <Spinner />
+          </motion.div>
+        ) : isError ? (
+          <motion.div
+            key="error"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            className="flex flex-col items-center gap-2 py-6 text-center"
+          >
+            <p className="text-white/50">Không thể tìm kiếm lúc này. Vui lòng thử lại.</p>
+            <button
+              type="button"
+              onClick={() => refetch()}
+              className="text-sm font-medium text-brand hover:underline"
+            >
+              Thử lại
+            </button>
           </motion.div>
         ) : movies && movies.length === 0 && query.trim() ? (
           <motion.p

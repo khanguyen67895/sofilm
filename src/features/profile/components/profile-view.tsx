@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/constants/routes";
 import { useAuthStore } from "@/store/auth.store";
 import { useHydrated } from "@/hooks/use-hydrated";
+import { FavoritesSection } from "./favorites-section";
 
 export function ProfileView() {
   const { user, isAuthenticated, clearSession } = useAuthStore();
@@ -53,6 +54,8 @@ export function ProfileView() {
       <Button variant="outline" onClick={clearSession}>
         <LogOut size={16} /> Đăng Xuất
       </Button>
+
+      <FavoritesSection />
     </motion.div>
   );
 }

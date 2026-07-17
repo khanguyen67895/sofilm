@@ -7,6 +7,7 @@ import { ROUTES } from "@/constants/routes";
 import { useGenres } from "@/features/movie";
 import { movieAdminService } from "@/services/admin/movie-admin.service";
 import type { Movie, MovieType } from "@/types/movie";
+import { getApiErrorMessages } from "@/utils/api-error";
 import { isValidImageSrc } from "@/utils/image";
 import { useCreateMovie } from "../hooks/use-create-movie";
 import { useUpdateMovie } from "../hooks/use-update-movie";
@@ -23,7 +24,7 @@ export function AdminMovieForm({ mode, movie }: AdminMovieFormProps) {
   const router = useRouter();
   const createMovie = useCreateMovie();
   const updateMovie = useUpdateMovie(movie?.id ?? "");
-  const { data: genres = [] } = useGenres();
+  const { data: genres = [], isError: isGenresError } = useGenres();
 
   const [title, setTitle] = useState(movie?.title ?? "");
   const [slug, setSlug] = useState(movie?.slug ?? "");
@@ -41,6 +42,7 @@ export function AdminMovieForm({ mode, movie }: AdminMovieFormProps) {
   const [queuedEpisodes, setQueuedEpisodes] = useState<QueuedEpisode[]>([]);
   const [errors, setErrors] = useState<AdminMovieFieldErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const isPending = isSubmitting || createMovie.isPending || updateMovie.isPending;
 
@@ -71,6 +73,7 @@ export function AdminMovieForm({ mode, movie }: AdminMovieFormProps) {
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
+    setSubmitError(null);
     if (!validate()) return;
 
     const payload = {
@@ -100,11 +103,14 @@ export function AdminMovieForm({ mode, movie }: AdminMovieFormProps) {
           });
         }
         router.push(ROUTES.adminMovieEdit(created.id));
-      } catch {
+      } catch (err) {
+        setSubmitError(getApiErrorMessages(err).join(" "));
         setIsSubmitting(false);
       }
     } else if (movie) {
-      updateMovie.mutate(payload);
+      updateMovie.mutate(payload, {
+        onError: (err) => setSubmitError(getApiErrorMessages(err).join(" ")),
+      });
     }
   }
 
@@ -166,6 +172,13 @@ export function AdminMovieForm({ mode, movie }: AdminMovieFormProps) {
           </p>
         )}
       </div>
+
+      {isGenresError && (
+        <p className="text-xs text-red-500">
+          Không thể tải danh sách thể loại. Vui lòng tải lại trang.
+        </p>
+      )}
+      {submitError && <p className="text-sm text-red-500">{submitError}</p>}
 
       <Button type="submit" disabled={isPending || blocked}>
         {isPending ? "Đang lưu..." : mode === "create" ? "Tạo Phim" : "Lưu Thay Đổi"}

@@ -90,6 +90,9 @@ export function RatingReviewsCard({ movieId }: { movieId: string }) {
             >
               {submitReview.isPending ? "Đang gửi..." : "Gửi Đánh Giá"}
             </Button>
+            {submitReview.isError && (
+              <p className="text-xs text-red-500">Gửi đánh giá thất bại. Vui lòng thử lại.</p>
+            )}
           </div>
         ) : (
           <Button variant="outline" size="sm" onClick={() => setShowForm(true)}>

@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { Clock, Crown, ListVideo } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/common/empty-state";
+import { ErrorState } from "@/components/common/error-state";
 import { RatingStarIcon } from "@/components/common/rating-star-icon";
 import { VideoPlayer } from "@/components/player/video-player";
 import { PLACEHOLDER_IMAGE } from "@/constants/config";
@@ -21,10 +22,14 @@ import { CommentSection } from "./comment-section";
 import { SimilarMoviesSection } from "./similar-movies-section";
 
 export function MovieDetailView({ slug }: { slug: string }) {
-  const { data: movie, isLoading } = useMovieDetail(slug);
+  const { data: movie, isLoading, isError, refetch } = useMovieDetail(slug);
   const currentMovieSlug = usePlayerStore((s) => s.currentMovieSlug);
   const currentEpisode = usePlayerStore((s) => s.currentEpisode);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+
+  if (isError) {
+    return <ErrorState title="Không thể tải thông tin phim." onRetry={() => refetch()} />;
+  }
 
   if (isLoading || !movie) {
     return (
@@ -63,7 +68,12 @@ export function MovieDetailView({ slug }: { slug: string }) {
           <div className="space-y-2">
             {canWatch ? (
               videoSrc ? (
+                // Keyed by src so switching episodes fully remounts the
+                // player — its internal playback/scrubber state (currentTime,
+                // duration, buffered) resets for free instead of briefly
+                // showing the previous episode's progress.
                 <VideoPlayer
+                  key={videoSrc}
                   src={videoSrc}
                   poster={resolveImageSrc(movie?.backdrop, PLACEHOLDER_IMAGE)}
                 />
@@ -124,7 +134,7 @@ export function MovieDetailView({ slug }: { slug: string }) {
                 ))}
               </motion.div>
             </div>
-            <LikeShareBar movieId={movie.id} isFavorite={movie.isFavorite} title={movie.title} />
+            <LikeShareBar movie={movie} />
           </div>
 
           <p className="text-white/70">{movie.description}</p>

@@ -4,12 +4,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRef } from "react";
 import { motion } from "framer-motion";
-import { ChevronRight } from "lucide-react";
 import { Reveal } from "@/components/common/reveal";
 import { PLACEHOLDER_IMAGE } from "@/constants/config";
 import { ROUTES } from "@/constants/routes";
 import type { Movie } from "@/types/movie";
 import { resolveImageSrc } from "@/utils/image";
+import { ChevronRight } from "lucide-react";
 
 export function TrendingRow({ movies }: { movies: Movie[] }) {
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -70,9 +70,9 @@ export function TrendingRow({ movies }: { movies: Movie[] }) {
           aria-label="Cuộn tiếp"
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
-          className="absolute top-1/2 right-2 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-black/70 text-white hover:bg-brand sm:flex"
+          className="absolute top-1/2 right-8"
         >
-          <ChevronRight size={20} />
+          <Image src="/image/ic_right.png" alt="" width={48} height={48} />
         </motion.button>
       </Reveal>
     </section>

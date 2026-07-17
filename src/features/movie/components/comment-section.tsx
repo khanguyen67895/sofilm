@@ -30,6 +30,10 @@ export function CommentSection({ movieId }: { movieId: string }) {
     );
   }
 
+  const postError = submitReview.isError && (
+    <p className="text-xs text-red-500">Đăng bình luận thất bại. Vui lòng thử lại.</p>
+  );
+
   return (
     <div className="space-y-4">
       <h2 className="text-lg font-semibold text-white">Comment ({summary?.commentsCount ?? 0})</h2>
@@ -50,6 +54,7 @@ export function CommentSection({ movieId }: { movieId: string }) {
           Post
         </Button>
       </div>
+      {postError}
 
       {isLoading ? (
         <div className="space-y-3">

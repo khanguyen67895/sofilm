@@ -5,8 +5,11 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { ROUTES } from "@/constants/routes";
+import { getApiErrorMessages } from "@/utils/api-error";
 import { useCreateShort } from "../hooks/use-create-short";
+import { ImageUploadField } from "./image-upload-field";
 import { VideoUploadField } from "./video-upload-field";
 
 interface FieldErrors {
@@ -20,9 +23,12 @@ export function AdminShortForm() {
   const createShort = useCreateShort();
 
   const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [thumbnailUrl, setThumbnailUrl] = useState("");
   const [videoId, setVideoId] = useState("");
   const [hasVideo, setHasVideo] = useState(false);
   const [errors, setErrors] = useState<FieldErrors>({});
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const videoMissing = !hasVideo;
 
@@ -35,11 +41,20 @@ export function AdminShortForm() {
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
+    setSubmitError(null);
     if (!validate()) return;
 
     createShort.mutate(
-      { title: title.trim(), videoId },
-      { onSuccess: () => router.push(ROUTES.adminShorts) }
+      {
+        title: title.trim(),
+        videoId,
+        content: content.trim() || undefined,
+        thumbnailUrl: thumbnailUrl || undefined,
+      },
+      {
+        onSuccess: () => router.push(ROUTES.adminShorts),
+        onError: (err) => setSubmitError(getApiErrorMessages(err).join(" ")),
+      }
     );
   }
 
@@ -53,6 +68,24 @@ export function AdminShortForm() {
           aria-invalid={Boolean(errors.title)}
         />
         {errors.title && <p className="mt-1 text-xs text-red-500">{errors.title}</p>}
+      </div>
+
+      <div>
+        <Label>Nội dung (tuỳ chọn)</Label>
+        <p className="mb-2 text-xs text-white/50">Caption hiển thị dưới tiêu đề trên feed.</p>
+        <Textarea rows={3} value={content} onChange={(e) => setContent(e.target.value)} />
+      </div>
+
+      <div>
+        <Label>Thumbnail (tuỳ chọn)</Label>
+        <p className="mb-2 text-xs text-white/50">
+          Nếu không tải lên, hệ thống sẽ tự dùng ảnh thumbnail tạo ra từ video.
+        </p>
+        <ImageUploadField
+          label="Thumbnail"
+          previewUrl={thumbnailUrl}
+          onUploaded={setThumbnailUrl}
+        />
       </div>
 
       <div>
@@ -71,6 +104,8 @@ export function AdminShortForm() {
           </p>
         )}
       </div>
+
+      {submitError && <p className="text-sm text-red-500">{submitError}</p>}
 
       <Button type="submit" disabled={createShort.isPending || videoMissing}>
         {createShort.isPending ? "Đang lưu..." : "Tạo Video Ngắn"}

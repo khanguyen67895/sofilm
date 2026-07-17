@@ -90,11 +90,11 @@ export const movieService = {
   async getHomeRows(): Promise<MovieRow[]> {
     const isAuthenticated = useAuthStore.getState().isAuthenticated;
 
-    const [latestRes, topViewRes, continueWatching] = await Promise.all([
+    const [latestRes, topRatedRes, continueWatching] = await Promise.all([
       apiClient.get<ApiResponse<BackendMovie[]>>(ENDPOINTS.movies.latest, {
         params: { limit: 20 },
       }),
-      apiClient.get<ApiResponse<BackendMovie[]>>(ENDPOINTS.movies.topView, {
+      apiClient.get<ApiResponse<BackendMovie[]>>(ENDPOINTS.movies.topRated, {
         params: { limit: 20 },
       }),
       isAuthenticated ? movieService.getWatchHistory().catch(() => []) : Promise.resolve([]),
@@ -112,7 +112,7 @@ export const movieService = {
     rows.push({
       id: "top-rated",
       title: "Top Rated",
-      movies: topViewRes.data.data.map(mapMovieResponse),
+      movies: topRatedRes.data.data.map(mapMovieResponse),
     });
 
     return rows;
@@ -156,11 +156,18 @@ export const movieService = {
     return data.data.items.map(mapMovieResponse);
   },
 
-  /** 1-indexed. `genreSlug` filters via the backend's genre-slug join. */
-  async getPage(page: number, pageSize = 24, genreSlug?: string): Promise<PaginatedResponse<Movie>> {
+  /** 1-indexed. `genreSlug` filters via the backend's genre-slug join.
+   * `sort: "title"` is used by the homepage's "All Movies" preview so it
+   * doesn't just repeat the New Releases row's newest-first ordering. */
+  async getPage(
+    page: number,
+    pageSize = 24,
+    genreSlug?: string,
+    sort?: "newest" | "title"
+  ): Promise<PaginatedResponse<Movie>> {
     const { data } = await apiClient.get<ApiResponse<BackendPage<BackendMovie>>>(
       ENDPOINTS.movies.list,
-      { params: { page, limit: pageSize, genre: genreSlug } }
+      { params: { page, limit: pageSize, genre: genreSlug, sort } }
     );
     const backendPage = data.data;
     return {

@@ -29,8 +29,9 @@ export function formatBillingCycle(durationDays: number): string {
 }
 
 export function formatCountdown(totalSeconds: number): string {
-  const m = Math.floor(Math.max(0, totalSeconds) / 60);
-  const s = Math.max(0, totalSeconds) % 60;
+  const total = Math.floor(Math.max(0, totalSeconds));
+  const m = Math.floor(total / 60);
+  const s = total % 60;
   return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
 }
 

@@ -1,35 +1,20 @@
 "use client";
 
-import { useState } from "react";
 import { Heart, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { movieService } from "@/services/movie/movie.service";
+import { useFavoriteIds } from "@/hooks/use-favorite-ids";
+import { useToggleFavorite } from "@/hooks/use-toggle-favorite";
+import type { Movie } from "@/types/movie";
 import { cn } from "@/utils/cn";
 
-interface LikeShareBarProps {
-  movieId: string;
-  isFavorite?: boolean;
-  title: string;
-}
-
-export function LikeShareBar({ movieId, isFavorite, title }: LikeShareBarProps) {
-  const [liked, setLiked] = useState(Boolean(isFavorite));
-
-  function toggleLike() {
-    const wasLiked = liked;
-    setLiked(!wasLiked);
-
-    const request = wasLiked
-      ? movieService.removeFavorite(movieId)
-      : movieService.addFavorite(movieId);
-
-    request.catch(() => setLiked(wasLiked));
-  }
+export function LikeShareBar({ movie }: { movie: Movie }) {
+  const liked = Boolean(useFavoriteIds().data?.has(movie.id));
+  const toggleFavorite = useToggleFavorite();
 
   async function share() {
     const url = window.location.href;
     if (navigator.share) {
-      navigator.share({ title, url }).catch(() => {});
+      navigator.share({ title: movie.title, url }).catch(() => {});
       return;
     }
     await navigator.clipboard.writeText(url);
@@ -37,7 +22,11 @@ export function LikeShareBar({ movieId, isFavorite, title }: LikeShareBarProps) 
 
   return (
     <div className="flex items-center gap-2">
-      <Button variant="outline" size="sm" onClick={toggleLike}>
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={() => toggleFavorite.mutate({ movie, isFavorite: liked })}
+      >
         <Heart size={16} className={cn(liked && "fill-brand text-brand")} />
         Like
       </Button>
@@ -45,6 +34,9 @@ export function LikeShareBar({ movieId, isFavorite, title }: LikeShareBarProps) 
         <Share2 size={16} />
         Share
       </Button>
+      {toggleFavorite.isError && (
+        <span className="text-xs text-red-500">Thao tác thất bại, vui lòng thử lại.</span>
+      )}
     </div>
   );
 }

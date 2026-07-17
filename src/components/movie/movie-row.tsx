@@ -1,12 +1,13 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useRef } from "react";
 import { motion } from "framer-motion";
-import { ChevronRight } from "lucide-react";
 import { Reveal } from "@/components/common/reveal";
 import { MovieCard } from "./movie-card";
 import type { MovieRow as MovieRowType } from "@/types/movie";
+import { ChevronRight } from "lucide-react";
 
 interface MovieRowProps {
   row: MovieRowType;
@@ -52,9 +53,9 @@ export function MovieRow({ row, viewAllHref }: MovieRowProps) {
           aria-label="Cuộn tiếp"
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
-          className="absolute right-2 top-1/2 hidden h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full bg-black/70 text-white hover:bg-brand sm:flex"
+          className="absolute right-8 top-1/2"
         >
-          <ChevronRight size={20} />
+          <Image src="/image/ic_right.png" alt="" width={48} height={48} />
         </motion.button>
       </Reveal>
     </section>

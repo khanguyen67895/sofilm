@@ -7,6 +7,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ErrorState } from "@/components/common/error-state";
 import { ROUTES } from "@/constants/routes";
 import type { AdminShortItem } from "@/types/shorts";
 import { isValidImageSrc } from "@/utils/image";
@@ -17,36 +18,41 @@ function ShortRow({ short }: { short: AdminShortItem }) {
   const deleteShort = useDeleteShort();
 
   return (
-    <div className="flex items-center gap-4 border-b border-white/10 px-4 py-3 last:border-b-0">
-      <div className="relative h-16 w-12 shrink-0 overflow-hidden rounded bg-white/5">
-        {isValidImageSrc(short.thumbnail) && (
-          <Image src={short.thumbnail} alt={short.title} fill className="object-cover" />
-        )}
+    <div className="flex flex-col gap-1.5 border-b border-white/10 px-4 py-3 last:border-b-0">
+      <div className="flex items-center gap-4">
+        <div className="relative h-16 w-12 shrink-0 overflow-hidden rounded bg-white/5">
+          {isValidImageSrc(short.thumbnail) && (
+            <Image src={short.thumbnail} alt={short.title} fill className="object-cover" />
+          )}
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-sm font-medium text-white">{short.title}</p>
+          <p className="text-xs text-white/50">
+            {short.movieSlug ? `Phim: ${short.movieSlug} · ` : ""}
+            {short.likes} lượt thích · {short.comments} bình luận
+            {!short.isActive && " · Đã ẩn"}
+          </p>
+        </div>
+        <button
+          type="button"
+          aria-label="Xoá video ngắn"
+          disabled={deleteShort.isPending}
+          onClick={() => deleteShort.mutate(short.id)}
+          className="text-white/40 hover:text-red-500 disabled:opacity-40"
+        >
+          <Trash2 size={16} />
+        </button>
       </div>
-      <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-medium text-white">{short.title}</p>
-        <p className="text-xs text-white/50">
-          {short.movieSlug ? `Phim: ${short.movieSlug} · ` : ""}
-          {short.likes} lượt thích · {short.comments} bình luận
-          {!short.isActive && " · Đã ẩn"}
-        </p>
-      </div>
-      <button
-        type="button"
-        aria-label="Xoá video ngắn"
-        disabled={deleteShort.isPending}
-        onClick={() => deleteShort.mutate(short.id)}
-        className="text-white/40 hover:text-red-500 disabled:opacity-40"
-      >
-        <Trash2 size={16} />
-      </button>
+      {deleteShort.isError && (
+        <p className="text-xs text-red-500">Xoá video ngắn thất bại. Vui lòng thử lại.</p>
+      )}
     </div>
   );
 }
 
 export function AdminShortList() {
   const [page, setPage] = useState(1);
-  const { data, isLoading } = useAdminShorts(page);
+  const { data, isLoading, isError, refetch } = useAdminShorts(page);
 
   return (
     <div className="space-y-4">
@@ -57,7 +63,9 @@ export function AdminShortList() {
         </Link>
       </div>
 
-      {isLoading ? (
+      {isError ? (
+        <ErrorState title="Không thể tải danh sách video ngắn." onRetry={() => refetch()} />
+      ) : isLoading ? (
         <div className="space-y-2">
           {Array.from({ length: 4 }).map((_, i) => (
             <Skeleton key={i} className="h-16 w-full" />

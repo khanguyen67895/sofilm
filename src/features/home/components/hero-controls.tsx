@@ -2,61 +2,30 @@
 
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { PLACEHOLDER_IMAGE } from "@/constants/config";
-import { cn } from "@/utils/cn";
-import type { HeroItem } from "@/types/movie";
-import { resolveImageSrc } from "@/utils/image";
+import { HERO_AUTOPLAY_MS } from "./hero-banner";
 
 interface HeroControlsProps {
-  items: HeroItem[];
   activeIndex: number;
   onGoTo: (index: number) => void;
 }
 
-export function HeroControls({ items, activeIndex, onGoTo }: HeroControlsProps) {
+/** Arrows + timed progress bar + slide counter. The thumbnail row itself now
+ * lives in `HeroCards` (it's the same element that morphs into the active
+ * card), so this component is just the "chrome" layer on top of it. */
+export function HeroControls({ activeIndex, onGoTo }: HeroControlsProps) {
   return (
-    <div className="absolute right-4 bottom-10 flex w-[calc(100%-2rem)] max-w-md flex-col items-end gap-3 sm:right-8 sm:bottom-12 sm:w-auto">
-      <div className="scrollbar-none flex w-full justify-end gap-2 overflow-x-auto">
-        {items.map((item, index) => (
-          <button
-            key={item.id}
-            type="button"
-            onClick={() => onGoTo(index)}
-            className={cn(
-              "relative h-16 w-12 shrink-0 overflow-hidden rounded-md sm:h-20 sm:w-14",
-              index !== activeIndex && "opacity-60 hover:opacity-100"
-            )}
-          >
-            <Image
-              src={resolveImageSrc(item.poster || item.backdrop, PLACEHOLDER_IMAGE)}
-              alt={item.title}
-              fill
-              sizes="56px"
-              className="object-cover"
-            />
-            {index === activeIndex && (
-              <motion.div
-                layoutId="hero-thumb-ring"
-                transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                className="absolute inset-0 rounded-md border-2 border-brand"
-              />
-            )}
-          </button>
-        ))}
-      </div>
-
+    <div className="absolute right-4 bottom-10 z-30 flex w-[calc(100%-2rem)] max-w-md items-center justify-end gap-3 sm:right-8 sm:bottom-12 sm:w-auto">
       <div className="flex items-center gap-3">
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-3">
           <motion.button
             type="button"
             onClick={() => onGoTo(activeIndex - 1)}
             aria-label="Phim trước"
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
-            className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20"
+            className="flex"
           >
-            <ChevronLeft size={16} />
+            <Image src="/image/ic_left.png" alt="" width={48} height={48} />
           </motion.button>
           <motion.button
             type="button"
@@ -64,19 +33,24 @@ export function HeroControls({ items, activeIndex, onGoTo }: HeroControlsProps) 
             aria-label="Phim tiếp theo"
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
-            className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-white hover:bg-white/20"
+            className="flex"
           >
-            <ChevronRight size={16} />
+            <Image src="/image/ic_right.png" alt="" width={48} height={48} />
           </motion.button>
         </div>
 
-        <div className="h-1 w-24 overflow-hidden rounded-full bg-white/20">
-          <div
-            className="h-full bg-brand transition-all duration-300"
-            style={{ width: `${((activeIndex + 1) / items.length) * 100}%` }}
+        <div className="h-1 w-120 overflow-hidden rounded-full bg-white/20">
+          {/* Keyed on activeIndex so it remounts and restarts from 0% on every
+           * slide change — auto-advance and manual clicks alike. */}
+          <motion.div
+            key={activeIndex}
+            className="h-full bg-brand"
+            initial={{ width: "0%" }}
+            animate={{ width: "100%" }}
+            transition={{ duration: HERO_AUTOPLAY_MS / 1000, ease: "linear" }}
           />
         </div>
-        <span className="text-sm font-semibold text-white/70">
+        <span className="text-[40px] font-bold text-white/70">
           {String(activeIndex + 1).padStart(2, "0")}
         </span>
       </div>

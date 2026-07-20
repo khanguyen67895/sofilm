@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuthStore } from "@/store/auth.store";
+import { useRequireAuth } from "@/hooks/use-require-auth";
 import { useMovieReviews } from "../hooks/use-movie-reviews";
 import { useReviewSummary } from "../hooks/use-review-summary";
 import { useSubmitReview } from "../hooks/use-submit-review";
@@ -16,6 +17,7 @@ export function CommentSection({ movieId }: { movieId: string }) {
     useMovieReviews(movieId);
   const submitReview = useSubmitReview(movieId);
   const user = useAuthStore((s) => s.user);
+  const requireAuth = useRequireAuth();
 
   const [comment, setComment] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
@@ -24,9 +26,13 @@ export function CommentSection({ movieId }: { movieId: string }) {
 
   function handlePost() {
     if (!comment.trim()) return;
-    submitReview.mutate(
-      { comment: comment.trim() },
-      { onSuccess: () => setComment("") }
+    requireAuth(
+      () =>
+        submitReview.mutate(
+          { comment: comment.trim() },
+          { onSuccess: () => setComment("") }
+        ),
+      "Đăng nhập để bình luận."
     );
   }
 

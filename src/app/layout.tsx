@@ -5,6 +5,7 @@ import { AppProviders } from "@/providers/app-providers";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { PageTransition } from "@/components/layout/page-transition";
+import { LoginRequiredModal } from "@/components/common/login-required-modal";
 import { SITE_CONFIG } from "@/constants/config";
 
 const geistSans = Geist({
@@ -52,6 +53,7 @@ export default function RootLayout({
             <PageTransition>{children}</PageTransition>
           </main>
           <Footer />
+          <LoginRequiredModal />
         </AppProviders>
       </body>
     </html>

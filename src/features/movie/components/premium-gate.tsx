@@ -1,14 +1,25 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Crown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/constants/routes";
+import { useRequireAuth } from "@/hooks/use-require-auth";
 import { isValidImageSrc } from "@/utils/image";
 
 export function PremiumGate({ backdrop }: { backdrop: string }) {
+  const router = useRouter();
+  const requireAuth = useRequireAuth();
+
+  function handleUpgrade() {
+    requireAuth(
+      () => router.push(ROUTES.subscription),
+      "Đăng nhập để nâng cấp gói VIP."
+    );
+  }
+
   return (
     <div className="relative h-65 w-full overflow-hidden rounded-xl bg-black sm:h-156.75">
       {isValidImageSrc(backdrop) && (
@@ -32,9 +43,9 @@ export function PremiumGate({ backdrop }: { backdrop: string }) {
             Nâng cấp gói VIP để xem phim này và toàn bộ kho phim cao cấp.
           </p>
         </div>
-        <Link href={ROUTES.subscription}>
-          <Button variant="primary">Nâng Cấp Ngay</Button>
-        </Link>
+        <Button variant="primary" onClick={handleUpgrade}>
+          Nâng Cấp Ngay
+        </Button>
       </motion.div>
     </div>
   );

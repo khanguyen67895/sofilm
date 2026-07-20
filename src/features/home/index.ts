@@ -1,5 +1,4 @@
 export * from "./components/home-view";
-export * from "./components/home-auth-gate";
 export * from "./components/hero-banner";
 export * from "./components/trending-row";
 export * from "./components/all-movies-section";

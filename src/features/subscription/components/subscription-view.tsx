@@ -3,15 +3,20 @@
 import { useRouter } from "next/navigation";
 import { Reveal } from "@/components/common/reveal";
 import { ROUTES } from "@/constants/routes";
+import { useRequireAuth } from "@/hooks/use-require-auth";
 import type { SubscriptionPlan } from "@/types/subscription";
 import { PLANS } from "../constants";
 import { PlanCard } from "./plan-card";
 
 export function SubscriptionView() {
   const router = useRouter();
+  const requireAuth = useRequireAuth();
 
   function selectPlan(plan: SubscriptionPlan) {
-    router.push(ROUTES.subscriptionCheckout(plan.id));
+    requireAuth(
+      () => router.push(ROUTES.subscriptionCheckout(plan.id)),
+      "Đăng nhập để đăng ký gói VIP."
+    );
   }
 
   return (

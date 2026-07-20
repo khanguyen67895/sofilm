@@ -7,6 +7,7 @@ import { RatingStarIcon } from "@/components/common/rating-star-icon";
 import { cn } from "@/utils/cn";
 import { formatRelativeDate } from "@/utils/format";
 import { useToggleReviewLike } from "../hooks/use-toggle-review-like";
+import { useRequireAuth } from "@/hooks/use-require-auth";
 import type { Review } from "@/types/review";
 
 interface CommentItemProps {
@@ -17,20 +18,23 @@ interface CommentItemProps {
 
 export function CommentItem({ movieId, review, onReply }: CommentItemProps) {
   const toggleLike = useToggleReviewLike(movieId);
+  const requireAuth = useRequireAuth();
   const [liked, setLiked] = useState(review.likedByMe);
   const [likesCount, setLikesCount] = useState(review.likesCount);
 
   function handleLike() {
-    const wasLiked = liked;
-    setLiked(!wasLiked);
-    setLikesCount((c) => (wasLiked ? c - 1 : c + 1));
+    requireAuth(() => {
+      const wasLiked = liked;
+      setLiked(!wasLiked);
+      setLikesCount((c) => (wasLiked ? c - 1 : c + 1));
 
-    toggleLike.mutate(review.id, {
-      onError: () => {
-        setLiked(wasLiked);
-        setLikesCount((c) => (wasLiked ? c + 1 : c - 1));
-      },
-    });
+      toggleLike.mutate(review.id, {
+        onError: () => {
+          setLiked(wasLiked);
+          setLikesCount((c) => (wasLiked ? c + 1 : c - 1));
+        },
+      });
+    }, "Đăng nhập để thích bình luận này.");
   }
 
   return (

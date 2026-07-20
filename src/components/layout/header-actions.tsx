@@ -2,9 +2,11 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/constants/routes";
+import { useRequireAuth } from "@/hooks/use-require-auth";
 import { resolveImageSrc } from "@/utils/image";
 import { NotificationBell } from "@/features/notifications";
 
@@ -12,16 +14,22 @@ const DEFAULT_AVATAR = "https://picsum.photos/seed/sofilm-avatar/88/88";
 
 export function HeaderActions({ avatar }: { avatar?: string }) {
   const avatarSrc = resolveImageSrc(avatar, DEFAULT_AVATAR);
+  const router = useRouter();
+  const requireAuth = useRequireAuth();
 
   return (
     <>
       <NotificationBell />
 
-      <Link href={ROUTES.subscription}>
-        <Button size="md" className="h-9 px-4 text-[11px] sm:h-11 sm:px-6 sm:text-sm">
-          Upgrade
-        </Button>
-      </Link>
+      <Button
+        size="md"
+        className="h-9 px-4 text-[11px] sm:h-11 sm:px-6 sm:text-sm"
+        onClick={() =>
+          requireAuth(() => router.push(ROUTES.subscription), "Đăng nhập để nâng cấp gói VIP.")
+        }
+      >
+        Upgrade
+      </Button>
 
       <Link
         href={ROUTES.profile}

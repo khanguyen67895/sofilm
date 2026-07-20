@@ -6,6 +6,9 @@ import { Building2, Check, Clock, CreditCard, Crown, Smartphone, Wallet } from "
 import { Button } from "@/components/ui/button";
 import { Reveal } from "@/components/common/reveal";
 import { ROUTES } from "@/constants/routes";
+import { useAuthStore } from "@/store/auth.store";
+import { useUiStore } from "@/store/ui.store";
+import { useHydrated } from "@/hooks/use-hydrated";
 import { cn } from "@/utils/cn";
 import { formatBillingCycle, formatCountdown, formatCurrency } from "@/utils/format";
 import type { PaymentProvider, SubscriptionPlan } from "@/types/subscription";
@@ -77,10 +80,22 @@ export function CheckoutView() {
   const searchParams = useSearchParams();
   const checkout = useCheckout();
   const confirmPayment = useConfirmPayment();
+  const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
+  const mounted = useHydrated();
+  const openLoginPrompt = useUiStore((s) => s.openLoginPrompt);
 
   const [selectedPlanId, setSelectedPlanId] = useState(searchParams.get("planId") ?? "");
   const [selectedMethodId, setSelectedMethodId] = useState(PAYMENT_METHODS[0].id);
   const [secondsLeft, setSecondsLeft] = useState(QR_COUNTDOWN_SECONDS);
+
+  // Guests can only land here by typing the URL directly (the normal entry
+  // point, choosing a plan on /subscription, is already gated) — bounce
+  // them back with the login popup instead of letting checkout render.
+  useEffect(() => {
+    if (!mounted || isAuthenticated) return;
+    openLoginPrompt("Đăng nhập để tiếp tục thanh toán.");
+    router.replace(ROUTES.subscription);
+  }, [mounted, isAuthenticated, router, openLoginPrompt]);
 
   const selectedPlan = PLANS.find((p) => p.id === selectedPlanId) ?? PLANS[0];
   const selectedMethod =
@@ -105,6 +120,8 @@ export function CheckoutView() {
     setSelectedMethodId(method.id);
     if (method.showQr) setSecondsLeft(QR_COUNTDOWN_SECONDS);
   }
+
+  if (mounted && !isAuthenticated) return null;
 
   async function handleCompletePayment() {
     if (!selectedPlan) return;

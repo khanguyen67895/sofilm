@@ -17,7 +17,10 @@ export const reviewService = {
     const { data } = await apiClient.get<ApiResponse<ReviewSummary>>(
       ENDPOINTS.reviews.summary(movieId)
     );
-    return data.data;
+    const summary = data.data;
+    // No reviews yet reads as a broken 0-star movie — default to 5 stars
+    // until real reviews land, matching mapMovieResponse's Movie.rating default.
+    return summary.total > 0 ? summary : { ...summary, average: 5 };
   },
 
   async list(movieId: string, page = 1, limit = 10): Promise<PaginatedResponse<Review>> {

@@ -30,7 +30,8 @@ export interface BannerPayload {
   title?: string;
   content?: string;
   thumbnailUrl?: string;
-  movieId?: string | null;
+  /** Required — the public hero's Watch Now/More Info always need a movie to link to. */
+  movieId: string;
   videoId: string;
   order?: number;
   isActive?: boolean;

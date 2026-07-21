@@ -11,11 +11,12 @@ export function AllMoviesSection({ movies }: { movies: Movie[] }) {
       <Reveal>
         <h2 className="text-lg font-semibold text-white">All Movies</h2>
       </Reveal>
-      <Reveal delay={0.1} className="flex flex-wrap gap-4">
+      <Reveal
+        delay={0.1}
+        className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6"
+      >
         {movies.map((movie) => (
-          <div key={movie.id} className="w-40 shrink-0 sm:w-55">
-            <MovieCard movie={movie} />
-          </div>
+          <MovieCard key={movie.id} movie={movie} />
         ))}
       </Reveal>
       <Reveal delay={0.2} className="flex justify-center pt-2">

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Merienda, Unbounded } from "next/font/google";
+import { Unbounded } from "next/font/google";
 import "./globals.css";
 import { AppProviders } from "@/providers/app-providers";
 import { Header } from "@/components/layout/header";
@@ -8,26 +8,13 @@ import { PageTransition } from "@/components/layout/page-transition";
 import { LoginRequiredModal } from "@/components/common/login-required-modal";
 import { SITE_CONFIG } from "@/constants/config";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
+/** The site's only font — every `--font-*` token in globals.css (`sans`,
+ * `mono`, `heading`, `rank`) resolves to this one variable, so there is
+ * exactly one typeface anywhere on the site, not per-element opt-in. */
 const unbounded = Unbounded({
   variable: "--font-unbounded",
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700"],
-});
-
-const merienda = Merienda({
-  variable: "--font-merienda",
-  subsets: ["latin"],
-  weight: ["400"],
+  weight: ["300", "400", "500", "600", "700", "800"],
 });
 
 export const metadata: Metadata = {
@@ -44,7 +31,7 @@ export default function RootLayout({
     <html
       lang="vi"
       suppressHydrationWarning
-      className={`${geistSans.variable} ${geistMono.variable} ${unbounded.variable} ${merienda.variable} h-full antialiased`}
+      className={`${unbounded.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-black">
         <AppProviders>

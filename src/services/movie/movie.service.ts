@@ -47,6 +47,12 @@ interface BackendPage<T> {
   hasMore: boolean;
 }
 
+/** No reviews yet reads as an untested 0-star movie, which looks broken next
+ * to real ratings — shown as a clean 5-star default until real reviews land. */
+function defaultRating(rating: number, reviewsCount: number): number {
+  return reviewsCount > 0 ? rating : 5;
+}
+
 export function mapMovieResponse(raw: BackendMovie): Movie {
   const episodes: Episode[] = (raw.seasons ?? [])
     .flatMap((season) => season.episodes)
@@ -74,7 +80,7 @@ export function mapMovieResponse(raw: BackendMovie): Movie {
     genreIds: (raw.genres ?? []).map((g) => g.id),
     releaseDate: raw.releaseDate ?? "",
     duration: raw.duration ?? 0,
-    rating: raw.rating,
+    rating: defaultRating(raw.rating, raw.reviewsCount ?? 0),
     reviewsCount: raw.reviewsCount ?? 0,
     views: raw.views,
     isPremium: raw.isPremium,

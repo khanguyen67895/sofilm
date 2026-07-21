@@ -42,17 +42,18 @@ export function AdminBannerForm({ mode, banner }: AdminBannerFormProps) {
 
   const isPending = createBanner.isPending || updateBanner.isPending;
   const videoMissing = !hasVideo;
+  const movieMissing = !selectedMovie;
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setSubmitError(null);
-    if (videoMissing) return;
+    if (videoMissing || movieMissing) return;
 
     const payload = {
       title: title.trim() || undefined,
       content: content.trim() || undefined,
       thumbnailUrl: thumbnailUrl || undefined,
-      movieId: selectedMovie ? selectedMovie.id : null,
+      movieId: selectedMovie.id,
       videoId,
       order: Number(order) || 0,
       isActive,
@@ -120,11 +121,14 @@ export function AdminBannerForm({ mode, banner }: AdminBannerFormProps) {
       </div>
 
       <div>
-        <Label>Gắn phim (tuỳ chọn)</Label>
+        <Label required>Gắn phim</Label>
         <p className="mb-2 text-xs text-white/50">
-          Khi gắn phim, nút Watch Now / More Info trên hero sẽ dẫn tới phim này.
+          Bắt buộc chọn phim đã đăng — nút Watch Now / More Info trên hero sẽ dẫn thẳng tới phim này.
         </p>
         <MoviePickerField selectedMovie={selectedMovie} onSelect={setSelectedMovie} />
+        {movieMissing && (
+          <p className="mt-2 text-xs text-red-500">Bắt buộc phải chọn phim trước khi lưu banner.</p>
+        )}
       </div>
 
       <div>
@@ -139,7 +143,7 @@ export function AdminBannerForm({ mode, banner }: AdminBannerFormProps) {
 
       {submitError && <p className="text-sm text-red-500">{submitError}</p>}
 
-      <Button type="submit" disabled={isPending || videoMissing}>
+      <Button type="submit" disabled={isPending || videoMissing || movieMissing}>
         {isPending ? "Đang lưu..." : mode === "create" ? "Tạo Banner" : "Lưu Thay Đổi"}
       </Button>
     </form>

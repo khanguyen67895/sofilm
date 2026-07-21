@@ -11,10 +11,12 @@
   --color-brand: #ff6a3d;
   --color-brand-dark: #e2551f;
   --color-brand-light: #ff9466;
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* Unbounded is the site's only font — every token below resolves to the
+   * same variable so nothing can fall back to the browser's default sans. */
+  --font-sans: var(--font-unbounded);
+  --font-mono: var(--font-unbounded);
   --font-heading: var(--font-unbounded);
-  --font-rank: var(--font-merienda);
+  --font-rank: var(--font-unbounded);
 }
 
 :root[data-theme="light"],

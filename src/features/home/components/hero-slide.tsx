@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { Info, Play } from "lucide-react";
@@ -26,13 +27,24 @@ const ITEM_VARIANTS = {
  * layer that fades in once the card has settled, the darkening gradients,
  * and the staggered title/description/CTA text. */
 export function HeroSlide({ item }: { item: HeroItem }) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  // The declarative `autoPlay` attribute is unreliable here — Chromium's
+  // autoplay gate can reject it silently (no error, just stays paused) when
+  // the element mounts post-hydration rather than from static markup.
+  // Calling `.play()` imperatively once data is ready is the same fix
+  // VideoPlayer already relies on for the movie-detail player.
+  useEffect(() => {
+    videoRef.current?.play().catch(() => {});
+  }, [item.videoUrl]);
+
   return (
     <>
       {item.videoUrl && (
         <motion.video
           key={item.videoUrl}
+          ref={videoRef}
           src={item.videoUrl}
-          autoPlay
           muted
           loop
           playsInline
@@ -66,7 +78,7 @@ export function HeroSlide({ item }: { item: HeroItem }) {
         )}
         {item.slug && (
           <motion.div variants={ITEM_VARIANTS} className="flex gap-3">
-            <Link href={ROUTES.watch(item.slug)}>
+            <Link href={ROUTES.movie(item.slug)}>
               <Button size="lg">
                 <Play size={18} /> Watch Now
               </Button>

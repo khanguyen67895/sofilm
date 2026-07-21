@@ -5,6 +5,7 @@ import type {
   LoginPayload,
   RegisterPayload,
   RequestPhoneOtpPayload,
+  SocialLoginPayload,
   VerifyPhoneOtpPayload,
   User,
 } from "@/types/user";
@@ -35,6 +36,14 @@ export const authService = {
     const { data } = await apiClient.post<ApiResponse<{ user: User } & AuthTokens>>(
       ENDPOINTS.auth.otpPhoneVerify,
       payload
+    );
+    return data.data;
+  },
+
+  async socialLogin({ provider, token, deviceId }: SocialLoginPayload) {
+    const { data } = await apiClient.post<ApiResponse<{ user: User } & AuthTokens>>(
+      ENDPOINTS.auth[provider],
+      { token, deviceId }
     );
     return data.data;
   },

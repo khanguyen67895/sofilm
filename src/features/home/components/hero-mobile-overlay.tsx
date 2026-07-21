@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
@@ -36,29 +37,52 @@ interface HeroMobileOverlayProps {
  * overlap on real content (longer titles/descriptions) before. */
 export function HeroMobileOverlay({ items, activeIndex, onGoTo }: HeroMobileOverlayProps) {
   const active = items[activeIndex];
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  // See HeroSlide (desktop counterpart) — the declarative `autoPlay`
+  // attribute can be silently rejected by Chromium's autoplay gate when the
+  // element mounts post-hydration; play() imperatively instead.
+  useEffect(() => {
+    videoRef.current?.play().catch(() => {});
+  }, [active.videoUrl]);
 
   return (
     <>
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={active.id}
+      {active.videoUrl ? (
+        <motion.video
+          key={active.videoUrl}
+          ref={videoRef}
+          src={active.videoUrl}
+          muted
+          loop
+          playsInline
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
           transition={{ duration: 0.4 }}
-          className="absolute inset-0 z-0"
-        >
-          <Image
-            src={resolveImageSrc(active.poster || active.backdrop, PLACEHOLDER_IMAGE)}
-            alt={active.title}
-            fill
-            sizes="100vw"
-            priority
-            quality={90}
-            className="object-cover"
-          />
-        </motion.div>
-      </AnimatePresence>
+          className="absolute inset-0 z-0 h-full w-full object-cover"
+        />
+      ) : (
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={active.id}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.4 }}
+            className="absolute inset-0 z-0"
+          >
+            <Image
+              src={resolveImageSrc(active.poster || active.backdrop, PLACEHOLDER_IMAGE)}
+              alt={active.title}
+              fill
+              sizes="100vw"
+              priority
+              quality={90}
+              className="object-cover"
+            />
+          </motion.div>
+        </AnimatePresence>
+      )}
 
       <div className="absolute inset-0 z-10 bg-linear-to-t from-black via-black/60 to-black/10" />
 
@@ -83,7 +107,7 @@ export function HeroMobileOverlay({ items, activeIndex, onGoTo }: HeroMobileOver
           )}
           {active.slug && (
             <motion.div variants={ITEM_VARIANTS} className="flex gap-3">
-              <Link href={ROUTES.watch(active.slug)}>
+              <Link href={ROUTES.movie(active.slug)}>
                 <Button size="md">
                   <Play size={16} /> Watch Now
                 </Button>

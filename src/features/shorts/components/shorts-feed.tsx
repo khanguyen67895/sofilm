@@ -1,27 +1,19 @@
 "use client";
 
-import Link from "next/link";
 import { motion } from "framer-motion";
 import { Virtuoso } from "react-virtuoso";
-import { ChevronLeft } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
 import { EmptyState } from "@/components/common/empty-state";
-import { ROUTES } from "@/constants/routes";
+import { useEnsureBackFallback } from "@/hooks/use-ensure-back-fallback";
 import { useShortsFeed } from "../hooks/use-shorts-feed";
 import { ShortItem } from "./short-item";
 
 export function ShortsFeed() {
+  useEnsureBackFallback();
   const { data: shorts, isLoading, isError } = useShortsFeed();
 
   return (
     <div className="relative h-dvh w-full bg-black">
-      <Link
-        href={ROUTES.home}
-        aria-label="Về trang chủ"
-        className="absolute top-4 left-4 z-20 flex h-9 w-9 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-sm"
-      >
-        <ChevronLeft size={20} />
-      </Link>
 
       {isLoading ? (
         <motion.div

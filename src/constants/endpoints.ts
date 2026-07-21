@@ -7,6 +7,8 @@ export const ENDPOINTS = {
     me: "/auth/me",
     otpPhoneRequest: "/auth/otp/phone/request",
     otpPhoneVerify: "/auth/otp/phone/verify",
+    google: "/auth/google",
+    facebook: "/auth/facebook",
   },
   movies: {
     list: "/movies",

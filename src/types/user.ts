@@ -40,3 +40,12 @@ export interface VerifyPhoneOtpPayload {
   phone: string;
   code: string;
 }
+
+export type SocialProvider = "google" | "facebook";
+
+export interface SocialLoginPayload {
+  provider: SocialProvider;
+  /** Provider-issued OAuth access token, verified server-side before trust. */
+  token: string;
+  deviceId?: string;
+}

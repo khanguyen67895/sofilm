@@ -35,7 +35,7 @@ export function MovieCatalogView() {
     <div className="space-y-8 pb-8">
       <div className="relative -mt-20 overflow-hidden pt-28 pb-10">
         <Image
-          src="/image/ic_bg_category.jfif"
+          src="/image/ic_bg_category.png"
           alt=""
           fill
           priority

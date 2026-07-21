@@ -41,11 +41,23 @@ export function VideoPlayer({ src, poster }: VideoPlayerProps) {
   }, [volume]);
 
   useEffect(() => {
+    const container = containerRef.current;
     function handleFullscreenChange() {
       setIsFullscreen(Boolean(document.fullscreenElement));
     }
     document.addEventListener("fullscreenchange", handleFullscreenChange);
-    return () => document.removeEventListener("fullscreenchange", handleFullscreenChange);
+    return () => {
+      document.removeEventListener("fullscreenchange", handleFullscreenChange);
+      // React detaches this container from the DOM on unmount (e.g. the
+      // route-change that follows pressing Back). Removing an element that's
+      // still `document.fullscreenElement` without exiting fullscreen first
+      // leaves Chromium in a broken state — the navigation that follows
+      // resolves to a blank about:blank tab instead of the previous page.
+      // Always exit cleanly before the node goes away.
+      if (document.fullscreenElement === container) {
+        document.exitFullscreen().catch(() => {});
+      }
+    };
   }, []);
 
   function toggle() {

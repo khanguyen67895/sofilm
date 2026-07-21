@@ -13,6 +13,7 @@ import { formatDuration, formatYear } from "@/utils/format";
 import { cn } from "@/utils/cn";
 import { resolveImageSrc } from "@/utils/image";
 import { useMediaQuery } from "@/hooks/use-media-query";
+import { useEnsureBackFallback } from "@/hooks/use-ensure-back-fallback";
 import { usePlayerStore } from "@/store/player.store";
 import { useMovieDetail } from "../hooks/use-movie-detail";
 import { EpisodeSidebar } from "./episode-sidebar";
@@ -23,6 +24,7 @@ import { CommentSection } from "./comment-section";
 import { SimilarMoviesSection } from "./similar-movies-section";
 
 export function MovieDetailView({ slug }: { slug: string }) {
+  useEnsureBackFallback();
   const { data: movie, isLoading, isError, refetch } = useMovieDetail(slug);
   const currentMovieSlug = usePlayerStore((s) => s.currentMovieSlug);
   const currentEpisode = usePlayerStore((s) => s.currentEpisode);

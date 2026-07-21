@@ -13,6 +13,11 @@ export const API_CONFIG = {
 export const AUTH_TOKEN_KEY = "sofilm_access_token";
 export const REFRESH_TOKEN_KEY = "sofilm_refresh_token";
 
+export const SOCIAL_AUTH_CONFIG = {
+  googleClientId: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? "",
+  facebookAppId: process.env.NEXT_PUBLIC_FACEBOOK_APP_ID ?? "",
+};
+
 /** Fallback for any poster/backdrop/thumbnail field that can come back empty
  * from the API — next/image throws ("Failed to construct 'URL': Invalid URL")
  * if given an empty-string src, so every such field must fall back to this

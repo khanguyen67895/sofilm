@@ -11,12 +11,12 @@
   --color-brand: #ff6a3d;
   --color-brand-dark: #e2551f;
   --color-brand-light: #ff9466;
-  /* Unbounded is the site's only font — every token below resolves to the
-   * same variable so nothing can fall back to the browser's default sans. */
+  /* Unbounded is the site's typeface everywhere except one place: `--font-rank`
+   * (TrendingRow's big rank number, `.font-rank`) is Merienda instead. */
   --font-sans: var(--font-unbounded);
   --font-mono: var(--font-unbounded);
   --font-heading: var(--font-unbounded);
-  --font-rank: var(--font-unbounded);
+  --font-rank: var(--font-merienda);
 }
 
 :root[data-theme="light"],

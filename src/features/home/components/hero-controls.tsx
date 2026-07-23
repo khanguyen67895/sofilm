@@ -1,20 +1,41 @@
 "use client";
 
+import { useRef } from "react";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { HERO_AUTOPLAY_MS } from "./hero-banner";
+import { gsap, useGSAP } from "@/lib/gsap";
+import { HeroSlideNumber } from "./hero-slide-number";
 
 interface HeroControlsProps {
   activeIndex: number;
+  total: number;
   onGoTo: (index: number) => void;
 }
 
 /** Desktop-only — mobile uses `HeroMobileOverlay` instead (see HeroBanner).
- * Arrows + timed progress bar + slide counter, clustered bottom-right next
- * to the reels-style thumbnail card. The thumbnail row itself lives in
+ * Arrows + deck-progress bar + rolling slide counter, clustered bottom-right
+ * next to the reels-style thumbnail card. The thumbnail row itself lives in
  * `HeroCards` (it's the same element that morphs into the active card), so
- * this component is just the "chrome" layer on top of it. */
-export function HeroControls({ activeIndex, onGoTo }: HeroControlsProps) {
+ * this component is just the "chrome" layer on top of it.
+ *
+ * The per-slide countdown now lives in the full-width `HeroIndicator` strip
+ * at the top of the hero (ported from the reference's `.indicator`); this
+ * bar instead mirrors the reference's `.progress-sub-foreground` — how far
+ * through the deck the active slide is, not a timer. */
+export function HeroControls({ activeIndex, total, onGoTo }: HeroControlsProps) {
+  const progressRef = useRef<HTMLDivElement>(null);
+
+  useGSAP(
+    () => {
+      gsap.to(progressRef.current, {
+        width: `${((activeIndex + 1) / total) * 100}%`,
+        duration: 0.6,
+        ease: "sine.inOut",
+      });
+    },
+    { dependencies: [activeIndex, total], scope: progressRef }
+  );
+
   return (
     <div className="absolute right-8 bottom-12 z-30 flex items-center gap-3">
       <motion.button
@@ -39,19 +60,10 @@ export function HeroControls({ activeIndex, onGoTo }: HeroControlsProps) {
       </motion.button>
 
       <div className="h-1 w-120 overflow-hidden rounded-full bg-white/20">
-        {/* Keyed on activeIndex so it remounts and restarts from 0% on every
-         * slide change — auto-advance and manual clicks alike. */}
-        <motion.div
-          key={activeIndex}
-          className="h-full bg-brand"
-          initial={{ width: "0%" }}
-          animate={{ width: "100%" }}
-          transition={{ duration: HERO_AUTOPLAY_MS / 1000, ease: "linear" }}
-        />
+        <div ref={progressRef} className="h-full w-0 bg-brand" />
       </div>
-      <span className="shrink-0 text-[40px] font-bold text-white/70">
-        {String(activeIndex + 1).padStart(2, "0")}
-      </span>
+
+      <HeroSlideNumber activeIndex={activeIndex} total={total} />
     </div>
   );
 }

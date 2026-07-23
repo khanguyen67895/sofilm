@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import { AlertDialog } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/constants/routes";
 import { useGenres } from "@/features/movie";
@@ -43,6 +44,13 @@ export function AdminMovieForm({ mode, movie }: AdminMovieFormProps) {
   const [errors, setErrors] = useState<AdminMovieFieldErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  // Create-only — the OK button routes back to the movie list on success, or
+  // just dismisses on error so the admin can fix and retry.
+  const [dialog, setDialog] = useState<{
+    variant: "success" | "error";
+    title: string;
+    description?: string;
+  } | null>(null);
 
   const isPending = isSubmitting || createMovie.isPending || updateMovie.isPending;
 
@@ -102,10 +110,15 @@ export function AdminMovieForm({ mode, movie }: AdminMovieFormProps) {
             videoId: ep.videoId,
           });
         }
-        router.push(ROUTES.adminMovieEdit(created.id));
-      } catch (err) {
-        setSubmitError(getApiErrorMessages(err).join(" "));
         setIsSubmitting(false);
+        setDialog({ variant: "success", title: "Tạo phim thành công!" });
+      } catch (err) {
+        setIsSubmitting(false);
+        setDialog({
+          variant: "error",
+          title: "Tạo phim thất bại",
+          description: getApiErrorMessages(err).join(" "),
+        });
       }
     } else if (movie) {
       updateMovie.mutate(payload, {
@@ -183,6 +196,18 @@ export function AdminMovieForm({ mode, movie }: AdminMovieFormProps) {
       <Button type="submit" disabled={isPending || blocked}>
         {isPending ? "Đang lưu..." : mode === "create" ? "Tạo Phim" : "Lưu Thay Đổi"}
       </Button>
+
+      <AlertDialog
+        open={dialog !== null}
+        variant={dialog?.variant ?? "success"}
+        title={dialog?.title ?? ""}
+        description={dialog?.description}
+        onConfirm={() => {
+          const wasSuccess = dialog?.variant === "success";
+          setDialog(null);
+          if (wasSuccess) router.push(ROUTES.adminMovies);
+        }}
+      />
     </form>
   );
 }

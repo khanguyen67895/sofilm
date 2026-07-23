@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Unbounded } from "next/font/google";
+import { Merienda, Unbounded } from "next/font/google";
 import "./globals.css";
 import { AppProviders } from "@/providers/app-providers";
 import { Header } from "@/components/layout/header";
@@ -8,13 +8,20 @@ import { PageTransition } from "@/components/layout/page-transition";
 import { LoginRequiredModal } from "@/components/common/login-required-modal";
 import { SITE_CONFIG } from "@/constants/config";
 
-/** The site's only font — every `--font-*` token in globals.css (`sans`,
- * `mono`, `heading`, `rank`) resolves to this one variable, so there is
- * exactly one typeface anywhere on the site, not per-element opt-in. */
+/** Unbounded is the site's typeface everywhere — `sans`/`mono`/`heading` in
+ * globals.css all resolve to this one variable. Merienda is the single
+ * deliberate exception: `--font-rank` (the big rank number on TrendingRow's
+ * cards, `.font-rank`) resolves to it instead, nowhere else. */
 const unbounded = Unbounded({
   variable: "--font-unbounded",
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700", "800"],
+});
+
+const merienda = Merienda({
+  variable: "--font-merienda",
+  subsets: ["latin"],
+  weight: ["400", "700"],
 });
 
 export const metadata: Metadata = {
@@ -31,7 +38,7 @@ export default function RootLayout({
     <html
       lang="vi"
       suppressHydrationWarning
-      className={`${unbounded.variable} h-full antialiased`}
+      className={`${unbounded.variable} ${merienda.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-black">
         <AppProviders>

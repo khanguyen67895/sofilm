@@ -1,12 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { Clapperboard, Crown, Home, LayoutGrid, Search, User } from "lucide-react";
 import { cn } from "@/utils/cn";
 import { ROUTES } from "@/constants/routes";
-import { useRequireAuth } from "@/hooks/use-require-auth";
 
 const ITEMS = [
   { href: ROUTES.home, label: "Trang chủ", icon: Home },
@@ -28,8 +27,6 @@ interface MobileMenuProps {
  * it stays consistent with how NotificationBell's panel already behaves. */
 export function MobileMenu({ open, onClose }: MobileMenuProps) {
   const pathname = usePathname();
-  const router = useRouter();
-  const requireAuth = useRequireAuth();
 
   return (
     <AnimatePresence>
@@ -52,27 +49,6 @@ export function MobileMenu({ open, onClose }: MobileMenuProps) {
             {ITEMS.map(({ href, label, icon: Icon }) => {
               const isActive =
                 href === ROUTES.home ? pathname === href : pathname.startsWith(href);
-              const isVip = href === ROUTES.subscription;
-
-              if (isVip) {
-                return (
-                  <button
-                    key={href}
-                    type="button"
-                    onClick={() => {
-                      onClose();
-                      requireAuth(() => router.push(href), "Đăng nhập để nâng cấp gói VIP.");
-                    }}
-                    className={cn(
-                      "flex w-full items-center gap-3 rounded-xl px-4 py-3 text-left text-sm font-medium text-white/70 transition-colors hover:bg-white/5 hover:text-white",
-                      isActive && "bg-brand/15 text-brand"
-                    )}
-                  >
-                    <Icon size={18} />
-                    {label}
-                  </button>
-                );
-              }
 
               return (
                 <Link

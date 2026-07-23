@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import { AlertDialog } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -28,7 +29,11 @@ export function AdminShortForm() {
   const [videoId, setVideoId] = useState("");
   const [hasVideo, setHasVideo] = useState(false);
   const [errors, setErrors] = useState<FieldErrors>({});
-  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [dialog, setDialog] = useState<{
+    variant: "success" | "error";
+    title: string;
+    description?: string;
+  } | null>(null);
 
   const videoMissing = !hasVideo;
 
@@ -41,7 +46,6 @@ export function AdminShortForm() {
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    setSubmitError(null);
     if (!validate()) return;
 
     createShort.mutate(
@@ -52,8 +56,13 @@ export function AdminShortForm() {
         thumbnailUrl: thumbnailUrl || undefined,
       },
       {
-        onSuccess: () => router.push(ROUTES.adminShorts),
-        onError: (err) => setSubmitError(getApiErrorMessages(err).join(" ")),
+        onSuccess: () => setDialog({ variant: "success", title: "Tạo video ngắn thành công!" }),
+        onError: (err) =>
+          setDialog({
+            variant: "error",
+            title: "Tạo video ngắn thất bại",
+            description: getApiErrorMessages(err).join(" "),
+          }),
       }
     );
   }
@@ -105,11 +114,21 @@ export function AdminShortForm() {
         )}
       </div>
 
-      {submitError && <p className="text-sm text-red-500">{submitError}</p>}
-
       <Button type="submit" disabled={createShort.isPending || videoMissing}>
         {createShort.isPending ? "Đang lưu..." : "Tạo Video Ngắn"}
       </Button>
+
+      <AlertDialog
+        open={dialog !== null}
+        variant={dialog?.variant ?? "success"}
+        title={dialog?.title ?? ""}
+        description={dialog?.description}
+        onConfirm={() => {
+          const wasSuccess = dialog?.variant === "success";
+          setDialog(null);
+          if (wasSuccess) router.push(ROUTES.adminShorts);
+        }}
+      />
     </form>
   );
 }

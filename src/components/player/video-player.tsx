@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type SyntheticEvent } from "react";
 import Image from "next/image";
 import { Maximize, Minimize, Pause, Play, Volume2, VolumeX } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
 import { usePlayerStore } from "@/store/player.store";
+import { cn } from "@/utils/cn";
 import { formatCountdown } from "@/utils/format";
 
 interface VideoPlayerProps {
@@ -20,6 +21,12 @@ export function VideoPlayer({ src, poster }: VideoPlayerProps) {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [buffered, setBuffered] = useState(0);
+  // Read straight off the actual playing element once its real pixel size is
+  // known — no backend metadata involved. The player frame itself (below)
+  // never resizes; only the fit mode changes, exactly like a native player
+  // (Windows Movies & TV, VLC, ...) pillarboxes a portrait video inside a
+  // fixed-size window instead of stretching/cropping it to fill.
+  const [isPortrait, setIsPortrait] = useState(false);
   // True while the video is stalled waiting on more data — surfaces network/
   // server-side buffering stalls as a visible spinner instead of a silent
   // freeze, so "did it crash" vs "is it just buffering" is no longer a guess.
@@ -86,6 +93,11 @@ export function VideoPlayer({ src, poster }: VideoPlayerProps) {
     setBuffered(video.buffered.end(video.buffered.length - 1));
   }
 
+  function handleLoadedMetadata(e: SyntheticEvent<HTMLVideoElement>) {
+    const { videoWidth, videoHeight } = e.currentTarget;
+    if (videoWidth > 0 && videoHeight > 0) setIsPortrait(videoHeight > videoWidth);
+  }
+
   const playedPct = duration > 0 ? (currentTime / duration) * 100 : 0;
   const bufferedPct = duration > 0 ? (buffered / duration) * 100 : 0;
 
@@ -99,8 +111,9 @@ export function VideoPlayer({ src, poster }: VideoPlayerProps) {
         src={src}
         poster={poster}
         preload="auto"
-        className="h-full w-full object-cover"
+        className={cn("h-full w-full", isPortrait ? "object-contain" : "object-cover")}
         onClick={toggle}
+        onLoadedMetadata={handleLoadedMetadata}
         onTimeUpdate={(e) => setCurrentTime(e.currentTarget.currentTime)}
         onDurationChange={(e) => setDuration(e.currentTarget.duration || 0)}
         onProgress={updateBuffered}

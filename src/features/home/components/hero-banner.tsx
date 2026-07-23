@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import type { HeroItem } from "@/types/movie";
 import { HeroCards } from "./hero-cards";
+import { HeroIndicator } from "./hero-indicator";
 import { HeroMobileOverlay } from "./hero-mobile-overlay";
 import { HeroSlide } from "./hero-slide";
 import { HeroControls } from "./hero-controls";
@@ -34,11 +35,12 @@ export function HeroBanner({ items }: { items: HeroItem[] }) {
 
   return (
     <div className="relative -mt-20 h-215 w-full overflow-hidden">
+      <HeroIndicator activeIndex={activeIndex} total={items.length} />
       {isDesktop ? (
         <>
           <HeroCards items={items} activeIndex={activeIndex} onGoTo={goTo} />
           <HeroSlide item={active} />
-          <HeroControls activeIndex={activeIndex} onGoTo={goTo} />
+          <HeroControls activeIndex={activeIndex} total={items.length} onGoTo={goTo} />
         </>
       ) : (
         <HeroMobileOverlay items={items} activeIndex={activeIndex} onGoTo={goTo} />

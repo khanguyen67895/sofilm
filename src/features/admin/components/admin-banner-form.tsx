@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import { AlertDialog } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -38,7 +39,11 @@ export function AdminBannerForm({ mode, banner }: AdminBannerFormProps) {
   const [isActive, setIsActive] = useState(banner?.isActive ?? true);
   const [videoId, setVideoId] = useState(banner?.videoId ?? "");
   const [hasVideo, setHasVideo] = useState(Boolean(banner?.videoId));
-  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [dialog, setDialog] = useState<{
+    variant: "success" | "error";
+    title: string;
+    description?: string;
+  } | null>(null);
 
   const isPending = createBanner.isPending || updateBanner.isPending;
   const videoMissing = !hasVideo;
@@ -46,7 +51,6 @@ export function AdminBannerForm({ mode, banner }: AdminBannerFormProps) {
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    setSubmitError(null);
     if (videoMissing || movieMissing) return;
 
     const payload = {
@@ -59,18 +63,22 @@ export function AdminBannerForm({ mode, banner }: AdminBannerFormProps) {
       isActive,
     };
 
-    const onError = (err: unknown) => setSubmitError(getApiErrorMessages(err).join(" "));
+    const onSuccess = () =>
+      setDialog({
+        variant: "success",
+        title: mode === "create" ? "Tạo banner thành công!" : "Cập nhật banner thành công!",
+      });
+    const onError = (err: unknown) =>
+      setDialog({
+        variant: "error",
+        title: mode === "create" ? "Tạo banner thất bại" : "Cập nhật banner thất bại",
+        description: getApiErrorMessages(err).join(" "),
+      });
 
     if (mode === "create") {
-      createBanner.mutate(payload, {
-        onSuccess: () => router.push(ROUTES.adminBanners),
-        onError,
-      });
+      createBanner.mutate(payload, { onSuccess, onError });
     } else if (banner) {
-      updateBanner.mutate(payload, {
-        onSuccess: () => router.push(ROUTES.adminBanners),
-        onError,
-      });
+      updateBanner.mutate(payload, { onSuccess, onError });
     }
   }
 
@@ -141,11 +149,21 @@ export function AdminBannerForm({ mode, banner }: AdminBannerFormProps) {
         Đang hiển thị trên trang chủ
       </label>
 
-      {submitError && <p className="text-sm text-red-500">{submitError}</p>}
-
       <Button type="submit" disabled={isPending || videoMissing || movieMissing}>
         {isPending ? "Đang lưu..." : mode === "create" ? "Tạo Banner" : "Lưu Thay Đổi"}
       </Button>
+
+      <AlertDialog
+        open={dialog !== null}
+        variant={dialog?.variant ?? "success"}
+        title={dialog?.title ?? ""}
+        description={dialog?.description}
+        onConfirm={() => {
+          const wasSuccess = dialog?.variant === "success";
+          setDialog(null);
+          if (wasSuccess) router.push(ROUTES.adminBanners);
+        }}
+      />
     </form>
   );
 }

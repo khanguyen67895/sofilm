@@ -3,12 +3,12 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Badge } from "@/components/ui/badge";
 import { FavoriteIcon, UnfavoriteIcon } from "@/components/common/favorite-icons";
 import { RatingStarIcon } from "@/components/common/rating-star-icon";
 import { PLACEHOLDER_IMAGE } from "@/constants/config";
 import { ROUTES } from "@/constants/routes";
 import { useFavoriteIds } from "@/hooks/use-favorite-ids";
+import { useRequireAuth } from "@/hooks/use-require-auth";
 import { useToggleFavorite } from "@/hooks/use-toggle-favorite";
 import type { Movie } from "@/types/movie";
 import { resolveImageSrc } from "@/utils/image";
@@ -16,11 +16,15 @@ import { resolveImageSrc } from "@/utils/image";
 export function MovieCard({ movie }: { movie: Movie }) {
   const isFavorite = Boolean(useFavoriteIds().data?.has(movie.id));
   const toggleFavorite = useToggleFavorite();
+  const requireAuth = useRequireAuth();
 
   function handleToggleFavorite(e: React.MouseEvent) {
     e.preventDefault();
     e.stopPropagation();
-    toggleFavorite.mutate({ movie, isFavorite });
+    requireAuth(
+      () => toggleFavorite.mutate({ movie, isFavorite }),
+      "Đăng nhập để lưu phim yêu thích."
+    );
   }
 
   return (

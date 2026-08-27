@@ -14,6 +14,25 @@ import { useNotifications } from "../hooks/use-notifications";
 
 const LAST_SEEN_KEY = "sofilm_notifications_last_seen_at";
 
+/** Shared empty state for the dropdown — guest (not signed in) and
+ * signed-in-but-nothing-yet both get the same illustration + bold headline,
+ * just with a different supporting line underneath. */
+function NotificationEmptyState({ subtitle }: { subtitle: string }) {
+  return (
+    <div className="m-4 flex flex-col items-center gap-3 rounded-xl bg-white/5 px-6 py-10 text-center">
+      <Image
+        src="/image/ic_notice_detail.png"
+        alt=""
+        width={80}
+        height={80}
+        className="h-16 w-16"
+      />
+      <p className="font-heading text-base font-bold text-white">Chưa có thông báo mới</p>
+      <p className="text-sm text-white/50">{subtitle}</p>
+    </div>
+  );
+}
+
 export function NotificationBell() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const { data } = useNotifications();
@@ -80,13 +99,9 @@ export function NotificationBell() {
 
             <div className="scrollbar-none max-h-96 overflow-y-auto">
               {!isAuthenticated ? (
-                <p className="px-4 py-8 text-center text-sm text-white/50">
-                  Sign in to see your latest notifications.
-                </p>
+                <NotificationEmptyState subtitle="Đăng nhập để xem thông báo cá nhân của bạn." />
               ) : notifications.length === 0 ? (
-                <p className="px-4 py-8 text-center text-sm text-white/50">
-                  No notifications yet.
-                </p>
+                <NotificationEmptyState subtitle="Thông báo của bạn sẽ xuất hiện tại đây." />
               ) : (
                 notifications.map((n) => {
                   const isUnread = new Date(n.createdAt).getTime() > lastSeenAt;

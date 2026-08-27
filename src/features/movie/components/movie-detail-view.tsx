@@ -40,7 +40,7 @@ export function MovieDetailView({ slug }: { slug: string }) {
 
   if (isLoading || !movie) {
     return (
-      <div className="space-y-4 px-4 py-8 sm:px-8">
+      <div className="space-y-4 px-6 py-8 sm:px-8 lg:px-20">
         <Skeleton className="aspect-video w-full" />
         <Skeleton className="h-8 w-1/2" />
         <Skeleton className="h-20 w-full" />
@@ -62,7 +62,7 @@ export function MovieDetailView({ slug }: { slug: string }) {
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: "easeOut" }}
-      className="space-y-8 px-4 py-8 sm:px-8"
+      className="space-y-8 px-6 py-8 sm:px-8 lg:px-20"
     >
       <div
         className={cn(
@@ -151,7 +151,7 @@ export function MovieDetailView({ slug }: { slug: string }) {
             </motion.div>
           </div>
 
-          <p className="text-white/70">{movie.description}</p>
+          <p className="leading-relaxed whitespace-pre-line text-white/70">{movie.description}</p>
 
           {/* Below `lg`, the episode list renders inline here (between the
            * description and Rating & Reviews) instead of as a sidebar. */}

@@ -31,7 +31,7 @@ export function MovieCard({ movie }: { movie: Movie }) {
     <motion.div
       whileHover={{ scale: 1.05 }}
       transition={{ duration: 0.2 }}
-      className="group relative pt-2 w-full shrink-0"
+      className="group relative w-full shrink-0"
     >
       {movie.isPremium && (
         <Image

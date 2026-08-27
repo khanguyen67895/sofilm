@@ -20,7 +20,7 @@ export function SubscriptionView() {
   }
 
   return (
-    <div className="space-y-8 px-4 py-12 sm:px-8">
+    <div className="space-y-8 px-6 py-12 sm:px-8 lg:px-20">
       <Reveal className="text-center">
         <h1 className="text-3xl font-extrabold text-white">Choose the Plan That Fits You</h1>
         <p className="mt-2 text-white/60">

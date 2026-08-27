@@ -11,11 +11,11 @@
   --color-brand: #ff6a3d;
   --color-brand-dark: #e2551f;
   --color-brand-light: #ff9466;
-  /* Unbounded is the site's typeface everywhere except one place: `--font-rank`
-   * (TrendingRow's big rank number, `.font-rank`) is Merienda instead. */
-  --font-sans: var(--font-unbounded);
-  --font-mono: var(--font-unbounded);
-  --font-heading: var(--font-unbounded);
+  /* Plus Jakarta Sans is the site's typeface everywhere except one place:
+   * `--font-rank` (TrendingRow's big rank number, `.font-rank`) is Merienda instead. */
+  --font-sans: var(--font-jakarta);
+  --font-mono: var(--font-jakarta);
+  --font-heading: var(--font-jakarta);
   --font-rank: var(--font-merienda);
 }
 

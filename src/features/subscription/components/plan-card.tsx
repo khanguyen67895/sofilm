@@ -51,22 +51,25 @@ export function PlanCard({ plan, onSelect, selected }: PlanCardProps) {
         </span>
       )}
       <h3 className="text-lg font-bold text-white">{plan.name}</h3>
-      <p className="text-3xl font-extrabold text-white">
+      <p className="text-6xl font-extrabold text-white">
         {plan.price.toLocaleString("vi-VN")}
         <span className="text-lg font-normal text-white/50">đ</span>
         <span className="text-sm font-normal text-white/50">
           {formatBillingCycle(plan.durationDays)}
         </span>
       </p>
-      <ul className="space-y-2">
+      <ul>
         {plan.perks.map((perk) => (
-          <li key={perk} className="flex items-center gap-2 text-sm text-white/70">
+          <li
+            key={perk}
+            className="flex items-center gap-2 border-b border-white/10 py-3 text-sm text-white/70 last:border-b-0"
+          >
             <PlanCheckIcon /> {perk}
           </li>
         ))}
       </ul>
       <Button
-        variant={plan.tier === "VIP" || selected ? "primary" : "outline"}
+        variant={plan.tier === "VIP" || selected ? "primary" : "secondary"}
         onClick={() => onSelect(plan)}
         className="mt-auto"
       >

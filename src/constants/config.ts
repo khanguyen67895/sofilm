@@ -5,8 +5,8 @@ export const SITE_CONFIG = {
 };
 
 export const API_CONFIG = {
-  baseURL: process.env.NEXT_PUBLIC_API_URL ?? "http://18.141.246.254",
-  socketURL: process.env.NEXT_PUBLIC_SOCKET_URL ?? "http://18.141.246.254",
+  baseURL: process.env.NEXT_PUBLIC_API_URL ?? "https://api.soaff.ai",
+  socketURL: process.env.NEXT_PUBLIC_SOCKET_URL ?? "https://api.soaff.ai",
   timeout: 15_000,
 };
 

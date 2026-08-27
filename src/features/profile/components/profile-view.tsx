@@ -39,7 +39,7 @@ export function ProfileView() {
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, ease: "easeOut" }}
-      className="space-y-6 px-4 py-8 sm:px-8"
+      className="space-y-6 px-6 py-8 sm:px-8 lg:px-20"
     >
       <div className="flex items-center gap-4">
         <div className="flex h-16 w-16 items-center justify-center rounded-full bg-red-600 text-xl font-bold text-white">

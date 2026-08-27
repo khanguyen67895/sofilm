@@ -48,10 +48,10 @@ export function MovieCatalogView() {
         />
         <div className="absolute bg-linear-to-t from-black via-black/40 to-transparent" />
 
-        <Reveal className="relative space-y-6 px-4 text-center sm:px-8">
+        <Reveal className="relative space-y-6 px-6 text-center sm:px-8 lg:px-20">
           <h1 className="font-heading text-3xl font-bold text-white uppercase">Categories</h1>
 
-          <div className="scrollbar-none -mx-4 flex items-center justify-start gap-2 overflow-x-auto px-4 text-left sm:mx-0 sm:flex-wrap sm:justify-center sm:overflow-visible sm:px-0 sm:text-center">
+          <div className="scrollbar-none -mx-6 flex items-center justify-start gap-2 overflow-x-auto px-6 text-left sm:mx-0 sm:flex-wrap sm:justify-center sm:overflow-visible sm:px-0 sm:text-center">
             <button
               type="button"
               onClick={() => selectGenre(undefined)}
@@ -95,7 +95,7 @@ export function MovieCatalogView() {
           </button>
         </div>
       ) : isLoading || !data ? (
-        <div className="grid grid-cols-2 gap-x-4 gap-y-8 px-4 sm:grid-cols-3 sm:px-8 md:grid-cols-4 lg:grid-cols-6">
+        <div className="grid grid-cols-2 gap-x-4 gap-y-8 px-6 sm:grid-cols-3 sm:px-8 md:grid-cols-4 lg:grid-cols-6 lg:px-20">
           {Array.from({ length: 12 }).map((_, i) => (
             <Skeleton key={i} className="aspect-2/3 w-full" />
           ))}
@@ -111,7 +111,7 @@ export function MovieCatalogView() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.2 }}
-          className="grid grid-cols-2 gap-x-4 gap-y-8 px-4 sm:grid-cols-3 sm:px-8 md:grid-cols-4 lg:grid-cols-6"
+          className="grid grid-cols-2 gap-x-4 gap-y-8 px-6 sm:grid-cols-3 sm:px-8 md:grid-cols-4 lg:grid-cols-6 lg:px-20"
         >
           {data.items.map((movie) => (
             <MovieCard key={movie.id} movie={movie} />

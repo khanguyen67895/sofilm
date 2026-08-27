@@ -43,7 +43,7 @@ export function Header() {
           : "sticky top-0 z-50 bg-transparent"
       }
     >
-      <div className="relative flex h-20 items-center justify-between gap-2 px-4 sm:gap-4 sm:px-8 lg:px-16">
+      <div className="relative flex h-20 items-center justify-between gap-2 px-6 sm:gap-4 sm:px-8 lg:px-20">
         {/* On /shorts the header itself is pointer-events-none (so empty
          * gaps let clicks fall through to the video's own mute button and
          * tap-to-play beneath) — only these three interactive clusters

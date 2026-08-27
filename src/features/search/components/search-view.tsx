@@ -15,7 +15,7 @@ export function SearchView() {
   const { data: movies, isFetching, isError, refetch } = useSearchMovies(query);
 
   return (
-    <div className="space-y-6 px-4 py-8 sm:px-8">
+    <div className="space-y-6 px-6 py-8 sm:px-8 lg:px-20">
       <div className="relative max-w-xl">
         <Search
           size={18}

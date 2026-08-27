@@ -58,9 +58,14 @@ export function HeroMobileOverlay({ items, activeIndex, onGoTo }: HeroMobileOver
           key={active.videoUrl}
           ref={videoRef}
           src={active.videoUrl}
+          // Without a poster the browser paints a blank/black frame until the
+          // video has enough data to decode — visible as a jump the instant
+          // the slide switches to a video-backed item.
+          poster={resolveImageSrc(active.poster || active.backdrop, PLACEHOLDER_IMAGE)}
           muted
           loop
           playsInline
+          preload="auto"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.4 }}
@@ -107,15 +112,15 @@ export function HeroMobileOverlay({ items, activeIndex, onGoTo }: HeroMobileOver
             </p>
           )}
           {active.slug && (
-            <div ref={ctaRef} className="flex gap-3">
-              <Link href={ROUTES.movie(active.slug)}>
-                <Button size="md">
-                  <Play size={16} /> Watch Now
+            <div ref={ctaRef} className="flex gap-2">
+              <Link href={ROUTES.movie(active.slug)} className="shrink-0">
+                <Button size="sm" className="whitespace-nowrap">
+                  <Play size={14} /> Watch Now
                 </Button>
               </Link>
-              <Link href={ROUTES.movie(active.slug)}>
-                <Button variant="secondary" size="md">
-                  <Info size={16} /> More Info
+              <Link href={ROUTES.movie(active.slug)} className="shrink-0">
+                <Button variant="secondary" size="sm" className="whitespace-nowrap">
+                  <Info size={14} /> More Info
                 </Button>
               </Link>
             </div>

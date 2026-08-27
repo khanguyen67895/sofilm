@@ -41,7 +41,7 @@ export function Footer() {
   ));
 
   return (
-    <footer className="relative mt-20 overflow-hidden border-t border-white/5 bg-black">
+    <footer className="relative overflow-hidden border-t border-white/5 bg-black">
       <Image
         src="/image/ic_bg_footer.png"
         alt=""
@@ -50,7 +50,7 @@ export function Footer() {
         className="pointer-events-none absolute inset-0 object-cover object-bottom-left opacity-25"
       />
 
-      <Reveal className="relative mx-auto flex max-w-6xl flex-col gap-8 px-4 py-14 sm:px-8">
+      <Reveal className="relative mx-auto flex max-w-360 flex-col gap-8 px-6 py-14 sm:px-8 lg:px-20">
         {/* Logo + socials share one row on desktop; on mobile the logo sits
          * alone up top and the socials move below the contacts instead, to
          * match the app's own mobile design (not squeezed into the same row). */}

@@ -12,7 +12,14 @@ import { HeroMobileOverlay } from "./hero-mobile-overlay";
  * countdown progress bar on mobile (same duration, kept in sync). */
 export const HERO_AUTOPLAY_MS = 7000;
 
-export function HeroBanner({ items }: { items: HeroItem[] }) {
+/** The hero only ever shows a handful of featured picks — cap the pool at 5
+ * regardless of how many banners the backend/mock sends, so the carousel
+ * (desktop arc + mobile thumbnail strip) stays readable and just auto-cycles
+ * through those 5 instead of growing unbounded. */
+const MAX_HERO_ITEMS = 5;
+
+export function HeroBanner({ items: allItems }: { items: HeroItem[] }) {
+  const items = allItems.slice(0, MAX_HERO_ITEMS);
   const [activeIndex, setActiveIndex] = useState(0);
   const active = items[activeIndex];
   const isDesktop = useMediaQuery("(min-width: 640px)");

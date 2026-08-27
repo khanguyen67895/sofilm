@@ -7,13 +7,13 @@ import type { Movie } from "@/types/movie";
 
 export function AllMoviesSection({ movies }: { movies: Movie[] }) {
   return (
-    <section className="space-y-6 px-4 sm:px-8">
+    <section className="space-y-6 px-6 sm:px-8 lg:px-20">
       <Reveal>
         <h2 className="text-lg font-semibold text-white">All Movies</h2>
       </Reveal>
       <Reveal
         delay={0.1}
-        className="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6"
+        className="grid grid-cols-[repeat(auto-fill,minmax(10rem,1fr))] gap-x-4 gap-y-8 sm:grid-cols-[repeat(auto-fill,minmax(13.75rem,1fr))]"
       >
         {movies.map((movie) => (
           <MovieCard key={movie.id} movie={movie} />

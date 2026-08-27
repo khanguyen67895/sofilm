@@ -84,9 +84,16 @@ function CardMedia({ item, width, isActive }: { item: HeroItem; width: number; i
         key={item.videoUrl}
         ref={videoRef}
         src={item.videoUrl}
+        // Same poster frame the still-image branch below would show — without
+        // it the browser paints a blank/black frame the instant this card
+        // becomes active, until the video has enough data to decode its
+        // first frame, which reads as the whole carousel "jumping" every
+        // time the active slide has a video.
+        poster={resolveImageSrc(item.poster || item.backdrop, PLACEHOLDER_IMAGE)}
         muted
         loop
         playsInline
+        preload="auto"
         disablePictureInPicture
         className="absolute inset-0 h-full w-full object-cover"
       />
@@ -124,7 +131,7 @@ export function HeroCarousel({ items, activeIndex, onGoTo }: HeroCarouselProps) 
 
   return (
     <div
-      className="relative flex items-center justify-center gap-6 px-4"
+      className="relative flex items-center justify-center gap-6 px-6 sm:px-8 lg:px-20"
       style={{ perspective: 1400 }}
     >
       {n > 1 && <ArrowButton direction="left" onClick={() => onGoTo(activeIndex - 1)} />}
@@ -139,12 +146,13 @@ export function HeroCarousel({ items, activeIndex, onGoTo }: HeroCarouselProps) 
           return (
             <motion.div
               key={item.id}
+              layout
               role="button"
               tabIndex={0}
               initial={{ opacity: 0 }}
-              animate={{ width: style.width, height: style.height, opacity: 1, rotateY }}
-              transition={{ duration: 0.5, ease: "easeInOut" }}
-              style={{ borderRadius: style.radius }}
+              animate={{ opacity: 1, rotateY }}
+              transition={{ duration: 0.5, ease: "easeInOut", layout: { duration: 0.5, ease: "easeInOut" } }}
+              style={{ width: style.width, height: style.height, borderRadius: style.radius, willChange: "transform" }}
               onClick={() => onGoTo(index)}
               onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && onGoTo(index)}
               aria-label={item.title}
@@ -175,10 +183,11 @@ export function HeroCarousel({ items, activeIndex, onGoTo }: HeroCarouselProps) 
         return (
           <motion.div
             key={item.id}
+            layout
             initial={{ opacity: 0 }}
-            animate={{ width: style.width, height: style.height, opacity: 1 }}
-            transition={{ duration: 0.5, ease: "easeInOut" }}
-            style={{ borderRadius: style.radius }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, ease: "easeInOut", layout: { duration: 0.5, ease: "easeInOut" } }}
+            style={{ width: style.width, height: style.height, borderRadius: style.radius, willChange: "transform" }}
             className="group relative shrink-0 overflow-hidden"
           >
             <Link href={item.slug ? ROUTES.movie(item.slug) : "#"} aria-label={item.title} className="block h-full w-full">

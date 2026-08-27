@@ -38,7 +38,7 @@ export function HomeView() {
 
   if (isRowsLoading || !rows) {
     return (
-      <div className="space-y-6 px-4 py-8 sm:px-8">
+      <div className="space-y-6 px-6 py-8 sm:px-8 lg:px-20">
         <Skeleton className="h-[62vh] min-h-95 w-full" />
         <Skeleton className="h-6 w-40" />
         <div className="flex gap-3">
@@ -75,7 +75,7 @@ export function HomeView() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.3 }}
-      className="space-y-10 pb-16"
+      className="space-y-10 pb-8"
     >
       {heroItems.length > 0 && <HeroBanner items={heroItems} />}
       <div className="space-y-10">

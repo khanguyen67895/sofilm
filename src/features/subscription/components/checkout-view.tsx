@@ -141,7 +141,7 @@ export function CheckoutView() {
   }
 
   return (
-    <div className="space-y-8 px-4 py-12 sm:px-8">
+    <div className="space-y-8 px-6 py-12 sm:px-8 lg:px-20">
       <Reveal className="text-center">
         <h1 className="text-2xl font-extrabold text-white sm:text-3xl">
           Choose a package and make a payment.
@@ -173,9 +173,9 @@ export function CheckoutView() {
                 />
                 <span className="text-sm text-white/80">{plan.name}</span>
               </div>
-              <p className="mt-1 text-xl font-bold text-white">
+              <p className="mt-1 text-6xl font-bold text-white">
                 {formatCurrency(plan.price, plan.currency)}
-                <span className="text-xs font-normal text-white/50">
+                <span className="text-sm font-normal text-white/50">
                   {formatBillingCycle(plan.durationDays)}
                 </span>
               </p>
@@ -257,9 +257,9 @@ export function CheckoutView() {
                 </div>
                 <div>
                   <p className="text-sm font-medium text-white">{selectedPlan.name}</p>
-                  <p className="text-lg font-bold text-white">
+                  <p className="text-xl font-bold text-white">
                     {formatCurrency(selectedPlan.price, selectedPlan.currency)}
-                    <span className="text-xs font-normal text-white/50">
+                    <span className="text-sm font-normal text-white/50">
                       {formatBillingCycle(selectedPlan.durationDays)}
                     </span>
                   </p>
@@ -272,9 +272,9 @@ export function CheckoutView() {
                   </li>
                 ))}
               </ul>
-              <div className="flex items-center justify-between border-t border-white/10 pt-3 text-sm">
-                <span className="text-white/60">Total Payment:</span>
-                <span className="font-bold text-green-500">
+              <div className="flex items-center justify-between border-t border-white/10 pt-3">
+                <span className="text-sm text-white/60">Total Payment:</span>
+                <span className="text-xl font-bold text-green-500">
                   {formatCurrency(selectedPlan.price, selectedPlan.currency)}
                 </span>
               </div>

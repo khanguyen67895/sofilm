@@ -50,8 +50,8 @@ export function PlanCard({ plan, onSelect, selected }: PlanCardProps) {
           Most Popular
         </span>
       )}
-      <h3 className="text-lg font-bold text-white">{plan.name}</h3>
-      <p className="text-6xl font-extrabold text-white">
+      <h3 className="text-lg text-center sm:text-left font-bold text-white">{plan.name}</h3>
+      <p className="text-center text-5xl font-extrabold text-white sm:text-left">
         {plan.price.toLocaleString("vi-VN")}
         <span className="text-lg font-normal text-white/50">đ</span>
         <span className="text-sm font-normal text-white/50">

@@ -23,7 +23,7 @@ export function MovieCard({ movie }: { movie: Movie }) {
     e.stopPropagation();
     requireAuth(
       () => toggleFavorite.mutate({ movie, isFavorite }),
-      "Đăng nhập để lưu phim yêu thích."
+      "Log in to save movies to your favorites."
     );
   }
 
@@ -43,7 +43,7 @@ export function MovieCard({ movie }: { movie: Movie }) {
         />
       )}
       <Link href={ROUTES.movie(movie.slug)} className="block">
-        <div className="relative aspect-2/3 overflow-hidden rounded-lg bg-white/5">
+        <div className="relative aspect-2/3 overflow-hidden rounded-2xl bg-white/5">
           <Image
             src={resolveImageSrc(movie.poster, PLACEHOLDER_IMAGE)}
             alt={movie.title}
@@ -55,7 +55,7 @@ export function MovieCard({ movie }: { movie: Movie }) {
           <motion.button
             type="button"
             onClick={handleToggleFavorite}
-            aria-label={isFavorite ? "Bỏ yêu thích" : "Yêu thích"}
+            aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
             whileTap={{ scale: 0.8 }}
             className="absolute top-2 right-2"
           >

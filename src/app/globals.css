@@ -29,8 +29,12 @@ html,
 body {
   /* Safety net — a single misbehaving element (fixed width, absolute
    * positioning gone wrong) shouldn't be able to force the whole page to
-   * scroll horizontally on mobile. */
-  overflow-x: hidden;
+   * scroll horizontally on mobile. `clip` instead of `hidden`: setting only
+   * overflow-x forces the UA to compute overflow-y as `auto`, turning body
+   * into its own scroll container and breaking the header's `sticky` (most
+   * visibly in Safari/WebKit). `clip` suppresses the overflow without
+   * establishing a scroll container, so sticky keeps working. */
+  overflow-x: clip;
 }
 
 body {

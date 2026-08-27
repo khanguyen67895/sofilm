@@ -20,6 +20,7 @@ export function useHeroBanners() {
           poster: banner.movie?.poster,
           backdrop: banner.thumbnailUrl || banner.imageUrl || banner.movie?.backdrop,
           videoUrl: banner.videoUrl ?? banner.movie?.videoUrl,
+          isPremium: banner.movie?.isPremium,
         })
       );
     },

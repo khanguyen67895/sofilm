@@ -27,7 +27,7 @@ export function HeaderActions({ avatar }: { avatar?: string }) {
 
       <Link
         href={ROUTES.profile}
-        aria-label="Tài khoản"
+        aria-label="Account"
         className="relative hidden h-11 w-11 shrink-0 overflow-hidden rounded-full bg-stone-300 sm:block"
       >
         <AnimatePresence>

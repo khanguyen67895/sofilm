@@ -11,8 +11,8 @@ interface EmptyStateProps {
 }
 
 export function EmptyState({
-  title = "Nội dung đang được cập nhật",
-  description = "Phim mới đang được tải lên, quay lại sau bạn nhé!",
+  title = "Content coming soon",
+  description = "New movies are being added — check back soon!",
   className,
 }: EmptyStateProps) {
   return (

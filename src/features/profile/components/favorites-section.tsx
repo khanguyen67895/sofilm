@@ -11,10 +11,10 @@ export function FavoritesSection() {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-lg font-semibold text-white">Phim Yêu Thích</h2>
+      <h2 className="text-lg font-semibold text-white">Favorites</h2>
 
       {isError ? (
-        <ErrorState title="Không thể tải danh sách yêu thích." onRetry={() => refetch()} />
+        <ErrorState title="Couldn't load your favorites." onRetry={() => refetch()} />
       ) : isLoading ? (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4 lg:grid-cols-6">
           {Array.from({ length: 6 }).map((_, i) => (
@@ -29,8 +29,8 @@ export function FavoritesSection() {
         </div>
       ) : (
         <EmptyState
-          title="Chưa có phim yêu thích"
-          description="Bấm biểu tượng trái tim trên phim bạn thích để lưu vào đây."
+          title="No favorites yet"
+          description="Tap the heart icon on a movie you like to save it here."
         />
       )}
     </div>

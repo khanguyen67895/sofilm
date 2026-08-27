@@ -44,6 +44,15 @@ export function ShortItem({ short }: { short: Short }) {
     const container = containerRef.current;
     if (!video || !container) return;
 
+    // Browsers check the `muted` *property* at the exact moment play() is
+    // invoked to allow autoplay without a user gesture. React commits the
+    // `muted` JSX prop but some browsers still evaluate the very first
+    // play() call before that's reliably reflected, which silently rejects
+    // the promise and makes the video look like it needs a tap to start.
+    // Setting it imperatively here guarantees it's true before we ever
+    // call play() below.
+    video.muted = true;
+
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting && entry.intersectionRatio >= 0.6) {
@@ -139,7 +148,7 @@ export function ShortItem({ short }: { short: Short }) {
 
         <video
           ref={videoRef}
-          src={short.videoUrl}
+          src={short.videoUrl || undefined}
           poster={resolveImageSrc(short.thumbnail, PLACEHOLDER_IMAGE)}
           className="h-full w-full object-cover"
           loop
@@ -197,7 +206,7 @@ export function ShortItem({ short }: { short: Short }) {
               exit={{ opacity: 0 }}
               className="pointer-events-none absolute top-4 left-1/2 z-10 -translate-x-1/2 rounded-full bg-black/70 px-3 py-1.5 text-xs text-white"
             >
-              Thao tác thất bại, vui lòng thử lại.
+              Action failed, please try again.
             </motion.div>
           )}
         </AnimatePresence>
@@ -208,7 +217,7 @@ export function ShortItem({ short }: { short: Short }) {
             e.stopPropagation();
             setIsMuted((m) => !m);
           }}
-          aria-label={isMuted ? "Bật âm thanh" : "Tắt âm thanh"}
+          aria-label={isMuted ? "Unmute" : "Mute"}
           className="absolute top-4 right-4 z-10 flex h-9 w-9 items-center justify-center rounded-full bg-black/40 text-white backdrop-blur-sm"
         >
           {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}

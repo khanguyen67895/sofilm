@@ -32,12 +32,12 @@ export function CommentSection({ movieId }: { movieId: string }) {
           { comment: comment.trim() },
           { onSuccess: () => setComment("") }
         ),
-      "Đăng nhập để bình luận."
+      "Sign in to comment."
     );
   }
 
   const postError = submitReview.isError && (
-    <p className="text-xs text-red-500">Đăng bình luận thất bại. Vui lòng thử lại.</p>
+    <p className="text-xs text-red-500">Failed to post comment. Please try again.</p>
   );
 
   return (
@@ -85,7 +85,7 @@ export function CommentSection({ movieId }: { movieId: string }) {
             />
           ))}
           {reviews.length === 0 && (
-            <p className="py-6 text-center text-sm text-white/50">Chưa có bình luận nào.</p>
+            <p className="py-6 text-center text-sm text-white/50">No comments yet.</p>
           )}
         </div>
       )}
@@ -98,7 +98,7 @@ export function CommentSection({ movieId }: { movieId: string }) {
             onClick={() => fetchNextPage()}
             disabled={isFetchingNextPage}
           >
-            {isFetchingNextPage ? "Đang tải..." : "Xem thêm"}
+            {isFetchingNextPage ? "Loading..." : "Load more"}
           </Button>
         </div>
       )}

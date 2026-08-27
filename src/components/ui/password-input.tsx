@@ -23,7 +23,7 @@ export function PasswordInput({ className, ...props }: HTMLMotionProps<"input">)
       <button
         type="button"
         onClick={() => setVisible((v) => !v)}
-        aria-label={visible ? "Ẩn mật khẩu" : "Hiện mật khẩu"}
+        aria-label={visible ? "Hide password" : "Show password"}
         className="absolute top-1/2 right-3.5 -translate-y-1/2 text-white/40 hover:text-white/70"
       >
         {visible ? <EyeOff size={16} /> : <Eye size={16} />}

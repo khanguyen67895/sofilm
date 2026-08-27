@@ -66,14 +66,14 @@ export function AdminMovieForm({ mode, movie }: AdminMovieFormProps) {
 
   function validate(): boolean {
     const nextErrors: AdminMovieFieldErrors = {};
-    if (!title.trim()) nextErrors.title = "Bắt buộc phải nhập tên phim.";
+    if (!title.trim()) nextErrors.title = "Title is required.";
     if (type === "SERIES") {
-      if (!isValidImageSrc(poster)) nextErrors.poster = "Bắt buộc phải tải ảnh poster lên.";
-      if (!isValidImageSrc(backdrop)) nextErrors.backdrop = "Bắt buộc phải tải ảnh backdrop lên.";
+      if (!isValidImageSrc(poster)) nextErrors.poster = "Poster image is required.";
+      if (!isValidImageSrc(backdrop)) nextErrors.backdrop = "Backdrop image is required.";
     }
-    if (!releaseDate) nextErrors.releaseDate = "Bắt buộc phải chọn ngày phát hành.";
-    if (type === "MOVIE" && !duration.trim()) nextErrors.duration = "Bắt buộc phải nhập thời lượng.";
-    if (!genreId) nextErrors.genreId = "Bắt buộc phải chọn thể loại.";
+    if (!releaseDate) nextErrors.releaseDate = "Release date is required.";
+    if (type === "MOVIE" && !duration.trim()) nextErrors.duration = "Duration is required.";
+    if (!genreId) nextErrors.genreId = "Genre is required.";
     setErrors(nextErrors);
 
     return Object.keys(nextErrors).length === 0 && !blocked;
@@ -107,16 +107,17 @@ export function AdminMovieForm({ mode, movie }: AdminMovieFormProps) {
             episodeNumber: ep.episodeNumber,
             title: ep.title,
             duration: ep.duration,
+            thumbnail: ep.thumbnail,
             videoId: ep.videoId,
           });
         }
         setIsSubmitting(false);
-        setDialog({ variant: "success", title: "Tạo phim thành công!" });
+        setDialog({ variant: "success", title: "Movie created successfully!" });
       } catch (err) {
         setIsSubmitting(false);
         setDialog({
           variant: "error",
-          title: "Tạo phim thất bại",
+          title: "Failed to create movie",
           description: getApiErrorMessages(err).join(" "),
         });
       }
@@ -171,30 +172,30 @@ export function AdminMovieForm({ mode, movie }: AdminMovieFormProps) {
         />
         {videoMissing && (
           <p className="mt-2 text-xs text-red-500">
-            Bắt buộc phải tải video lên trước khi tạo phim.
+            You must upload a video before creating the movie.
           </p>
         )}
         {!videoMissing && thumbnailMissing && (
           <p className="mt-2 text-xs text-red-500">
-            Bắt buộc phải tải thumbnail lên trước khi lưu.
+            You must upload a thumbnail before saving.
           </p>
         )}
         {episodesMissing && (
           <p className="mt-2 text-xs text-red-500">
-            Bắt buộc phải có ít nhất 1 tập phim trước khi tạo.
+            At least 1 episode is required before creating.
           </p>
         )}
       </div>
 
       {isGenresError && (
         <p className="text-xs text-red-500">
-          Không thể tải danh sách thể loại. Vui lòng tải lại trang.
+          Failed to load genres. Please reload the page.
         </p>
       )}
       {submitError && <p className="text-sm text-red-500">{submitError}</p>}
 
       <Button type="submit" disabled={isPending || blocked}>
-        {isPending ? "Đang lưu..." : mode === "create" ? "Tạo Phim" : "Lưu Thay Đổi"}
+        {isPending ? "Saving..." : mode === "create" ? "Create Movie" : "Save Changes"}
       </Button>
 
       <AlertDialog

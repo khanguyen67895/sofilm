@@ -54,7 +54,7 @@ export function NotificationBell() {
       <button
         type="button"
         onClick={toggleOpen}
-        aria-label="Thông báo"
+        aria-label="Notifications"
         className="relative block"
       >
         <NotificationIcon width={46} height={46} className="h-8 w-8 sm:h-11.5 sm:w-11.5" />
@@ -81,11 +81,11 @@ export function NotificationBell() {
             <div className="scrollbar-none max-h-96 overflow-y-auto">
               {!isAuthenticated ? (
                 <p className="px-4 py-8 text-center text-sm text-white/50">
-                  Đăng nhập để xem thông báo mới nhất.
+                  Sign in to see your latest notifications.
                 </p>
               ) : notifications.length === 0 ? (
                 <p className="px-4 py-8 text-center text-sm text-white/50">
-                  Chưa có thông báo nào.
+                  No notifications yet.
                 </p>
               ) : (
                 notifications.map((n) => {

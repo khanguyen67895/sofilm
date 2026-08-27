@@ -57,7 +57,7 @@ export function LoginRequiredModal() {
             <button
               type="button"
               onClick={close}
-              aria-label="Đóng"
+              aria-label="Close"
               className="absolute top-4 right-4 text-white/50 hover:text-white"
             >
               <X size={18} />
@@ -68,19 +68,19 @@ export function LoginRequiredModal() {
                 id="login-required-title"
                 className="font-heading text-xl font-bold tracking-wide text-white uppercase"
               >
-                Yêu Cầu <span className="text-brand">Đăng Nhập</span>
+                Login <span className="text-brand">Required</span>
               </h2>
               <p className="text-sm text-white/60">
-                {message ?? "Đăng nhập hoặc tạo tài khoản để tiếp tục."}
+                {message ?? "Log in or create an account to continue."}
               </p>
             </div>
             <div className="flex flex-col gap-3">
               <Link href={ROUTES.login} className="w-full" onClick={close}>
-                <Button className="w-full">Đăng Nhập</Button>
+                <Button className="w-full">Log In</Button>
               </Link>
               <Link href={ROUTES.register} className="w-full" onClick={close}>
                 <Button variant="outline" className="w-full">
-                  Đăng Ký
+                  Sign Up
                 </Button>
               </Link>
             </div>

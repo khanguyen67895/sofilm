@@ -26,9 +26,9 @@ export function ProfileView() {
         transition={{ duration: 0.35, ease: "easeOut" }}
         className="flex flex-col items-center gap-4 px-4 py-20 text-center"
       >
-        <p className="text-white/70">Bạn cần đăng nhập để xem trang cá nhân.</p>
+        <p className="text-white/70">Sign in to view your profile.</p>
         <Link href={ROUTES.login}>
-          <Button>Đăng Nhập</Button>
+          <Button>Sign In</Button>
         </Link>
       </motion.div>
     );
@@ -52,7 +52,7 @@ export function ProfileView() {
       </div>
 
       <Button variant="outline" onClick={clearSession}>
-        <LogOut size={16} /> Đăng Xuất
+        <LogOut size={16} /> Sign Out
       </Button>
 
       <FavoritesSection />

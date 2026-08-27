@@ -33,7 +33,7 @@ export function MovieRow({ row, viewAllHref }: MovieRowProps) {
         {viewAllHref && (isDesktop ? (
           <Link
             href={viewAllHref}
-            aria-label="Xem tất cả"
+            aria-label="View all"
             className="flex h-8 w-8 items-center justify-center rounded-full border border-white/30 text-white/70 transition-colors hover:border-white hover:text-white"
           >
             <ChevronRight size={16} />
@@ -42,7 +42,7 @@ export function MovieRow({ row, viewAllHref }: MovieRowProps) {
           <button
             type="button"
             onClick={scrollNext}
-            aria-label="Cuộn tiếp"
+            aria-label="Scroll next"
             className="flex h-8 w-8 items-center justify-center rounded-full border border-white/30 text-white/70 transition-colors hover:border-white hover:text-white"
           >
             <ChevronRight size={16} />
@@ -65,7 +65,7 @@ export function MovieRow({ row, viewAllHref }: MovieRowProps) {
         <motion.button
           type="button"
           onClick={scrollNext}
-          aria-label="Cuộn tiếp"
+          aria-label="Scroll next"
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
           className="absolute right-8 top-1/2 hidden sm:block"

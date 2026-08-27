@@ -27,7 +27,7 @@ export function AdminMovieList() {
   function handleDelete(e: React.MouseEvent, id: string, title: string) {
     e.preventDefault();
     e.stopPropagation();
-    if (window.confirm(`Xoá phim "${title}"? Hành động này không thể hoàn tác.`)) {
+    if (window.confirm(`Delete "${title}"? This action cannot be undone.`)) {
       deleteMovie.mutate(id);
     }
   }
@@ -35,20 +35,20 @@ export function AdminMovieList() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="font-heading text-lg text-white">Danh Sách Phim</h2>
+        <h2 className="font-heading text-lg text-white">Movies</h2>
         <Link href={ROUTES.adminMovieNew}>
           <Button size="sm">
-            <PlusCircle size={16} /> Đăng Phim Mới
+            <PlusCircle size={16} /> Add New Movie
           </Button>
         </Link>
       </div>
 
       {deleteMovie.isError && (
-        <p className="text-xs text-red-500">Xoá phim thất bại. Vui lòng thử lại.</p>
+        <p className="text-xs text-red-500">Failed to delete movie. Please try again.</p>
       )}
 
       {isError ? (
-        <ErrorState title="Không thể tải danh sách phim." onRetry={() => refetch()} />
+        <ErrorState title="Failed to load movies." onRetry={() => refetch()} />
       ) : isLoading ? (
         <div className="space-y-2">
           {Array.from({ length: 6 }).map((_, i) => (
@@ -84,7 +84,7 @@ export function AdminMovieList() {
                       <p className="truncate text-sm font-medium text-white">{movie.title}</p>
                       <div className="mt-1 flex items-center gap-1.5">
                         <span className="rounded-md bg-white/10 px-2 py-0.5 text-[11px] text-white/70">
-                          {movie.type === "SERIES" ? "Phim Bộ" : "Phim Lẻ"}
+                          {movie.type === "SERIES" ? "Series" : "Movie"}
                         </span>
                         {movie.isPremium && (
                           <span className="rounded-md bg-brand/15 px-2 py-0.5 text-[11px] text-brand">
@@ -95,7 +95,7 @@ export function AdminMovieList() {
                     </div>
                     <button
                       type="button"
-                      aria-label={`Xoá phim ${movie.title}`}
+                      aria-label={`Delete ${movie.title}`}
                       disabled={deleteMovie.isPending}
                       onClick={(e) => handleDelete(e, movie.id, movie.title)}
                       className="shrink-0 text-white/40 hover:text-red-500 disabled:opacity-40"
@@ -106,7 +106,7 @@ export function AdminMovieList() {
                 </motion.div>
               ))}
               {data?.items.length === 0 && (
-                <p className="px-4 py-6 text-center text-sm text-white/50">Chưa có phim nào.</p>
+                <p className="px-4 py-6 text-center text-sm text-white/50">No movies yet.</p>
               )}
             </motion.div>
           </AnimatePresence>
@@ -121,16 +121,16 @@ export function AdminMovieList() {
             onClick={() => setPage((p) => p - 1)}
             className="transition-opacity disabled:opacity-40"
           >
-            Trước
+            Previous
           </button>
-          <span>Trang {data.page}</span>
+          <span>Page {data.page}</span>
           <button
             type="button"
             disabled={!data.hasMore}
             onClick={() => setPage((p) => p + 1)}
             className="transition-opacity disabled:opacity-40"
           >
-            Sau
+            Next
           </button>
         </div>
       )}

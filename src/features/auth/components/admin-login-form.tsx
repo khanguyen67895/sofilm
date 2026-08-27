@@ -30,8 +30,8 @@ export function AdminLoginForm() {
 
   function validate(): boolean {
     const next: FieldErrors = {};
-    if (!email.trim()) next.email = "Vui lòng nhập email hoặc tên đăng nhập.";
-    if (!password) next.password = "Vui lòng nhập mật khẩu.";
+    if (!email.trim()) next.email = "Please enter your email or username.";
+    if (!password) next.password = "Please enter your password.";
     setErrors(next);
     return Object.keys(next).length === 0;
   }
@@ -53,14 +53,14 @@ export function AdminLoginForm() {
     <div className="space-y-6">
       <div className="space-y-2 text-center">
         <h1 className="font-heading text-2xl leading-snug font-bold text-white sm:text-2xl">
-          Admin <span className="text-brand">Đăng Nhập</span>
+          Admin <span className="text-brand">Sign In</span>
         </h1>
-        <p className="text-base text-[#CCCCCC]">Đăng nhập để quản lý nội dung SoFilm.</p>
+        <p className="text-base text-[#CCCCCC]">Sign in to manage SoFilm content.</p>
       </div>
 
       <form onSubmit={handleSubmit} noValidate className="space-y-4">
         <div>
-          <Label required>Email hoặc tên đăng nhập</Label>
+          <Label required>Email or Username</Label>
           <div className="relative">
             <User
               size={16}
@@ -69,7 +69,7 @@ export function AdminLoginForm() {
             <Input
               type="text"
               autoComplete="username"
-              placeholder="Nhập email hoặc tên đăng nhập"
+              placeholder="Enter your email or username"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="h-12 rounded-full pl-10"
@@ -92,10 +92,10 @@ export function AdminLoginForm() {
         </div>
 
         <div>
-          <Label required>Mật khẩu</Label>
+          <Label required>Password</Label>
           <PasswordInput
             autoComplete="current-password"
-            placeholder="Nhập mật khẩu"
+            placeholder="Enter your password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             aria-invalid={Boolean(errors.password)}
@@ -129,7 +129,7 @@ export function AdminLoginForm() {
         </AnimatePresence>
 
         <Button type="submit" className="h-12 w-full" disabled={login.isPending}>
-          {login.isPending ? "Đang đăng nhập..." : "Đăng Nhập"}
+          {login.isPending ? "Signing in..." : "Sign In"}
         </Button>
       </form>
     </div>

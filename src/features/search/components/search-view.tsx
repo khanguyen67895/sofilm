@@ -24,7 +24,7 @@ export function SearchView() {
         <Input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Tìm phim, series..."
+          placeholder="Search movies, series..."
           className="pl-10"
         />
       </div>
@@ -48,13 +48,13 @@ export function SearchView() {
             exit={{ opacity: 0 }}
             className="flex flex-col items-center gap-2 py-6 text-center"
           >
-            <p className="text-white/50">Không thể tìm kiếm lúc này. Vui lòng thử lại.</p>
+            <p className="text-white/50">Search isn&apos;t available right now. Please try again.</p>
             <button
               type="button"
               onClick={() => refetch()}
               className="text-sm font-medium text-brand hover:underline"
             >
-              Thử lại
+              Retry
             </button>
           </motion.div>
         ) : movies && movies.length === 0 && query.trim() ? (
@@ -65,7 +65,7 @@ export function SearchView() {
             exit={{ opacity: 0 }}
             className="text-white/50"
           >
-            Không tìm thấy kết quả cho &quot;{query}&quot;.
+            No results found for &quot;{query}&quot;.
           </motion.p>
         ) : (
           <motion.div

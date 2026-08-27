@@ -1,6 +1,6 @@
 export const SITE_CONFIG = {
   name: "SoFilm",
-  description: "Xem phim, series và shorts chất lượng cao — mọi lúc, mọi nơi.",
+  description: "Watch movies, series, and shorts in high quality — anytime, anywhere.",
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
 };
 

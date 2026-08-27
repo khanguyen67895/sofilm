@@ -49,9 +49,9 @@ export function AdminGuard({ children }: { children: ReactNode }) {
         transition={{ duration: 0.35, ease: "easeOut" }}
         className="flex flex-col items-center gap-4 px-4 py-20 text-center"
       >
-        <p className="text-white/70">Bạn cần đăng nhập để truy cập trang quản trị.</p>
+        <p className="text-white/70">You need to sign in to access the admin panel.</p>
         <Link href={ROUTES.adminLogin}>
-          <Button>Đăng Nhập</Button>
+          <Button>Sign In</Button>
         </Link>
       </motion.div>
     );
@@ -65,9 +65,9 @@ export function AdminGuard({ children }: { children: ReactNode }) {
         transition={{ duration: 0.35, ease: "easeOut" }}
         className="flex flex-col items-center gap-4 px-4 py-20 text-center"
       >
-        <p className="text-white/70">Bạn không có quyền truy cập trang này.</p>
+        <p className="text-white/70">You don&apos;t have permission to access this page.</p>
         <Link href={ROUTES.home}>
-          <Button variant="outline">Về Trang Chủ</Button>
+          <Button variant="outline">Back to Home</Button>
         </Link>
       </motion.div>
     );

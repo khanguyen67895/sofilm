@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { MovieCard } from "@/components/movie/movie-card";
 import { Pagination } from "@/components/ui/pagination";
@@ -13,8 +14,11 @@ import { useGenres } from "../hooks/use-genres";
 import { useCatalogPage } from "../hooks/use-catalog-page";
 
 export function MovieCatalogView() {
+  const searchParams = useSearchParams();
   const { data: genres } = useGenres();
-  const [selectedGenreSlug, setSelectedGenreSlug] = useState<string>();
+  const [selectedGenreSlug, setSelectedGenreSlug] = useState<string | undefined>(
+    () => searchParams.get("genre") ?? undefined
+  );
   const [page, setPage] = useState(1);
 
   const { data, isLoading, isError, refetch } = useCatalogPage(page, selectedGenreSlug);
@@ -81,13 +85,13 @@ export function MovieCatalogView() {
 
       {isError ? (
         <div className="flex flex-col items-center gap-3 px-4 py-16 text-center">
-          <p className="text-white/70">Không thể tải danh sách phim.</p>
+          <p className="text-white/70">Unable to load the movie list.</p>
           <button
             type="button"
             onClick={() => refetch()}
             className="text-sm font-medium text-brand hover:underline"
           >
-            Thử lại
+            Retry
           </button>
         </div>
       ) : isLoading || !data ? (
@@ -98,8 +102,8 @@ export function MovieCatalogView() {
         </div>
       ) : data.items.length === 0 ? (
         <EmptyState
-          title="Chưa có phim trong danh mục này"
-          description="Phim mới đang được tải lên, quay lại sau bạn nhé!"
+          title="No movies in this category yet"
+          description="New movies are being added — check back soon!"
         />
       ) : (
         <motion.div

@@ -49,7 +49,7 @@ export function ImageUploadField({ label, previewUrl, onUploaded }: ImageUploadF
         onClick={() => inputRef.current?.click()}
       >
         <UploadCloud size={16} />
-        {previewUrl ? `Thay ${label}` : `Tải ${label} Lên`}
+        {previewUrl ? `Replace ${label}` : `Upload ${label}`}
       </Button>
 
       <AnimatePresence mode="wait">
@@ -70,7 +70,7 @@ export function ImageUploadField({ label, previewUrl, onUploaded }: ImageUploadF
             exit={{ opacity: 0, height: 0 }}
             className="flex items-center gap-1 text-xs text-green-500"
           >
-            <CheckCircle2 size={14} /> Tải lên thành công
+            <CheckCircle2 size={14} /> Upload successful
           </motion.p>
         ) : status === "error" ? (
           <motion.p
@@ -80,14 +80,14 @@ export function ImageUploadField({ label, previewUrl, onUploaded }: ImageUploadF
             exit={{ opacity: 0, height: 0 }}
             className="text-xs text-red-500"
           >
-            Tải ảnh thất bại. Vui lòng thử lại.
+            Failed to upload image. Please try again.
           </motion.p>
         ) : null}
       </AnimatePresence>
 
       {isValidImageSrc(previewUrl) && (
         <div className="relative h-32 w-56 overflow-hidden rounded-md bg-white/5">
-          <Image src={previewUrl} alt={`Xem trước ${label}`} fill className="object-cover" />
+          <Image src={previewUrl} alt={`${label} preview`} fill className="object-cover" />
         </div>
       )}
     </div>

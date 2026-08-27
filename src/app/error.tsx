@@ -21,9 +21,9 @@ export default function Error({
 
   return (
     <div className="flex min-h-150 flex-col items-center justify-center gap-4 px-4 py-24 text-center">
-      <p className="text-lg font-semibold text-white">Đã có lỗi xảy ra.</p>
+      <p className="text-lg font-semibold text-white">Something went wrong.</p>
       <p className="max-w-md text-sm text-white/50">{error.message}</p>
-      <Button onClick={reset}>Thử lại</Button>
+      <Button onClick={reset}>Try Again</Button>
     </div>
   );
 }

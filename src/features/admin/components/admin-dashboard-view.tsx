@@ -61,7 +61,7 @@ export function AdminDashboardView() {
         transition={{ duration: 0.3 }}
         className="font-heading text-lg text-white"
       >
-        Tổng Quan
+        Overview
       </motion.h2>
 
       <motion.div
@@ -72,19 +72,19 @@ export function AdminDashboardView() {
       >
         <StatCard
           icon={Film}
-          label="Tổng số phim"
+          label="Total Movies"
           value={moviePage?.total ?? 0}
           isLoading={isMoviesLoading}
         />
         <StatCard
           icon={GalleryHorizontal}
-          label="Banner Hero"
+          label="Hero Banners"
           value={banners?.length ?? 0}
           isLoading={isBannersLoading}
         />
         <StatCard
           icon={Clapperboard}
-          label="Video Ngắn"
+          label="Shorts"
           value={shortPage?.total ?? 0}
           isLoading={isShortsLoading}
         />
@@ -98,17 +98,17 @@ export function AdminDashboardView() {
       >
         <Link href={ROUTES.adminMovieNew}>
           <Button size="sm">
-            <PlusCircle size={16} /> Đăng Phim Mới
+            <PlusCircle size={16} /> Add New Movie
           </Button>
         </Link>
         <Link href={ROUTES.adminBannerNew}>
           <Button variant="outline" size="sm">
-            <GalleryHorizontal size={16} /> Thêm Banner Hero
+            <GalleryHorizontal size={16} /> Add Hero Banner
           </Button>
         </Link>
         <Link href={ROUTES.adminShortNew}>
           <Button variant="outline" size="sm">
-            <Clapperboard size={16} /> Thêm Video Ngắn
+            <Clapperboard size={16} /> Add Short
           </Button>
         </Link>
       </motion.div>

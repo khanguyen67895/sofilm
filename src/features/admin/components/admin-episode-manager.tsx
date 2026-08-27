@@ -16,7 +16,7 @@ export function AdminEpisodeManager({ movieId, episodes }: AdminEpisodeManagerPr
   return (
     <div className="space-y-4">
       <h3 className="font-heading text-sm tracking-wide text-white/80 uppercase">
-        Danh Sách Tập
+        Episode List
       </h3>
 
       <div className="space-y-3">
@@ -25,7 +25,7 @@ export function AdminEpisodeManager({ movieId, episodes }: AdminEpisodeManagerPr
             <AdminEpisodeRow key={ep.id} movieId={movieId} episode={ep} />
           ))}
         </AnimatePresence>
-        {episodes.length === 0 && <p className="text-sm text-white/50">Chưa có tập nào.</p>}
+        {episodes.length === 0 && <p className="text-sm text-white/50">No episodes yet.</p>}
       </div>
 
       <AdminEpisodeAddForm movieId={movieId} episodes={episodes} />

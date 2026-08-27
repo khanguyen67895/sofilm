@@ -26,7 +26,7 @@ function readVideoDuration(file: File): Promise<number> {
     };
     video.onerror = () => {
       URL.revokeObjectURL(url);
-      reject(new Error("Không đọc được thời lượng video."));
+      reject(new Error("Could not read video duration."));
     };
     video.src = url;
   });
@@ -35,9 +35,9 @@ function readVideoDuration(file: File): Promise<number> {
 function formatMaxDuration(seconds: number): string {
   const m = Math.floor(seconds / 60);
   const s = seconds % 60;
-  if (m <= 0) return `${s} giây`;
-  if (s === 0) return `${m} phút`;
-  return `${m} phút ${s} giây`;
+  if (m <= 0) return `${s}s`;
+  if (s === 0) return `${m}m`;
+  return `${m}m ${s}s`;
 }
 
 export function VideoUploadField({ hasVideo, onUploaded, maxDurationSeconds }: VideoUploadFieldProps) {
@@ -55,7 +55,7 @@ export function VideoUploadField({ hasVideo, onUploaded, maxDurationSeconds }: V
         const duration = await readVideoDuration(file);
         if (duration > maxDurationSeconds) {
           setDurationError(
-            `Video phải ngắn hơn ${formatMaxDuration(maxDurationSeconds)} (video này dài ${Math.round(duration)} giây).`
+            `Video must be shorter than ${formatMaxDuration(maxDurationSeconds)} (this video is ${Math.round(duration)}s long).`
           );
           e.target.value = "";
           return;
@@ -90,7 +90,7 @@ export function VideoUploadField({ hasVideo, onUploaded, maxDurationSeconds }: V
         onClick={() => inputRef.current?.click()}
       >
         <UploadCloud size={16} />
-        {hasVideo ? "Thay Video" : "Tải Video Lên"}
+        {hasVideo ? "Replace Video" : "Upload Video"}
       </Button>
       <AnimatePresence mode="wait">
         {durationError ? (
@@ -120,7 +120,7 @@ export function VideoUploadField({ hasVideo, onUploaded, maxDurationSeconds }: V
             exit={{ opacity: 0, height: 0 }}
             className="flex items-center gap-1 text-xs text-green-500"
           >
-            <CheckCircle2 size={14} /> Tải lên thành công
+            <CheckCircle2 size={14} /> Upload successful
           </motion.p>
         ) : status === "error" ? (
           <motion.p
@@ -130,7 +130,7 @@ export function VideoUploadField({ hasVideo, onUploaded, maxDurationSeconds }: V
             exit={{ opacity: 0, height: 0 }}
             className="text-xs text-red-500"
           >
-            Tải video thất bại. Vui lòng thử lại.
+            Failed to upload video. Please try again.
           </motion.p>
         ) : (
           hasVideo && (

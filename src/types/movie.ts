@@ -54,4 +54,5 @@ export interface HeroItem {
   poster?: string;
   backdrop?: string;
   videoUrl?: string;
+  isPremium?: boolean;
 }

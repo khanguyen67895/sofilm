@@ -1,5 +1,5 @@
 export function formatDuration(minutes: number): string {
-  return `${minutes} phút`;
+  return `${minutes} min`;
 }
 
 export function formatViews(views: number): string {
@@ -37,10 +37,10 @@ export function formatCountdown(totalSeconds: number): string {
 
 export function formatRelativeDate(iso: string): string {
   const days = Math.floor((Date.now() - new Date(iso).getTime()) / (1000 * 60 * 60 * 24));
-  if (days <= 0) return "Hôm nay";
-  if (days === 1) return "1 ngày trước";
-  if (days < 30) return `${days} ngày trước`;
+  if (days <= 0) return "Today";
+  if (days === 1) return "1 day ago";
+  if (days < 30) return `${days} days ago`;
   const months = Math.floor(days / 30);
-  if (months < 12) return `${months} tháng trước`;
-  return `${Math.floor(months / 12)} năm trước`;
+  if (months < 12) return `${months} months ago`;
+  return `${Math.floor(months / 12)} years ago`;
 }

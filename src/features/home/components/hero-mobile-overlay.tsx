@@ -126,7 +126,7 @@ export function HeroMobileOverlay({ items, activeIndex, onGoTo }: HeroMobileOver
           <button
             type="button"
             onClick={() => onGoTo(activeIndex - 1)}
-            aria-label="Phim trước"
+            aria-label="Previous"
             className="flex shrink-0"
           >
             <Image src="/image/ic_left.png" alt="" width={32} height={32} />
@@ -134,7 +134,7 @@ export function HeroMobileOverlay({ items, activeIndex, onGoTo }: HeroMobileOver
           <button
             type="button"
             onClick={() => onGoTo(activeIndex + 1)}
-            aria-label="Phim tiếp theo"
+            aria-label="Next"
             className="flex shrink-0"
           >
             <Image src="/image/ic_right.png" alt="" width={32} height={32} />

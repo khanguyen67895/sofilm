@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ROUTES } from "@/constants/routes";
+import { cn } from "@/utils/cn";
 
 const NAV_LINKS = [
   { href: ROUTES.home, label: "Home" },
@@ -20,7 +21,10 @@ export function HeaderNav({ pathname }: { pathname: string }) {
           <Link
             key={link.href}
             href={link.href}
-            className="font-heading relative pb-2 text-base font-normal text-white"
+            className={cn(
+              "font-heading relative pb-2 text-base font-normal transition-colors",
+              isActive ? "text-brand" : "text-white/80 hover:text-white"
+            )}
           >
             {link.label}
             {isActive && (

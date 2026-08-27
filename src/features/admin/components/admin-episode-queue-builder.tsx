@@ -1,14 +1,18 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { Trash2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { isValidImageSrc } from "@/utils/image";
+import { ImageUploadField } from "./image-upload-field";
 import { VideoUploadField } from "./video-upload-field";
 
 export interface QueuedEpisode {
   episodeNumber: number;
   title: string;
   duration?: number;
+  thumbnail?: string;
   videoId: string;
 }
 
@@ -24,6 +28,7 @@ interface AdminEpisodeQueueBuilderProps {
 export function AdminEpisodeQueueBuilder({ episodes, onChange }: AdminEpisodeQueueBuilderProps) {
   const [title, setTitle] = useState("");
   const [duration, setDuration] = useState("");
+  const [thumbnail, setThumbnail] = useState("");
 
   const nextNumber =
     episodes.length > 0 ? Math.max(...episodes.map((e) => e.episodeNumber)) + 1 : 1;
@@ -33,13 +38,15 @@ export function AdminEpisodeQueueBuilder({ episodes, onChange }: AdminEpisodeQue
       ...episodes,
       {
         episodeNumber: nextNumber,
-        title: title.trim() || `Tập ${nextNumber}`,
+        title: title.trim() || `Episode ${nextNumber}`,
         duration: duration ? Number(duration) : undefined,
+        thumbnail: thumbnail || undefined,
         videoId,
       },
     ]);
     setTitle("");
     setDuration("");
+    setThumbnail("");
   }
 
   function removeEpisode(episodeNumber: number) {
@@ -49,7 +56,7 @@ export function AdminEpisodeQueueBuilder({ episodes, onChange }: AdminEpisodeQue
   return (
     <div className="space-y-3">
       <h3 className="font-heading text-sm tracking-wide text-white/80 uppercase">
-        Danh Sách Tập
+        Episode List
       </h3>
 
       {episodes.length > 0 && (
@@ -59,18 +66,25 @@ export function AdminEpisodeQueueBuilder({ episodes, onChange }: AdminEpisodeQue
               key={ep.episodeNumber}
               className="flex items-center justify-between rounded-md border border-white/10 p-3"
             >
-              <div>
-                <p className="text-sm font-medium text-white">
-                  Tập {ep.episodeNumber} — {ep.title}
-                </p>
-                {ep.duration ? (
-                  <p className="text-xs text-white/50">{ep.duration} phút</p>
-                ) : null}
+              <div className="flex items-center gap-3">
+                {isValidImageSrc(ep.thumbnail) && (
+                  <div className="relative h-12 w-20 shrink-0 overflow-hidden rounded bg-white/5">
+                    <Image src={ep.thumbnail} alt={ep.title} fill className="object-cover" />
+                  </div>
+                )}
+                <div>
+                  <p className="text-sm font-medium text-white">
+                    Episode {ep.episodeNumber} — {ep.title}
+                  </p>
+                  {ep.duration ? (
+                    <p className="text-xs text-white/50">{ep.duration} min</p>
+                  ) : null}
+                </div>
               </div>
               <button
                 type="button"
                 onClick={() => removeEpisode(ep.episodeNumber)}
-                aria-label={`Xoá Tập ${ep.episodeNumber}`}
+                aria-label={`Delete Episode ${ep.episodeNumber}`}
                 className="text-white/40 hover:text-red-500"
               >
                 <Trash2 size={16} />
@@ -81,22 +95,28 @@ export function AdminEpisodeQueueBuilder({ episodes, onChange }: AdminEpisodeQue
       )}
 
       <div className="space-y-3 rounded-md border border-dashed border-white/15 p-3">
-        <p className="text-sm font-medium text-white">Thêm Tập {nextNumber}</p>
+        <p className="text-sm font-medium text-white">Add Episode {nextNumber}</p>
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
           <Input
-            placeholder={`Tên tập (mặc định: Tập ${nextNumber})`}
+            placeholder={`Episode title (default: Episode ${nextNumber})`}
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             className="sm:flex-1"
           />
           <Input
             type="number"
-            placeholder="Thời lượng (phút)"
+            placeholder="Duration (minutes)"
             value={duration}
             onChange={(e) => setDuration(e.target.value)}
             className="sm:w-40"
           />
         </div>
+        <ImageUploadField
+          key={`thumb-${nextNumber}`}
+          label="Thumbnail"
+          previewUrl={thumbnail}
+          onUploaded={setThumbnail}
+        />
         <VideoUploadField key={nextNumber} hasVideo={false} onUploaded={handleUploaded} />
       </div>
     </div>

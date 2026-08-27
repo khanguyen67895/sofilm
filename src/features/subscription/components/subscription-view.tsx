@@ -15,7 +15,7 @@ export function SubscriptionView() {
   function selectPlan(plan: SubscriptionPlan) {
     requireAuth(
       () => router.push(ROUTES.subscriptionCheckout(plan.id)),
-      "Đăng nhập để đăng ký gói VIP."
+      "Sign in to subscribe to a VIP plan."
     );
   }
 

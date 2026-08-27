@@ -24,12 +24,12 @@ export function EpisodeSidebar({ slug, title, episodes, onClose }: EpisodeSideba
   return (
     <div className="flex h-98.25 flex-col self-start rounded-lg border border-white/15 bg-black/40 backdrop-blur-xl lg:h-156.75 lg:sticky lg:top-8">
       <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
-        <h3 className="text-sm font-semibold text-white">Danh Sách Tập</h3>
+        <h3 className="text-sm font-semibold text-white">Episode List</h3>
         {onClose && (
           <button
             type="button"
             onClick={onClose}
-            aria-label="Đóng danh sách tập"
+            aria-label="Close episode list"
             className="text-white/50 hover:text-white"
           >
             <X size={16} />
@@ -75,7 +75,7 @@ export function EpisodeSidebar({ slug, title, episodes, onClose }: EpisodeSideba
                   isActive ? "font-medium text-brand" : "text-white/80"
                 )}
               >
-                {title} - Tập {ep.episodeNumber}
+                {title} - Episode {ep.episodeNumber}
               </span>
             </motion.button>
           );

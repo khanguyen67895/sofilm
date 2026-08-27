@@ -10,7 +10,7 @@ interface ErrorStateProps {
 }
 
 export function ErrorState({
-  title = "Đã có lỗi xảy ra. Vui lòng thử lại.",
+  title = "Something went wrong. Please try again.",
   onRetry,
   className,
 }: ErrorStateProps) {
@@ -28,7 +28,7 @@ export function ErrorState({
           onClick={onRetry}
           className="text-sm font-medium text-brand hover:underline"
         >
-          Thử lại
+          Retry
         </button>
       )}
     </motion.div>

@@ -40,19 +40,19 @@ export function RegisterForm() {
   function validate(): boolean {
     const next: FieldErrors = {};
     if (!USERNAME_PATTERN.test(username)) {
-      next.username = "Tên đăng nhập phải dài 3-32 ký tự (chữ, số, _ hoặc .).";
+      next.username = "Username must be 3-32 characters (letters, numbers, _ or .).";
     }
     if (!EMAIL_PATTERN.test(email)) {
-      next.email = "Email không hợp lệ.";
+      next.email = "Invalid email address.";
     }
     if (!PHONE_PATTERN.test(phone)) {
-      next.phone = "Số điện thoại không hợp lệ.";
+      next.phone = "Invalid phone number.";
     }
     if (password.length < 8) {
-      next.password = "Mật khẩu phải có ít nhất 8 ký tự.";
+      next.password = "Password must be at least 8 characters.";
     }
     if (confirmPassword !== password) {
-      next.confirmPassword = "Mật khẩu xác nhận không khớp.";
+      next.confirmPassword = "Passwords do not match.";
     }
     setErrors(next);
     return Object.keys(next).length === 0;
@@ -259,7 +259,7 @@ export function RegisterForm() {
         </AnimatePresence>
 
         <Button type="submit" className="h-12 w-full" disabled={register.isPending}>
-          {register.isPending ? "Đang tạo tài khoản..." : "Continue"}
+          {register.isPending ? "Creating account..." : "Continue"}
         </Button>
       </form>
 

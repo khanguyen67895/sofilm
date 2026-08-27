@@ -56,7 +56,7 @@ function NavButton({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      aria-label={direction === "prev" ? "Trang trước" : "Trang sau"}
+      aria-label={direction === "prev" ? "Previous page" : "Next page"}
       style={DARK_CIRCLE_STYLE}
       className={cn(
         CIRCLE_SIZE,

@@ -93,7 +93,7 @@ export function CheckoutView() {
   // them back with the login popup instead of letting checkout render.
   useEffect(() => {
     if (!mounted || isAuthenticated) return;
-    openLoginPrompt("Đăng nhập để tiếp tục thanh toán.");
+    openLoginPrompt("Sign in to continue with payment.");
     router.replace(ROUTES.subscription);
   }, [mounted, isAuthenticated, router, openLoginPrompt]);
 
@@ -279,11 +279,11 @@ export function CheckoutView() {
                 </span>
               </div>
               <Button onClick={handleCompletePayment} disabled={isPending} className="w-full">
-                {isPending ? "Đang xử lý..." : "Complete Payment"}
+                {isPending ? "Processing..." : "Complete Payment"}
               </Button>
               {hasError && (
                 <p className="text-center text-xs text-red-500">
-                  Thanh toán thất bại. Vui lòng thử lại.
+                  Payment failed. Please try again.
                 </p>
               )}
               <p className="text-center text-[11px] text-white/40">

@@ -28,14 +28,14 @@ function ShortRow({ short }: { short: AdminShortItem }) {
         <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-medium text-white">{short.title}</p>
           <p className="text-xs text-white/50">
-            {short.movieSlug ? `Phim: ${short.movieSlug} · ` : ""}
-            {short.likes} lượt thích · {short.comments} bình luận
-            {!short.isActive && " · Đã ẩn"}
+            {short.movieSlug ? `Movie: ${short.movieSlug} · ` : ""}
+            {short.likes} likes · {short.comments} comments
+            {!short.isActive && " · Hidden"}
           </p>
         </div>
         <button
           type="button"
-          aria-label="Xoá video ngắn"
+          aria-label="Delete short"
           disabled={deleteShort.isPending}
           onClick={() => deleteShort.mutate(short.id)}
           className="text-white/40 hover:text-red-500 disabled:opacity-40"
@@ -44,7 +44,7 @@ function ShortRow({ short }: { short: AdminShortItem }) {
         </button>
       </div>
       {deleteShort.isError && (
-        <p className="text-xs text-red-500">Xoá video ngắn thất bại. Vui lòng thử lại.</p>
+        <p className="text-xs text-red-500">Failed to delete short. Please try again.</p>
       )}
     </div>
   );
@@ -57,14 +57,14 @@ export function AdminShortList() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="font-heading text-lg text-white">Video Ngắn</h2>
+        <h2 className="font-heading text-lg text-white">Shorts</h2>
         <Link href={ROUTES.adminShortNew}>
-          <Button size="sm">+ Thêm Video Ngắn</Button>
+          <Button size="sm">+ Add Short</Button>
         </Link>
       </div>
 
       {isError ? (
-        <ErrorState title="Không thể tải danh sách video ngắn." onRetry={() => refetch()} />
+        <ErrorState title="Failed to load shorts." onRetry={() => refetch()} />
       ) : isLoading ? (
         <div className="space-y-2">
           {Array.from({ length: 4 }).map((_, i) => (
@@ -86,7 +86,7 @@ export function AdminShortList() {
               ))}
               {data?.items.length === 0 && (
                 <p className="px-4 py-6 text-center text-sm text-white/50">
-                  Chưa có video ngắn nào.
+                  No shorts yet.
                 </p>
               )}
             </motion.div>
@@ -102,16 +102,16 @@ export function AdminShortList() {
             onClick={() => setPage((p) => p - 1)}
             className="disabled:opacity-40"
           >
-            Trước
+            Previous
           </button>
-          <span>Trang {data.page}</span>
+          <span>Page {data.page}</span>
           <button
             type="button"
             disabled={!data.hasMore}
             onClick={() => setPage((p) => p + 1)}
             className="disabled:opacity-40"
           >
-            Sau
+            Next
           </button>
         </div>
       )}

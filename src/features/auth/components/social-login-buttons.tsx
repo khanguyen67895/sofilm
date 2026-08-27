@@ -25,7 +25,7 @@ export function SocialLoginButtons() {
 
   async function handleGoogle() {
     if (!SOCIAL_AUTH_CONFIG.googleClientId) {
-      setError("Đăng nhập Google chưa được cấu hình.");
+      setError("Google sign-in is not configured yet.");
       return;
     }
     setError(null);
@@ -38,7 +38,7 @@ export function SocialLoginButtons() {
       setError(
         err && typeof err === "object" && "isAxiosError" in err
           ? getApiErrorMessages(err).join(" ")
-          : "Đăng nhập Google thất bại. Vui lòng thử lại."
+          : "Google sign-in failed. Please try again."
       );
     } finally {
       setPendingProvider(null);
@@ -47,7 +47,7 @@ export function SocialLoginButtons() {
 
   async function handleFacebook() {
     if (!SOCIAL_AUTH_CONFIG.facebookAppId) {
-      setError("Đăng nhập Facebook chưa được cấu hình.");
+      setError("Facebook sign-in is not configured yet.");
       return;
     }
     setError(null);
@@ -60,7 +60,7 @@ export function SocialLoginButtons() {
       setError(
         err && typeof err === "object" && "isAxiosError" in err
           ? getApiErrorMessages(err).join(" ")
-          : "Đăng nhập Facebook thất bại. Vui lòng thử lại."
+          : "Facebook sign-in failed. Please try again."
       );
     } finally {
       setPendingProvider(null);
@@ -78,7 +78,7 @@ export function SocialLoginButtons() {
           disabled={pendingProvider !== null}
         >
           <GoogleIcon width={25} height={25} />
-          {pendingProvider === "google" ? "Đang xử lý..." : "GOOGLE"}
+          {pendingProvider === "google" ? "Processing..." : "GOOGLE"}
         </Button>
         <Button
           type="button"
@@ -88,7 +88,7 @@ export function SocialLoginButtons() {
           disabled={pendingProvider !== null}
         >
           <FacebookIcon width={25} height={25} className="text-[#1877F2]" />
-          {pendingProvider === "facebook" ? "Đang xử lý..." : "FACEBOOK"}
+          {pendingProvider === "facebook" ? "Processing..." : "FACEBOOK"}
         </Button>
       </div>
 

@@ -16,7 +16,7 @@ export function PremiumGate({ backdrop }: { backdrop: string }) {
   function handleUpgrade() {
     requireAuth(
       () => router.push(ROUTES.subscription),
-      "Đăng nhập để nâng cấp gói VIP."
+      "Sign in to upgrade to VIP."
     );
   }
 
@@ -38,13 +38,13 @@ export function PremiumGate({ backdrop }: { backdrop: string }) {
       >
         <Crown size={40} className="text-brand" />
         <div className="space-y-1">
-          <h3 className="text-xl font-bold text-white">Nội Dung Premium</h3>
+          <h3 className="text-xl font-bold text-white">Premium Content</h3>
           <p className="text-sm text-white/70">
-            Nâng cấp gói VIP để xem phim này và toàn bộ kho phim cao cấp.
+            Upgrade to VIP to watch this movie and unlock our entire premium library.
           </p>
         </div>
         <Button variant="primary" onClick={handleUpgrade}>
-          Nâng Cấp Ngay
+          Upgrade Now
         </Button>
       </motion.div>
     </div>

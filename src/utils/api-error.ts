@@ -9,10 +9,10 @@ interface BackendErrorPayload {
  * backend message for anything not in this list, so new backend copy is never
  * silently hidden from the user. */
 const MESSAGE_TRANSLATIONS: Record<string, string> = {
-  "Invalid credentials": "Tài khoản hoặc mật khẩu không đúng.",
-  "Email already registered": "Email này đã được đăng ký.",
-  "Username already taken": "Tên đăng nhập này đã được sử dụng.",
-  "Phone number already registered": "Số điện thoại này đã được đăng ký.",
+  "Invalid credentials": "Incorrect username or password.",
+  "Email already registered": "This email is already registered.",
+  "Username already taken": "This username is already taken.",
+  "Phone number already registered": "This phone number is already registered.",
 };
 
 function translate(message: string): string {
@@ -23,10 +23,10 @@ function translate(message: string): string {
  * class-validator's `errors.validation` array when present (one entry per
  * failed field), otherwise the single top-level `message`. */
 export function getApiErrorMessages(error: unknown): string[] {
-  if (!isAxiosError(error)) return ["Đã có lỗi xảy ra. Vui lòng thử lại."];
+  if (!isAxiosError(error)) return ["Something went wrong. Please try again."];
 
   const data = error.response?.data as BackendErrorPayload | undefined;
   if (data?.errors?.validation?.length) return data.errors.validation.map(translate);
   if (data?.message) return [translate(data.message)];
-  return ["Đã có lỗi xảy ra. Vui lòng thử lại."];
+  return ["Something went wrong. Please try again."];
 }

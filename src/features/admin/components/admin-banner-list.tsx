@@ -34,7 +34,7 @@ function BannerRow({ banner }: { banner: Banner }) {
           <p className="truncate text-sm font-medium text-white">
             {banner.title || banner.movie?.title || "Banner"}
           </p>
-          <p className="text-xs text-white/50">Thứ tự {banner.order}</p>
+          <p className="text-xs text-white/50">Order {banner.order}</p>
         </div>
         <label className="flex items-center gap-2 text-xs text-white/70">
           <input
@@ -43,17 +43,17 @@ function BannerRow({ banner }: { banner: Banner }) {
             checked={banner.isActive}
             onChange={(e) => updateBanner.mutate({ isActive: e.target.checked })}
           />
-          Hiển thị
+          Visible
         </label>
         <Link
           href={ROUTES.adminBannerEdit(banner.id)}
           className="text-xs text-white/60 hover:text-white"
         >
-          Sửa
+          Edit
         </Link>
         <button
           type="button"
-          aria-label="Xoá banner"
+          aria-label="Delete banner"
           disabled={deleteBanner.isPending}
           onClick={() => deleteBanner.mutate(banner.id)}
           className="text-white/40 hover:text-red-500 disabled:opacity-40"
@@ -64,8 +64,8 @@ function BannerRow({ banner }: { banner: Banner }) {
       {(updateBanner.isError || deleteBanner.isError) && (
         <p className="text-xs text-red-500">
           {updateBanner.isError
-            ? "Cập nhật banner thất bại. Vui lòng thử lại."
-            : "Xoá banner thất bại. Vui lòng thử lại."}
+            ? "Failed to update banner. Please try again."
+            : "Failed to delete banner. Please try again."}
         </p>
       )}
     </div>
@@ -78,14 +78,14 @@ export function AdminBannerList() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="font-heading text-lg text-white">Hero Trang Chủ</h2>
+        <h2 className="font-heading text-lg text-white">Homepage Hero</h2>
         <Link href={ROUTES.adminBannerNew}>
-          <Button size="sm">+ Thêm Banner</Button>
+          <Button size="sm">+ Add Banner</Button>
         </Link>
       </div>
 
       {isError ? (
-        <ErrorState title="Không thể tải danh sách banner." onRetry={() => refetch()} />
+        <ErrorState title="Failed to load banners." onRetry={() => refetch()} />
       ) : isLoading ? (
         <div className="space-y-2">
           {Array.from({ length: 3 }).map((_, i) => (
@@ -98,7 +98,7 @@ export function AdminBannerList() {
             <BannerRow key={banner.id} banner={banner} />
           ))}
           {banners?.length === 0 && (
-            <p className="px-4 py-6 text-center text-sm text-white/50">Chưa có banner nào.</p>
+            <p className="px-4 py-6 text-center text-sm text-white/50">No banners yet.</p>
           )}
         </div>
       )}

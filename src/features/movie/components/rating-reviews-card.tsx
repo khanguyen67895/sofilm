@@ -79,7 +79,7 @@ export function RatingReviewsCard({ movieId }: { movieId: string }) {
           <div className="space-y-2">
             <Textarea
               rows={3}
-              placeholder="Chia sẻ cảm nhận của bạn..."
+              placeholder="Share your thoughts..."
               value={comment}
               onChange={(e) => setComment(e.target.value)}
             />
@@ -88,10 +88,10 @@ export function RatingReviewsCard({ movieId }: { movieId: string }) {
               onClick={handleSubmit}
               disabled={!myRating || submitReview.isPending}
             >
-              {submitReview.isPending ? "Đang gửi..." : "Gửi Đánh Giá"}
+              {submitReview.isPending ? "Submitting..." : "Submit Review"}
             </Button>
             {submitReview.isError && (
-              <p className="text-xs text-red-500">Gửi đánh giá thất bại. Vui lòng thử lại.</p>
+              <p className="text-xs text-red-500">Failed to submit review. Please try again.</p>
             )}
           </div>
         ) : (

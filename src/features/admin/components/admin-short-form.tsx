@@ -39,7 +39,7 @@ export function AdminShortForm() {
 
   function validate(): boolean {
     const nextErrors: FieldErrors = {};
-    if (!title.trim()) nextErrors.title = "Bắt buộc phải nhập tiêu đề.";
+    if (!title.trim()) nextErrors.title = "Title is required.";
     setErrors(nextErrors);
     return Object.keys(nextErrors).length === 0 && !videoMissing;
   }
@@ -56,11 +56,11 @@ export function AdminShortForm() {
         thumbnailUrl: thumbnailUrl || undefined,
       },
       {
-        onSuccess: () => setDialog({ variant: "success", title: "Tạo video ngắn thành công!" }),
+        onSuccess: () => setDialog({ variant: "success", title: "Short created successfully!" }),
         onError: (err) =>
           setDialog({
             variant: "error",
-            title: "Tạo video ngắn thất bại",
+            title: "Failed to create short",
             description: getApiErrorMessages(err).join(" "),
           }),
       }
@@ -70,7 +70,7 @@ export function AdminShortForm() {
   return (
     <form onSubmit={handleSubmit} noValidate className="max-w-xl space-y-5">
       <div>
-        <Label required>Tiêu đề</Label>
+        <Label required>Title</Label>
         <Input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
@@ -80,15 +80,15 @@ export function AdminShortForm() {
       </div>
 
       <div>
-        <Label>Nội dung (tuỳ chọn)</Label>
-        <p className="mb-2 text-xs text-white/50">Caption hiển thị dưới tiêu đề trên feed.</p>
+        <Label>Content (optional)</Label>
+        <p className="mb-2 text-xs text-white/50">Caption shown below the title on the feed.</p>
         <Textarea rows={3} value={content} onChange={(e) => setContent(e.target.value)} />
       </div>
 
       <div>
-        <Label>Thumbnail (tuỳ chọn)</Label>
+        <Label>Thumbnail (optional)</Label>
         <p className="mb-2 text-xs text-white/50">
-          Nếu không tải lên, hệ thống sẽ tự dùng ảnh thumbnail tạo ra từ video.
+          If not uploaded, a thumbnail will be auto-generated from the video.
         </p>
         <ImageUploadField
           label="Thumbnail"
@@ -98,7 +98,7 @@ export function AdminShortForm() {
       </div>
 
       <div>
-        <Label required>Video (tối đa 1 phút 30 giây)</Label>
+        <Label required>Video (max 1 minute 30 seconds)</Label>
         <VideoUploadField
           hasVideo={hasVideo}
           maxDurationSeconds={SHORT_MAX_DURATION_SECONDS}
@@ -109,13 +109,13 @@ export function AdminShortForm() {
         />
         {videoMissing && (
           <p className="mt-2 text-xs text-red-500">
-            Bắt buộc phải tải video lên trước khi tạo video ngắn.
+            You must upload a video before creating the short.
           </p>
         )}
       </div>
 
       <Button type="submit" disabled={createShort.isPending || videoMissing}>
-        {createShort.isPending ? "Đang lưu..." : "Tạo Video Ngắn"}
+        {createShort.isPending ? "Saving..." : "Create Short"}
       </Button>
 
       <AlertDialog

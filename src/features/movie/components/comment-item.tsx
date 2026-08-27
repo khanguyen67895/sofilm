@@ -34,7 +34,7 @@ export function CommentItem({ movieId, review, onReply }: CommentItemProps) {
           setLikesCount((c) => (wasLiked ? c + 1 : c - 1));
         },
       });
-    }, "Đăng nhập để thích bình luận này.");
+    }, "Sign in to like this comment.");
   }
 
   return (
@@ -76,7 +76,7 @@ export function CommentItem({ movieId, review, onReply }: CommentItemProps) {
             <Share2 size={13} /> Share
           </button>
           {toggleLike.isError && (
-            <span className="text-red-500">Thao tác thất bại, vui lòng thử lại.</span>
+            <span className="text-red-500">Action failed, please try again.</span>
           )}
         </div>
       </div>

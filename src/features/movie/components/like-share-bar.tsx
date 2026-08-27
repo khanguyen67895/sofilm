@@ -31,7 +31,7 @@ export function LikeShareBar({ movie }: { movie: Movie }) {
         onClick={() =>
           requireAuth(
             () => toggleFavorite.mutate({ movie, isFavorite: liked }),
-            "Đăng nhập để thích phim này."
+            "Sign in to like this movie."
           )
         }
       >
@@ -42,13 +42,13 @@ export function LikeShareBar({ movie }: { movie: Movie }) {
         variant="outline"
         size="sm"
         className="w-9 px-0 sm:w-auto sm:px-4"
-        onClick={() => requireAuth(share, "Đăng nhập để chia sẻ phim này.")}
+        onClick={() => requireAuth(share, "Sign in to share this movie.")}
       >
         <Share2 size={16} />
         <span className="hidden sm:inline">Share</span>
       </Button>
       {toggleFavorite.isError && (
-        <span className="text-xs text-red-500">Thao tác thất bại, vui lòng thử lại.</span>
+        <span className="text-xs text-red-500">Action failed, please try again.</span>
       )}
     </div>
   );

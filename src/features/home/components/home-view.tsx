@@ -24,13 +24,13 @@ export function HomeView() {
   if (isRowsError) {
     return (
       <div className="flex flex-col items-center gap-3 px-4 py-24 text-center">
-        <p className="text-white/70">Không thể tải dữ liệu trang chủ.</p>
+        <p className="text-white/70">Couldn&apos;t load homepage data.</p>
         <button
           type="button"
           onClick={() => refetch()}
           className="text-sm font-medium text-brand hover:underline"
         >
-          Thử lại
+          Retry
         </button>
       </div>
     );
@@ -64,8 +64,8 @@ export function HomeView() {
   ) {
     return (
       <EmptyState
-        title="Chưa có phim nào"
-        description="Phim mới đang được tải lên, quay lại sau bạn nhé!"
+        title="No movies yet"
+        description="New movies are being uploaded — check back soon!"
       />
     );
   }

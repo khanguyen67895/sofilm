@@ -19,6 +19,7 @@ export interface Banner {
     /** Resolved server-side (video-service lookup) from the movie's videoId — a
      * short clip the hero can autoplay as its background. */
     videoUrl?: string;
+    isPremium?: boolean;
   };
   order: number;
   isActive: boolean;

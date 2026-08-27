@@ -39,3 +39,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# deploy notes (contains VPS credentials, keep local-only)
+DEPLOY-NOTES.md

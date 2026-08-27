@@ -18,7 +18,7 @@ export function ThemeToggle() {
   return (
     <button
       type="button"
-      aria-label="Đổi giao diện"
+      aria-label="Toggle theme"
       onClick={() => setTheme(isDark ? "light" : "dark")}
       className="relative flex h-9 w-9 items-center justify-center overflow-hidden rounded-full text-white/80 transition-colors hover:bg-white/10"
     >

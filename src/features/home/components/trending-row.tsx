@@ -30,7 +30,7 @@ export function TrendingRow({ movies }: { movies: Movie[] }) {
         {isDesktop ? (
           <Link
             href={ROUTES.category}
-            aria-label="Xem tất cả"
+            aria-label="View all"
             className="flex h-8 w-8 items-center justify-center rounded-full border border-white/30 text-white/70 transition-colors hover:border-white hover:text-white"
           >
             <ChevronRight size={16} />
@@ -39,7 +39,7 @@ export function TrendingRow({ movies }: { movies: Movie[] }) {
           <button
             type="button"
             onClick={scrollNext}
-            aria-label="Cuộn tiếp"
+            aria-label="Scroll next"
             className="flex h-8 w-8 items-center justify-center rounded-full border border-white/30 text-white/70 transition-colors hover:border-white hover:text-white"
           >
             <ChevronRight size={16} />
@@ -58,7 +58,7 @@ export function TrendingRow({ movies }: { movies: Movie[] }) {
               href={ROUTES.movie(movie.slug)}
               className="group relative w-40 shrink-0 sm:w-55"
             >
-              <div className="relative aspect-2/3 overflow-hidden rounded-lg bg-white/5">
+              <div className="relative aspect-2/3 overflow-hidden rounded-2xl bg-white/5">
                 <Image
                   src={resolveImageSrc(movie.poster, PLACEHOLDER_IMAGE)}
                   alt={movie.title}
@@ -84,7 +84,7 @@ export function TrendingRow({ movies }: { movies: Movie[] }) {
         <motion.button
           type="button"
           onClick={scrollNext}
-          aria-label="Cuộn tiếp"
+          aria-label="Scroll next"
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
           className="absolute top-1/2 right-8 hidden sm:block"

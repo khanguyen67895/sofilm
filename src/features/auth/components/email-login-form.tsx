@@ -32,8 +32,8 @@ export function EmailLoginForm() {
 
   function validate(): boolean {
     const next: FieldErrors = {};
-    if (!email.trim()) next.email = "Vui lòng nhập username hoặc email.";
-    if (!password) next.password = "Vui lòng nhập mật khẩu.";
+    if (!email.trim()) next.email = "Please enter your username or email.";
+    if (!password) next.password = "Please enter your password.";
     setErrors(next);
     return Object.keys(next).length === 0;
   }
@@ -145,7 +145,7 @@ export function EmailLoginForm() {
         </AnimatePresence>
 
         <Button type="submit" className="h-12 w-full" disabled={login.isPending}>
-          {login.isPending ? "Đang đăng nhập..." : "Continue"}
+          {login.isPending ? "Signing in..." : "Continue"}
         </Button>
       </form>
 

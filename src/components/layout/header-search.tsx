@@ -26,7 +26,7 @@ export function HeaderSearch() {
         placeholder="Searching for movies..."
         className="font-heading h-full w-full bg-transparent text-sm font-light text-white outline-none placeholder:text-white/40"
       />
-      <button type="submit" aria-label="Tìm kiếm" className="shrink-0">
+      <button type="submit" aria-label="Search" className="shrink-0">
         <SearchIcon width={18} height={18} />
       </button>
     </form>

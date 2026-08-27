@@ -66,12 +66,12 @@ export function AdminBannerForm({ mode, banner }: AdminBannerFormProps) {
     const onSuccess = () =>
       setDialog({
         variant: "success",
-        title: mode === "create" ? "Tạo banner thành công!" : "Cập nhật banner thành công!",
+        title: mode === "create" ? "Banner created successfully!" : "Banner updated successfully!",
       });
     const onError = (err: unknown) =>
       setDialog({
         variant: "error",
-        title: mode === "create" ? "Tạo banner thất bại" : "Cập nhật banner thất bại",
+        title: mode === "create" ? "Failed to create banner" : "Failed to update banner",
         description: getApiErrorMessages(err).join(" "),
       });
 

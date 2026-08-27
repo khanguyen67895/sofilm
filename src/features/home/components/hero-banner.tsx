@@ -1,16 +1,15 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import type { HeroItem } from "@/types/movie";
-import { HeroCards } from "./hero-cards";
+import { HeroCarousel } from "./hero-carousel";
 import { HeroIndicator } from "./hero-indicator";
 import { HeroMobileOverlay } from "./hero-mobile-overlay";
-import { HeroSlide } from "./hero-slide";
-import { HeroControls } from "./hero-controls";
 
 /** How long each slide stays up before auto-advancing — also drives the
- * countdown progress bar in HeroControls (same duration, kept in sync). */
+ * countdown progress bar on mobile (same duration, kept in sync). */
 export const HERO_AUTOPLAY_MS = 7000;
 
 export function HeroBanner({ items }: { items: HeroItem[] }) {
@@ -33,18 +32,26 @@ export function HeroBanner({ items }: { items: HeroItem[] }) {
 
   if (!active) return null;
 
-  return (
-    <div className="relative -mt-20 h-215 w-full overflow-hidden">
-      <HeroIndicator activeIndex={activeIndex} total={items.length} />
-      {isDesktop ? (
-        <>
-          <HeroCards items={items} activeIndex={activeIndex} onGoTo={goTo} />
-          <HeroSlide item={active} />
-          <HeroControls activeIndex={activeIndex} total={items.length} onGoTo={goTo} />
-        </>
-      ) : (
+  if (!isDesktop) {
+    return (
+      <div className="relative -mt-20 h-215 w-full overflow-hidden">
+        <HeroIndicator activeIndex={activeIndex} total={items.length} />
         <HeroMobileOverlay items={items} activeIndex={activeIndex} onGoTo={goTo} />
-      )}
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative w-full overflow-hidden bg-background py-16">
+      <Image
+        src="/image/ic_background_hero.png"
+        alt=""
+        fill
+        priority
+        sizes="100vw"
+        className="object-cover object-[center_65%]"
+      />
+      <HeroCarousel items={items} activeIndex={activeIndex} onGoTo={goTo} />
     </div>
   );
 }

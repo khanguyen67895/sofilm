@@ -33,6 +33,19 @@ export function useHlsVideo(videoRef: RefObject<HTMLVideoElement | null>, src: s
         // dry, at the cost of a slightly larger memory footprint.
         maxBufferLength: 60,
         maxMaxBufferLength: 120,
+        // Always start at the lowest rung instead of hls.js's default -1
+        // "auto" pick — a fast first segment (local TCP burst) otherwise
+        // gets read as "bandwidth is great", jumps straight to a high rung,
+        // then can't sustain it once the real, slower throughput kicks in —
+        // that overshoot-then-stall is a big source of the mid-playback
+        // loading spinner. Ramping up from the bottom only once bandwidth is
+        // actually proven trades a softer first frame for far fewer stalls.
+        startLevel: 0,
+        // Lower than the ~0.9/0.7 defaults — makes the ABR controller more
+        // conservative about trusting a bandwidth spike enough to switch up,
+        // for the same overshoot-then-stall reason as startLevel above.
+        abrBandWidthFactor: 0.7,
+        abrBandWidthUpFactor: 0.6,
       });
       hls.loadSource(src);
       hls.attachMedia(video);

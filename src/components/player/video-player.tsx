@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState, type SyntheticEvent } from "react";
 import Image from "next/image";
 import { Maximize, Minimize, Pause, Play, Volume2, VolumeX } from "lucide-react";
-import { Spinner } from "@/components/ui/spinner";
 import { usePlayerStore } from "@/store/player.store";
 import { useHlsVideo } from "@/hooks/use-hls-video";
 import { useMediaQuery } from "@/hooks/use-media-query";
@@ -13,9 +12,10 @@ import { formatCountdown } from "@/utils/format";
 interface VideoPlayerProps {
   src: string;
   poster?: string;
+  onEnded?: () => void;
 }
 
-export function VideoPlayer({ src, poster }: VideoPlayerProps) {
+export function VideoPlayer({ src, poster, onEnded }: VideoPlayerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const { isPlaying, volume, resume, pause, setVolume } = usePlayerStore();
@@ -137,13 +137,8 @@ export function VideoPlayer({ src, poster }: VideoPlayerProps) {
         onStalled={() => setIsBuffering(true)}
         onPlaying={() => setIsBuffering(false)}
         onCanPlay={() => setIsBuffering(false)}
+        onEnded={onEnded}
       />
-
-      {isBuffering && (
-        <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-black/20">
-          <Spinner className="h-10 w-10 border-4" />
-        </div>
-      )}
 
       {!isPlaying && !isBuffering && (
         <button

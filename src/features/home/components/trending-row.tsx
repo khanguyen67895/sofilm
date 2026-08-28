@@ -65,14 +65,14 @@ export function TrendingRow({ movies }: { movies: Movie[] }) {
         <div className="overflow-x-clip px-6 sm:px-24 lg:px-40">
           <div
             ref={scrollRef}
-            className="scrollbar-none grid grid-cols-2 gap-4 pb-2 sm:flex sm:overflow-x-auto sm:scroll-smooth"
+            className="scrollbar-none flex gap-4 overflow-x-auto scroll-smooth pb-2"
           >
             {movies.map((movie, index) => (
               <Link
                 key={movie.id}
                 href={ROUTES.movie(movie.slug)}
-                style={{ width: isDesktop ? cardWidth : undefined }}
-                className="group relative sm:shrink-0"
+                style={{ width: cardWidth }}
+                className="group relative shrink-0"
               >
                 <div className="relative aspect-3/5 overflow-hidden rounded-2xl bg-white/5">
                   <Image

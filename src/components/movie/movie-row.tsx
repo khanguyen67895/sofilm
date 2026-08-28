@@ -68,14 +68,10 @@ export function MovieRow({ row, viewAllHref }: MovieRowProps) {
         <div className="overflow-x-clip px-6 sm:px-24 lg:px-40">
           <div
             ref={scrollRef}
-            className="grid grid-cols-2 gap-4 pt-3 pb-4 sm:flex sm:overflow-x-auto sm:scroll-smooth sm:scrollbar-none sm:[&::-webkit-scrollbar]:hidden"
+            className="flex gap-4 overflow-x-auto scroll-smooth pt-3 pb-4 scrollbar-none [&::-webkit-scrollbar]:hidden"
           >
             {row.movies.map((movie) => (
-              <div
-                key={movie.id}
-                style={{ width: isDesktop ? cardWidth : undefined }}
-                className="sm:shrink-0"
-              >
+              <div key={movie.id} style={{ width: cardWidth }} className="shrink-0">
                 <MovieCard movie={movie} />
               </div>
             ))}

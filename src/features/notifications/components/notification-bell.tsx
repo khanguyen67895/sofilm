@@ -76,7 +76,7 @@ export function NotificationBell() {
         aria-label="Notifications"
         className="relative block"
       >
-        <NotificationIcon width={46} height={46} className="h-8 w-8 sm:h-11.5 sm:w-11.5" />
+        <NotificationIcon width={46} height={46} className="h-10 w-10 sm:h-11.5 sm:w-11.5" />
         {hasUnread && (
           <span className="absolute top-2 right-2 h-2.5 w-2.5 rounded-full bg-brand ring-2 ring-black" />
         )}

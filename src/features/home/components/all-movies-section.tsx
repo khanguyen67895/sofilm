@@ -7,7 +7,7 @@ import type { Movie } from "@/types/movie";
 
 export function AllMoviesSection({ movies }: { movies: Movie[] }) {
   return (
-    <section className="space-y-6 px-18 sm:px-24 lg:px-40">
+    <section className="space-y-6 px-6 sm:px-24 lg:px-40">
       <Reveal>
         <h2 className="text-lg font-semibold text-white">All Movies</h2>
       </Reveal>

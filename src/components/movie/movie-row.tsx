@@ -34,7 +34,7 @@ export function MovieRow({ row, viewAllHref }: MovieRowProps) {
 
   return (
     <section className="space-y-0">
-      <Reveal className="flex items-center justify-between px-18 sm:px-24 lg:px-40">
+      <Reveal className="flex items-center justify-between px-6 sm:px-24 lg:px-40">
         <h2 className="text-lg font-semibold text-white">{row.title}</h2>
         {/* Desktop: navigates to the full catalog. Mobile: there's no
          * separate floating scroll button there (removed below), so this
@@ -65,13 +65,17 @@ export function MovieRow({ row, viewAllHref }: MovieRowProps) {
          * (`overflow-x-clip`) anything the inner row scrolls past it — so the
          * gutter is a real boundary the cards never cross, at rest or mid-scroll,
          * instead of only showing up at the very start/end of the scroll range. */}
-        <div className="overflow-x-clip px-18 sm:px-24 lg:px-40">
+        <div className="overflow-x-clip px-6 sm:px-24 lg:px-40">
           <div
             ref={scrollRef}
-            className="flex gap-4 overflow-x-auto scroll-smooth pt-3 pb-4 scrollbar-none [&::-webkit-scrollbar]:hidden"
+            className="grid grid-cols-2 gap-4 pt-3 pb-4 sm:flex sm:overflow-x-auto sm:scroll-smooth sm:scrollbar-none sm:[&::-webkit-scrollbar]:hidden"
           >
             {row.movies.map((movie) => (
-              <div key={movie.id} style={{ width: cardWidth }} className="shrink-0">
+              <div
+                key={movie.id}
+                style={{ width: isDesktop ? cardWidth : undefined }}
+                className="sm:shrink-0"
+              >
                 <MovieCard movie={movie} />
               </div>
             ))}

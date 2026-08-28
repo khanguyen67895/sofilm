@@ -31,20 +31,20 @@ export function TrendingRow({ movies }: { movies: Movie[] }) {
 
   return (
     <section className="space-y-3">
-      <Reveal className="flex items-center justify-between px-18 sm:px-24 lg:px-40">
+      <Reveal className="flex items-center justify-between px-6 sm:px-24 lg:px-40">
         <h2 className="text-lg font-semibold text-white">Top Trending Movies</h2>
         {/* Desktop: navigates to the full catalog. Mobile: there's no
          * separate floating scroll button there (removed below), so this
          * same circle just scrolls the row instead. */}
         {isDesktop ? (
-          <Link
-            href={ROUTES.category}
-            aria-label="View all"
-            className="flex items-center gap-1 text-sm font-medium text-white/70 transition-colors hover:text-white"
-          >
-            View all
-            <ChevronRight size={16} />
-          </Link>
+        <Link
+          href={ROUTES.category}
+          aria-label="View all"
+          className="flex items-center gap-1 text-sm font-medium text-white/70 transition-colors hover:text-white"
+        >
+          View all
+          <ChevronRight size={16} />
+        </Link>
         ) : (
           <button
             type="button"
@@ -52,7 +52,7 @@ export function TrendingRow({ movies }: { movies: Movie[] }) {
             aria-label="Scroll next"
             className="flex h-8 w-8 items-center justify-center rounded-full border border-white/30 text-white/70 transition-colors hover:border-white hover:text-white"
           >
-            <ChevronRight size={16} />
+            <Image src="/image/ic_right.png" alt="" width={32} height={32} />
           </button>
         )}
       </Reveal>
@@ -62,17 +62,17 @@ export function TrendingRow({ movies }: { movies: Movie[] }) {
          * (`overflow-x-clip`) anything the inner row scrolls past it — so the
          * gutter is a real boundary the cards never cross, at rest or mid-scroll,
          * instead of only showing up at the very start/end of the scroll range. */}
-        <div className="overflow-x-clip px-18 sm:px-24 lg:px-40">
+        <div className="overflow-x-clip px-6 sm:px-24 lg:px-40">
           <div
             ref={scrollRef}
-            className="scrollbar-none flex gap-4 overflow-x-auto scroll-smooth pb-2"
+            className="scrollbar-none grid grid-cols-2 gap-4 pb-2 sm:flex sm:overflow-x-auto sm:scroll-smooth"
           >
             {movies.map((movie, index) => (
               <Link
                 key={movie.id}
                 href={ROUTES.movie(movie.slug)}
-                style={{ width: cardWidth }}
-                className="group relative shrink-0"
+                style={{ width: isDesktop ? cardWidth : undefined }}
+                className="group relative sm:shrink-0"
               >
                 <div className="relative aspect-3/5 overflow-hidden rounded-2xl bg-white/5">
                   <Image

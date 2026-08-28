@@ -95,7 +95,7 @@ export function MovieCatalogView() {
           </button>
         </div>
       ) : isLoading || !data ? (
-        <div className="grid grid-cols-3 gap-x-4 gap-y-8 px-6 sm:grid-cols-4 sm:px-8 md:grid-cols-5 lg:grid-cols-7 lg:px-20">
+        <div className="grid grid-cols-2 gap-x-4 gap-y-8 px-6 sm:grid-cols-4 sm:px-8 md:grid-cols-5 lg:grid-cols-7 lg:px-20">
           {Array.from({ length: 12 }).map((_, i) => (
             <Skeleton key={i} className="aspect-3/5 w-full" />
           ))}
@@ -111,7 +111,7 @@ export function MovieCatalogView() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.2 }}
-          className="grid grid-cols-3 gap-x-4 gap-y-8 px-6 sm:grid-cols-4 sm:px-8 md:grid-cols-5 lg:grid-cols-7 lg:px-20"
+          className="grid grid-cols-2 gap-x-4 gap-y-8 px-6 sm:grid-cols-4 sm:px-8 md:grid-cols-5 lg:grid-cols-7 lg:px-20"
         >
           {data.items.map((movie) => (
             <MovieCard key={movie.id} movie={movie} />

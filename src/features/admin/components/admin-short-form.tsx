@@ -8,8 +8,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { ROUTES } from "@/constants/routes";
+import type { AdminShortItem } from "@/types/shorts";
 import { getApiErrorMessages } from "@/utils/api-error";
 import { useCreateShort } from "../hooks/use-create-short";
+import { useUpdateShort } from "../hooks/use-update-short";
 import { ImageUploadField } from "./image-upload-field";
 import { VideoUploadField } from "./video-upload-field";
 
@@ -17,17 +19,23 @@ interface FieldErrors {
   title?: string;
 }
 
+interface AdminShortFormProps {
+  mode: "create" | "edit";
+  short?: AdminShortItem;
+}
+
 const SHORT_MAX_DURATION_SECONDS = 90;
 
-export function AdminShortForm() {
+export function AdminShortForm({ mode, short }: AdminShortFormProps) {
   const router = useRouter();
   const createShort = useCreateShort();
+  const updateShort = useUpdateShort(short?.id ?? "");
 
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
-  const [thumbnailUrl, setThumbnailUrl] = useState("");
+  const [title, setTitle] = useState(short?.title ?? "");
+  const [content, setContent] = useState(short?.content ?? "");
+  const [thumbnailUrl, setThumbnailUrl] = useState(short?.thumbnail ?? "");
   const [videoId, setVideoId] = useState("");
-  const [hasVideo, setHasVideo] = useState(false);
+  const [hasVideo, setHasVideo] = useState(Boolean(short?.videoUrl));
   const [errors, setErrors] = useState<FieldErrors>({});
   const [dialog, setDialog] = useState<{
     variant: "success" | "error";
@@ -35,7 +43,10 @@ export function AdminShortForm() {
     description?: string;
   } | null>(null);
 
-  const videoMissing = !hasVideo;
+  const isPending = createShort.isPending || updateShort.isPending;
+  // A create needs a freshly uploaded video attached; editing already has one
+  // from the original short unless the admin explicitly replaces it.
+  const videoMissing = mode === "create" && !hasVideo;
 
   function validate(): boolean {
     const nextErrors: FieldErrors = {};
@@ -48,23 +59,39 @@ export function AdminShortForm() {
     e.preventDefault();
     if (!validate()) return;
 
-    createShort.mutate(
-      {
-        title: title.trim(),
-        videoId,
-        content: content.trim() || undefined,
-        thumbnailUrl: thumbnailUrl || undefined,
-      },
-      {
-        onSuccess: () => setDialog({ variant: "success", title: "Short created successfully!" }),
-        onError: (err) =>
-          setDialog({
-            variant: "error",
-            title: "Failed to create short",
-            description: getApiErrorMessages(err).join(" "),
-          }),
-      }
-    );
+    const onSuccess = () =>
+      setDialog({
+        variant: "success",
+        title: mode === "create" ? "Short created successfully!" : "Short updated successfully!",
+      });
+    const onError = (err: unknown) =>
+      setDialog({
+        variant: "error",
+        title: mode === "create" ? "Failed to create short" : "Failed to update short",
+        description: getApiErrorMessages(err).join(" "),
+      });
+
+    if (mode === "create") {
+      createShort.mutate(
+        {
+          title: title.trim(),
+          videoId,
+          content: content.trim() || undefined,
+          thumbnailUrl: thumbnailUrl || undefined,
+        },
+        { onSuccess, onError }
+      );
+    } else if (short) {
+      updateShort.mutate(
+        {
+          title: title.trim(),
+          content: content.trim() || undefined,
+          thumbnailUrl: thumbnailUrl || undefined,
+          videoId: videoId || undefined,
+        },
+        { onSuccess, onError }
+      );
+    }
   }
 
   return (
@@ -98,7 +125,7 @@ export function AdminShortForm() {
       </div>
 
       <div>
-        <Label required>Video (max 1 minute 30 seconds)</Label>
+        <Label required={mode === "create"}>Video (max 1 minute 30 seconds)</Label>
         <VideoUploadField
           hasVideo={hasVideo}
           maxDurationSeconds={SHORT_MAX_DURATION_SECONDS}
@@ -114,8 +141,8 @@ export function AdminShortForm() {
         )}
       </div>
 
-      <Button type="submit" disabled={createShort.isPending || videoMissing}>
-        {createShort.isPending ? "Saving..." : "Create Short"}
+      <Button type="submit" disabled={isPending || videoMissing}>
+        {isPending ? "Saving..." : mode === "create" ? "Create Short" : "Save Changes"}
       </Button>
 
       <AlertDialog

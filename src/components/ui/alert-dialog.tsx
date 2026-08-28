@@ -19,11 +19,12 @@ const VARIANT_STYLE = {
   error: { icon: XCircle, iconClass: "text-red-500" },
 } as const;
 
-/** A single-action ("OK") modal for reporting the outcome of a form
- * submission — success or error — instead of a silent redirect or an inline
- * error line that's easy to miss. Used by the admin create flows (movie,
- * banner, short): success closes to the list, error just dismisses so the
- * admin can fix the form and retry. */
+/** A single-action ("OK") modal for reporting the outcome of an action —
+ * success or error — instead of a silent redirect or an inline error line
+ * that's easy to miss. Used across the admin create/edit/delete flows
+ * (movie, banner, short): success on a form submit closes to the list,
+ * success on a delete just dismisses in place, error just dismisses so the
+ * admin can fix and retry. */
 export function AlertDialog({
   open,
   variant,

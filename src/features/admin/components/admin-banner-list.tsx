@@ -1,8 +1,10 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Trash2 } from "lucide-react";
+import { AlertDialog } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ErrorState } from "@/components/common/error-state";
@@ -13,9 +15,15 @@ import { useAdminBanners } from "../hooks/use-admin-banners";
 import { useDeleteBanner } from "../hooks/use-delete-banner";
 import { useUpdateBanner } from "../hooks/use-update-banner";
 
-function BannerRow({ banner }: { banner: Banner }) {
+function BannerRow({ banner, onDeleted }: { banner: Banner; onDeleted: () => void }) {
   const updateBanner = useUpdateBanner(banner.id);
   const deleteBanner = useDeleteBanner();
+
+  function handleDelete() {
+    const label = banner.title || banner.movie?.title || "this banner";
+    if (!window.confirm(`Delete "${label}"? This action cannot be undone.`)) return;
+    deleteBanner.mutate(banner.id, { onSuccess: onDeleted });
+  }
 
   return (
     <div className="flex flex-col gap-1.5 border-b border-white/10 px-4 py-3 last:border-b-0">
@@ -55,7 +63,7 @@ function BannerRow({ banner }: { banner: Banner }) {
           type="button"
           aria-label="Delete banner"
           disabled={deleteBanner.isPending}
-          onClick={() => deleteBanner.mutate(banner.id)}
+          onClick={handleDelete}
           className="text-white/40 hover:text-red-500 disabled:opacity-40"
         >
           <Trash2 size={16} />
@@ -74,6 +82,7 @@ function BannerRow({ banner }: { banner: Banner }) {
 
 export function AdminBannerList() {
   const { data: banners, isLoading, isError, refetch } = useAdminBanners();
+  const [showDeleted, setShowDeleted] = useState(false);
 
   return (
     <div className="space-y-4">
@@ -95,13 +104,24 @@ export function AdminBannerList() {
       ) : (
         <div className="divide-y divide-white/10 rounded-md border border-white/10">
           {banners?.map((banner) => (
-            <BannerRow key={banner.id} banner={banner} />
+            <BannerRow
+              key={banner.id}
+              banner={banner}
+              onDeleted={() => setShowDeleted(true)}
+            />
           ))}
           {banners?.length === 0 && (
             <p className="px-4 py-6 text-center text-sm text-white/50">No banners yet.</p>
           )}
         </div>
       )}
+
+      <AlertDialog
+        open={showDeleted}
+        variant="success"
+        title="Banner deleted successfully!"
+        onConfirm={() => setShowDeleted(false)}
+      />
     </div>
   );
 }

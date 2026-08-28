@@ -18,7 +18,7 @@ export function FavoritesSection() {
       ) : isLoading ? (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4 lg:grid-cols-6">
           {Array.from({ length: 6 }).map((_, i) => (
-            <Skeleton key={i} className="aspect-2/3 w-full" />
+            <Skeleton key={i} className="aspect-3/5 w-full" />
           ))}
         </div>
       ) : favorites && favorites.length > 0 ? (

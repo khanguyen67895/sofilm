@@ -58,6 +58,10 @@ export function HeroBanner({ items: allItems }: { items: HeroItem[] }) {
         sizes="100vw"
         className="object-cover object-[center_65%]"
       />
+      {/* Fades the background image into the page's own background color at
+       * the top/bottom edges so the hero blends into the header above and
+       * the row sections below instead of hard-cutting into them. */}
+      <div className="absolute inset-0 bg-linear-to-b from-background via-transparent to-background" />
       <HeroCarousel items={items} activeIndex={activeIndex} onGoTo={goTo} />
     </div>
   );

@@ -12,6 +12,7 @@ import {
   Volume2,
   VolumeX,
 } from "lucide-react";
+import { useHlsVideo } from "@/hooks/use-hls-video";
 import { cn } from "@/utils/cn";
 import { formatViews } from "@/utils/format";
 import { PLACEHOLDER_IMAGE } from "@/constants/config";
@@ -26,6 +27,13 @@ export function ShortItem({ short }: { short: Short }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const lastTapRef = useRef(0);
+  // The very first play() the IntersectionObserver below fires almost always
+  // loses the race against hls.js still loading the manifest/first segment —
+  // it rejects silently and nothing retries once the video actually has data.
+  // Tracks whether this item is the one that's supposed to be playing right
+  // now, so the `onCanPlay`/`onLoadedData` handlers on the <video> below can
+  // retry play() the moment the browser is actually ready for it.
+  const shouldPlayRef = useRef(false);
 
   const [isLiked, setIsLiked] = useState(short.isLiked);
   const [likes, setLikes] = useState(short.likes);
@@ -35,6 +43,8 @@ export function ShortItem({ short }: { short: Short }) {
   const [progress, setProgress] = useState(0);
   const [burstHeart, setBurstHeart] = useState(false);
   const [likeError, setLikeError] = useState(false);
+
+  useHlsVideo(videoRef, short.videoUrl || undefined);
 
   // Active-only playback — play only once this item is meaningfully in view,
   // pause the moment it scrolls away (Virtuoso's overscan can keep neighbors
@@ -56,9 +66,11 @@ export function ShortItem({ short }: { short: Short }) {
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting && entry.intersectionRatio >= 0.6) {
+          shouldPlayRef.current = true;
           video.play().catch(() => {});
           setIsPaused(false);
         } else {
+          shouldPlayRef.current = false;
           video.pause();
           setIsPaused(true);
         }
@@ -69,6 +81,14 @@ export function ShortItem({ short }: { short: Short }) {
     return () => observer.disconnect();
   }, []);
 
+  // Retries the play() the IntersectionObserver already attempted, for the
+  // case where it lost the race against hls.js still loading data.
+  function retryPlayIfShouldBePlaying() {
+    const video = videoRef.current;
+    if (!video || !shouldPlayRef.current || !video.paused) return;
+    video.play().catch(() => {});
+  }
+
   function flashPlayState() {
     setShowPlayState(true);
     window.setTimeout(() => setShowPlayState(false), 450);
@@ -78,9 +98,11 @@ export function ShortItem({ short }: { short: Short }) {
     const video = videoRef.current;
     if (!video) return;
     if (video.paused) {
+      shouldPlayRef.current = true;
       video.play().catch(() => {});
       setIsPaused(false);
     } else {
+      shouldPlayRef.current = false;
       video.pause();
       setIsPaused(true);
     }
@@ -148,13 +170,14 @@ export function ShortItem({ short }: { short: Short }) {
 
         <video
           ref={videoRef}
-          src={short.videoUrl || undefined}
           poster={resolveImageSrc(short.thumbnail, PLACEHOLDER_IMAGE)}
           className="h-full w-full object-cover"
           loop
           muted={isMuted}
           playsInline
           onClick={handleVideoTap}
+          onCanPlay={retryPlayIfShouldBePlaying}
+          onLoadedData={retryPlayIfShouldBePlaying}
           onTimeUpdate={(e) => {
             const video = e.currentTarget;
             if (video.duration)

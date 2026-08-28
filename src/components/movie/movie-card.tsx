@@ -31,7 +31,7 @@ export function MovieCard({ movie }: { movie: Movie }) {
     <motion.div
       whileHover={{ scale: 1.05 }}
       transition={{ duration: 0.2 }}
-      className="group relative w-full shrink-0"
+      className="group relative pt-2 w-full shrink-0"
     >
       {movie.isPremium && (
         <Image
@@ -39,16 +39,16 @@ export function MovieCard({ movie }: { movie: Movie }) {
           alt="Premium"
           width={141}
           height={36}
-          className="absolute top-0 left-1/2 z-20 h-auto w-[70%] max-w-35 -translate-x-1/2"
+          className="absolute top-0 left-1/2 z-20 h-auto w-[60%] max-w-28 -translate-x-1/2"
         />
       )}
       <Link href={ROUTES.movie(movie.slug)} className="block">
-        <div className="relative aspect-2/3 overflow-hidden rounded-2xl bg-white/5">
+        <div className="relative aspect-3/5 overflow-hidden rounded-2xl bg-white/5">
           <Image
             src={resolveImageSrc(movie.poster, PLACEHOLDER_IMAGE)}
             alt={movie.title}
             fill
-            sizes="(max-width: 640px) 160px, 220px"
+            sizes="(max-width: 640px) 160px, 208px"
             quality={90}
             className="object-cover transition-transform duration-300 group-hover:scale-110"
           />
@@ -57,18 +57,18 @@ export function MovieCard({ movie }: { movie: Movie }) {
             onClick={handleToggleFavorite}
             aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
             whileTap={{ scale: 0.8 }}
-            className="absolute top-2 right-2"
+            className="absolute top-1.5 right-1.5"
           >
             {isFavorite ? (
-              <UnfavoriteIcon width={28} height={28} />
+              <UnfavoriteIcon width={22} height={22} />
             ) : (
-              <FavoriteIcon width={28} height={28} />
+              <FavoriteIcon width={22} height={22} />
             )}
           </motion.button>
         </div>
-        <p className="mt-2 truncate text-base font-medium text-[#F2F2F2]">{movie.title}</p>
-        <div className="mt-1 flex items-center gap-1 text-sm text-[#F2F2F2]">
-          <RatingStarIcon width={13} height={12} />
+        <p className="mt-1.5 truncate text-sm font-medium text-[#F2F2F2]">{movie.title}</p>
+        <div className="mt-0.5 flex items-center gap-1 text-xs text-[#F2F2F2]">
+          <RatingStarIcon width={11} height={10} />
           {movie.rating}
           {movie.reviewsCount > 0 && (
             <span className="text-white/50">({movie.reviewsCount})</span>

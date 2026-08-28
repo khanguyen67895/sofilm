@@ -22,6 +22,7 @@ export const ROUTES = {
   adminBannerEdit: (id: string) => `/admin/banners/${id}/edit`,
   adminShorts: "/admin/shorts",
   adminShortNew: "/admin/shorts/new",
+  adminShortEdit: (id: string) => `/admin/shorts/${id}/edit`,
 } as const;
 
 /** Full-bleed screens that render their own layout — no public Header/Footer:

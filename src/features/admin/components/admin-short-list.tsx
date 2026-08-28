@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { Trash2 } from "lucide-react";
+import { AlertDialog } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ErrorState } from "@/components/common/error-state";
@@ -14,8 +15,19 @@ import { isValidImageSrc } from "@/utils/image";
 import { useAdminShorts } from "../hooks/use-admin-shorts";
 import { useDeleteShort } from "../hooks/use-delete-short";
 
-function ShortRow({ short }: { short: AdminShortItem }) {
+function ShortRow({
+  short,
+  onDeleted,
+}: {
+  short: AdminShortItem;
+  onDeleted: () => void;
+}) {
   const deleteShort = useDeleteShort();
+
+  function handleDelete() {
+    if (!window.confirm(`Delete "${short.title}"? This action cannot be undone.`)) return;
+    deleteShort.mutate(short.id, { onSuccess: onDeleted });
+  }
 
   return (
     <div className="flex flex-col gap-1.5 border-b border-white/10 px-4 py-3 last:border-b-0">
@@ -33,11 +45,17 @@ function ShortRow({ short }: { short: AdminShortItem }) {
             {!short.isActive && " · Hidden"}
           </p>
         </div>
+        <Link
+          href={ROUTES.adminShortEdit(short.id)}
+          className="text-xs text-white/60 hover:text-white"
+        >
+          Edit
+        </Link>
         <button
           type="button"
           aria-label="Delete short"
           disabled={deleteShort.isPending}
-          onClick={() => deleteShort.mutate(short.id)}
+          onClick={handleDelete}
           className="text-white/40 hover:text-red-500 disabled:opacity-40"
         >
           <Trash2 size={16} />
@@ -53,6 +71,7 @@ function ShortRow({ short }: { short: AdminShortItem }) {
 export function AdminShortList() {
   const [page, setPage] = useState(1);
   const { data, isLoading, isError, refetch } = useAdminShorts(page);
+  const [showDeleted, setShowDeleted] = useState(false);
 
   return (
     <div className="space-y-4">
@@ -82,7 +101,7 @@ export function AdminShortList() {
               transition={{ duration: 0.15 }}
             >
               {data?.items.map((short) => (
-                <ShortRow key={short.id} short={short} />
+                <ShortRow key={short.id} short={short} onDeleted={() => setShowDeleted(true)} />
               ))}
               {data?.items.length === 0 && (
                 <p className="px-4 py-6 text-center text-sm text-white/50">
@@ -115,6 +134,13 @@ export function AdminShortList() {
           </button>
         </div>
       )}
+
+      <AlertDialog
+        open={showDeleted}
+        variant="success"
+        title="Short deleted successfully!"
+        onConfirm={() => setShowDeleted(false)}
+      />
     </div>
   );
 }

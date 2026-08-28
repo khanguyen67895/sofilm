@@ -20,7 +20,7 @@ export function HeaderActions({ avatar }: { avatar?: string }) {
       {/* Plans are browsable by anyone — the login gate only kicks in once a
        * guest actually picks a plan (see SubscriptionView.selectPlan). */}
       <Link href={ROUTES.subscription}>
-        <Button size="md" className="h-9 px-4 text-[11px] sm:h-11 sm:px-6 sm:text-sm">
+        <Button size="md" className="h-11 px-4 text-[11px] sm:h-11 sm:px-6 sm:text-sm">
           Upgrade
         </Button>
       </Link>

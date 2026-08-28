@@ -21,7 +21,7 @@ const NAV_ITEMS = [
   { href: ROUTES.adminMovies, label: "Danh sách phim", icon: Film, matchEditChild: true },
   { href: ROUTES.adminMovieNew, label: "Đăng phim mới", icon: UploadCloud, exact: true },
   { href: ROUTES.adminBanners, label: "Hero trang chủ", icon: GalleryHorizontal, matchEditChild: true },
-  { href: ROUTES.adminShorts, label: "Video ngắn", icon: Clapperboard },
+  { href: ROUTES.adminShorts, label: "Video ngắn", icon: Clapperboard, matchEditChild: true },
 ] as const;
 
 function isNavItemActive(

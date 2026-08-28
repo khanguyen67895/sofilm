@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { PlusCircle, Trash2 } from "lucide-react";
+import { AlertDialog } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ErrorState } from "@/components/common/error-state";
@@ -23,12 +24,13 @@ export function AdminMovieList() {
   const [page, setPage] = useState(1);
   const { data, isLoading, isError, refetch } = useAdminMovies(page);
   const deleteMovie = useDeleteMovie();
+  const [showDeleted, setShowDeleted] = useState(false);
 
   function handleDelete(e: React.MouseEvent, id: string, title: string) {
     e.preventDefault();
     e.stopPropagation();
     if (window.confirm(`Delete "${title}"? This action cannot be undone.`)) {
-      deleteMovie.mutate(id);
+      deleteMovie.mutate(id, { onSuccess: () => setShowDeleted(true) });
     }
   }
 
@@ -134,6 +136,13 @@ export function AdminMovieList() {
           </button>
         </div>
       )}
+
+      <AlertDialog
+        open={showDeleted}
+        variant="success"
+        title="Movie deleted successfully!"
+        onConfirm={() => setShowDeleted(false)}
+      />
     </div>
   );
 }

@@ -61,6 +61,8 @@ export const ENDPOINTS = {
     unlike: (id: string) => `/shorts/${id}/like`,
     create: "/shorts",
     adminList: "/shorts/admin/list",
+    adminDetail: (id: string) => `/shorts/${id}`,
+    update: (id: string) => `/shorts/${id}`,
     remove: (id: string) => `/shorts/${id}`,
   },
   subscriptions: {

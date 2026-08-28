@@ -16,6 +16,7 @@ export const QUERY_KEYS = {
   heroBanners: ["home", "banners"] as const,
   adminBanners: ["admin", "banners"] as const,
   adminShorts: (page: number) => ["admin", "shorts", page] as const,
+  adminShortDetail: (id: string) => ["admin", "short", id] as const,
   similarMovies: (slug: string) => ["movie", "similar", slug] as const,
   reviewSummary: (movieId: string) => ["reviews", "summary", movieId] as const,
   reviews: (movieId: string) => ["reviews", "list", movieId] as const,

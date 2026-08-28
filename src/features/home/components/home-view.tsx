@@ -43,7 +43,7 @@ export function HomeView() {
         <Skeleton className="h-6 w-40" />
         <div className="flex gap-3">
           {Array.from({ length: 6 }).map((_, i) => (
-            <Skeleton key={i} className="aspect-2/3 w-32 sm:w-40" />
+            <Skeleton key={i} className="aspect-3/5 w-32 sm:w-40" />
           ))}
         </div>
       </div>

@@ -43,9 +43,8 @@ export function AdminMovieForm({ mode, movie }: AdminMovieFormProps) {
   const [queuedEpisodes, setQueuedEpisodes] = useState<QueuedEpisode[]>([]);
   const [errors, setErrors] = useState<AdminMovieFieldErrors>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [submitError, setSubmitError] = useState<string | null>(null);
-  // Create-only — the OK button routes back to the movie list on success, or
-  // just dismisses on error so the admin can fix and retry.
+  // The OK button routes back to the movie list on success (both create and
+  // edit), or just dismisses on error so the admin can fix and retry.
   const [dialog, setDialog] = useState<{
     variant: "success" | "error";
     title: string;
@@ -81,7 +80,6 @@ export function AdminMovieForm({ mode, movie }: AdminMovieFormProps) {
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    setSubmitError(null);
     if (!validate()) return;
 
     const payload = {
@@ -123,7 +121,13 @@ export function AdminMovieForm({ mode, movie }: AdminMovieFormProps) {
       }
     } else if (movie) {
       updateMovie.mutate(payload, {
-        onError: (err) => setSubmitError(getApiErrorMessages(err).join(" ")),
+        onSuccess: () => setDialog({ variant: "success", title: "Movie updated successfully!" }),
+        onError: (err) =>
+          setDialog({
+            variant: "error",
+            title: "Failed to update movie",
+            description: getApiErrorMessages(err).join(" "),
+          }),
       });
     }
   }
@@ -192,7 +196,6 @@ export function AdminMovieForm({ mode, movie }: AdminMovieFormProps) {
           Failed to load genres. Please reload the page.
         </p>
       )}
-      {submitError && <p className="text-sm text-red-500">{submitError}</p>}
 
       <Button type="submit" disabled={isPending || blocked}>
         {isPending ? "Saving..." : mode === "create" ? "Create Movie" : "Save Changes"}

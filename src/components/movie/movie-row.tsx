@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRef } from "react";
 import { motion } from "framer-motion";
 import { Reveal } from "@/components/common/reveal";
+import { useGridCardWidth } from "@/hooks/use-grid-card-width";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { MovieCard } from "./movie-card";
 import type { MovieRow as MovieRowType } from "@/types/movie";
@@ -18,14 +19,22 @@ interface MovieRowProps {
 export function MovieRow({ row, viewAllHref }: MovieRowProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const isDesktop = useMediaQuery("(min-width: 640px)");
+  // Matches AllMoviesSection's fluid grid card width exactly (same min +
+  // gap + container padding), so this scroll row's fixed-width cards line
+  // up with it pixel-for-pixel instead of an eyeballed static width.
+  const cardWidth = useGridCardWidth(scrollRef, isDesktop ? 176 : 128);
 
   function scrollNext() {
     scrollRef.current?.scrollBy({ left: 480, behavior: "smooth" });
   }
 
+  function scrollPrev() {
+    scrollRef.current?.scrollBy({ left: -480, behavior: "smooth" });
+  }
+
   return (
     <section className="space-y-0">
-      <Reveal className="flex items-center justify-between px-6 sm:px-8 lg:px-20">
+      <Reveal className="flex items-center justify-between px-18 sm:px-24 lg:px-40">
         <h2 className="text-lg font-semibold text-white">{row.title}</h2>
         {/* Desktop: navigates to the full catalog. Mobile: there's no
          * separate floating scroll button there (removed below), so this
@@ -34,8 +43,9 @@ export function MovieRow({ row, viewAllHref }: MovieRowProps) {
           <Link
             href={viewAllHref}
             aria-label="View all"
-            className="flex h-8 w-8 items-center justify-center rounded-full border border-white/30 text-white/70 transition-colors hover:border-white hover:text-white"
+            className="flex items-center gap-1 text-sm font-medium text-white/70 transition-colors hover:text-white"
           >
+            View all
             <ChevronRight size={16} />
           </Link>
         ) : (
@@ -55,13 +65,13 @@ export function MovieRow({ row, viewAllHref }: MovieRowProps) {
          * (`overflow-x-clip`) anything the inner row scrolls past it — so the
          * gutter is a real boundary the cards never cross, at rest or mid-scroll,
          * instead of only showing up at the very start/end of the scroll range. */}
-        <div className="overflow-x-clip px-6 sm:px-8 lg:px-20">
+        <div className="overflow-x-clip px-18 sm:px-24 lg:px-40">
           <div
             ref={scrollRef}
             className="flex gap-4 overflow-x-auto scroll-smooth pt-3 pb-4 scrollbar-none [&::-webkit-scrollbar]:hidden"
           >
             {row.movies.map((movie) => (
-              <div key={movie.id} className="w-40 shrink-0 sm:w-55">
+              <div key={movie.id} style={{ width: cardWidth }} className="shrink-0">
                 <MovieCard movie={movie} />
               </div>
             ))}
@@ -70,11 +80,22 @@ export function MovieRow({ row, viewAllHref }: MovieRowProps) {
 
         <motion.button
           type="button"
+          onClick={scrollPrev}
+          aria-label="Scroll previous"
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          className="absolute left-34 top-1/2 z-20 hidden sm:block"
+        >
+          <Image src="/image/ic_left.png" alt="" width={48} height={48} />
+        </motion.button>
+
+        <motion.button
+          type="button"
           onClick={scrollNext}
           aria-label="Scroll next"
           whileHover={{ scale: 1.1 }}
           whileTap={{ scale: 0.9 }}
-          className="absolute right-14 top-1/2 z-20 hidden sm:block"
+          className="absolute right-34 top-1/2 z-20 hidden sm:block"
         >
           <Image src="/image/ic_right.png" alt="" width={48} height={48} />
         </motion.button>

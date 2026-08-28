@@ -30,3 +30,12 @@ export interface CreateShortPayload {
   thumbnailUrl?: string;
   movieSlug?: string;
 }
+
+export interface UpdateShortPayload {
+  title?: string;
+  content?: string;
+  thumbnailUrl?: string;
+  movieSlug?: string;
+  videoId?: string;
+  isActive?: boolean;
+}

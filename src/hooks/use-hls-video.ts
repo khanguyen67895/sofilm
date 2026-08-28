@@ -24,7 +24,16 @@ export function useHlsVideo(videoRef: RefObject<HTMLVideoElement | null>, src: s
         console.error("This browser can't play HLS video and hls.js isn't supported either.");
         return;
       }
-      const hls = new Hls();
+      const hls = new Hls({
+        // The origin (S3, no CDN in front of it yet) is a long, sometimes
+        // inconsistent round-trip from the viewer, so the default ~30s
+        // buffer target empties out mid-segment on any throughput dip —
+        // that's the stall/loading-spinner this config is tuned against.
+        // A deeper buffer absorbs more of that jitter before playback runs
+        // dry, at the cost of a slightly larger memory footprint.
+        maxBufferLength: 60,
+        maxMaxBufferLength: 120,
+      });
       hls.loadSource(src);
       hls.attachMedia(video);
       hls.on(Hls.Events.ERROR, (_event, data) => {

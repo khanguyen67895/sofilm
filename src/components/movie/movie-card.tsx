@@ -28,11 +28,7 @@ export function MovieCard({ movie }: { movie: Movie }) {
   }
 
   return (
-    <motion.div
-      whileHover={{ scale: 1.05 }}
-      transition={{ duration: 0.2 }}
-      className="group relative pt-2 w-full shrink-0"
-    >
+    <div className="group relative pt-2 w-full shrink-0">
       {movie.isPremium && (
         <Image
           src="/image/ic_premium.png"
@@ -50,14 +46,23 @@ export function MovieCard({ movie }: { movie: Movie }) {
             fill
             sizes="(max-width: 640px) 160px, 208px"
             quality={90}
-            className="object-cover transition-transform duration-300 group-hover:scale-110"
+            className="object-cover"
           />
+          <div className="absolute inset-0 flex items-center justify-center bg-black/0 opacity-0 transition-all duration-200 group-hover:bg-black/40 group-hover:opacity-100">
+            <Image
+              src="/image/ic_play.png"
+              alt=""
+              width={80}
+              height={80}
+              className="scale-90 transition-transform duration-200 group-hover:scale-100"
+            />
+          </div>
           <motion.button
             type="button"
             onClick={handleToggleFavorite}
             aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
             whileTap={{ scale: 0.8 }}
-            className="absolute top-1.5 right-1.5"
+            className="absolute top-1.5 right-1.5 z-10"
           >
             {isFavorite ? (
               <UnfavoriteIcon width={22} height={22} />
@@ -75,6 +80,6 @@ export function MovieCard({ movie }: { movie: Movie }) {
           )}
         </div>
       </Link>
-    </motion.div>
+    </div>
   );
 }

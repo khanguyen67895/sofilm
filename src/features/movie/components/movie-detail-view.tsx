@@ -1,8 +1,9 @@
 "use client";
 
 import { useLayoutEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { ChevronDown, Clock, Crown, ListVideo } from "lucide-react";
+import { ChevronDown, Clock, Crown, ListVideo, X } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/common/empty-state";
 import { ErrorState } from "@/components/common/error-state";
@@ -12,7 +13,6 @@ import { PLACEHOLDER_IMAGE } from "@/constants/config";
 import { formatDuration, formatYear } from "@/utils/format";
 import { cn } from "@/utils/cn";
 import { resolveImageSrc } from "@/utils/image";
-import { useMediaQuery } from "@/hooks/use-media-query";
 import { useEnsureBackFallback } from "@/hooks/use-ensure-back-fallback";
 import { usePlayerStore } from "@/store/player.store";
 import { useMovieDetail } from "../hooks/use-movie-detail";
@@ -104,13 +104,13 @@ function MovieDescription({ description }: { description: string }) {
         aria-hidden
         className="pointer-events-none invisible absolute top-0 left-0 -z-10 leading-relaxed whitespace-pre-line"
       />
-      <p className="leading-relaxed whitespace-pre-line text-white/70">
+      <p className="leading-relaxed whitespace-pre-line text-[#f2f2f2]">
         {expanded || !overflows ? description : truncated}
         {overflows && (
           <button
             type="button"
             onClick={() => setExpanded((e) => !e)}
-            className="ml-1 inline-flex items-center gap-1 align-middle text-sm font-medium text-brand hover:underline"
+            className="ml-1 inline-flex items-center gap-1 align-middle text-sm font-medium text-[#999] hover:text-white"
           >
             {expanded ? "See less" : "See more"}
             <ChevronDown size={14} className={cn(expanded && "rotate-180")} />
@@ -123,15 +123,50 @@ function MovieDescription({ description }: { description: string }) {
 
 export function MovieDetailView({ slug }: { slug: string }) {
   useEnsureBackFallback();
+  const router = useRouter();
   const { data: movie, isLoading, isError, refetch } = useMovieDetail(slug);
   const currentMovieSlug = usePlayerStore((s) => s.currentMovieSlug);
   const currentEpisode = usePlayerStore((s) => s.currentEpisode);
   const play = usePlayerStore((s) => s.play);
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  // Below `lg`, the episode list isn't a floating sidebar next to the video —
-  // it's an inline card stacked between the description and Rating & Reviews
-  // (see render below), matching the mobile design.
-  const isDesktopLayout = useMediaQuery("(min-width: 1024px)");
+  // Portrait (9:16-ish) videos give the info column equal width instead of
+  // the narrower fixed sidebar used for landscape video, matching the two
+  // SOFIN Figma layouts. Unknown until the video's real metadata loads.
+  const [isPortraitVideo, setIsPortraitVideo] = useState(false);
+
+  // The right info panel is capped to the video column's rendered height so
+  // it never grows the row when "See more" expands the description — CSS
+  // grid's `auto` row track still sizes to an item's max-content height even
+  // when that item has `overflow: hidden` (overflow only changes the
+  // *minimum* size contribution, not the max-content one used for `auto`
+  // tracks), so the cap has to come from an actual measured pixel height,
+  // matching the measure-in-JS approach `MovieDescription` already uses
+  // above. Only enforced at the `lg` breakpoint, where the two columns sit
+  // side by side — below that they stack and should size naturally.
+  const videoColumnRef = useRef<HTMLDivElement>(null);
+  const [panelMaxHeight, setPanelMaxHeight] = useState<number | undefined>(undefined);
+
+  useLayoutEffect(() => {
+    const el = videoColumnRef.current;
+    if (!el) return;
+
+    const mql = window.matchMedia("(min-width: 1024px)");
+    function update() {
+      setPanelMaxHeight(mql.matches ? el!.getBoundingClientRect().height : undefined);
+    }
+
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(el);
+    mql.addEventListener("change", update);
+    return () => {
+      observer.disconnect();
+      mql.removeEventListener("change", update);
+    };
+    // `videoColumnRef` only attaches once the loading skeleton is replaced
+    // by the real layout, so this must re-run when that happens instead of
+    // running once against a still-null ref.
+  }, [isLoading]);
 
   if (isError) {
     return <ErrorState title="Unable to load movie details." onRetry={() => refetch()} />;
@@ -163,6 +198,9 @@ export function MovieDetailView({ slug }: { slug: string }) {
   const nextEpisode = sortedEpisodes
     ? sortedEpisodes.find((ep) => ep.episodeNumber > (activeEpisode?.episodeNumber ?? 0))
     : undefined;
+  const prevEpisode = sortedEpisodes
+    ? [...sortedEpisodes].reverse().find((ep) => ep.episodeNumber < (activeEpisode?.episodeNumber ?? Infinity))
+    : undefined;
 
   return (
     <motion.div
@@ -173,16 +211,22 @@ export function MovieDetailView({ slug }: { slug: string }) {
     >
       <div
         className={cn(
-          "grid grid-cols-1 gap-4",
-          hasEpisodes && isSidebarOpen && isDesktopLayout && "lg:grid-cols-[1fr_300px]"
+          "grid grid-cols-1 gap-6",
+          isPortraitVideo ? "lg:grid-cols-2" : "lg:grid-cols-[6fr_4fr]"
         )}
       >
-        {/* Left column — video and everything under it stay confined to the
-         * player's own width instead of spanning the full page, so the
-         * episode sidebar reads as a sidebar next to all of it, not just the
-         * video. */}
-        <div className="space-y-8">
-          <div className="space-y-2">
+        {/* Left column — just the video. Its aspect ratio follows the
+         * actual video (portrait or landscape) instead of a fixed box, so
+         * this column's height/width is driven by the content, not the
+         * other way around. `self-start` keeps it from being stretched by
+         * CSS grid's default `align-items: stretch` to match the row height
+         * — without it, this column's *rendered* height would just mirror
+         * whatever the right panel happens to need, making it useless to
+         * measure (a feedback loop: panelMaxHeight would echo the right
+         * panel's own natural height back at it, never actually capping
+         * anything). */}
+        <div ref={videoColumnRef} className="space-y-2 self-start">
+          <div className="relative">
             {canWatch ? (
               videoSrc ? (
                 // Keyed by src so switching episodes fully remounts the
@@ -194,6 +238,9 @@ export function MovieDetailView({ slug }: { slug: string }) {
                   src={videoSrc}
                   poster={resolveImageSrc(activeEpisode?.thumbnail || movie?.backdrop, PLACEHOLDER_IMAGE)}
                   onEnded={nextEpisode ? () => play(movie.slug, nextEpisode.episodeNumber) : undefined}
+                  onNextEpisode={nextEpisode ? () => play(movie.slug, nextEpisode.episodeNumber) : undefined}
+                  onPrevEpisode={prevEpisode ? () => play(movie.slug, prevEpisode.episodeNumber) : undefined}
+                  onAspectRatioChange={(ratio) => setIsPortraitVideo(ratio < 1)}
                 />
               ) : (
                 <div className="flex h-65 w-full items-center justify-center rounded-lg bg-black sm:h-156.75">
@@ -207,42 +254,76 @@ export function MovieDetailView({ slug }: { slug: string }) {
               <PremiumGate backdrop={movie?.backdrop} />
             )}
 
-            {hasEpisodes && !isSidebarOpen && (
-              <button
-                type="button"
-                onClick={() => setIsSidebarOpen(true)}
-                className="flex items-center gap-1.5 text-sm font-medium text-white/70 hover:text-white"
-              >
-                <ListVideo size={16} /> Episode List
-              </button>
-            )}
+            <button
+              type="button"
+              onClick={() => router.back()}
+              aria-label="Back"
+              className="absolute top-2.5 left-2.5 z-20 flex size-8.5 items-center justify-center rounded-full bg-black/60 text-white/90 transition-colors hover:bg-black/80"
+            >
+              <X size={18} />
+            </button>
           </div>
 
-          <div className="space-y-3">
-            <h1 className="text-2xl font-bold text-white sm:text-3xl">{movie.title}</h1>
+          {hasEpisodes && !isSidebarOpen && (
+            <button
+              type="button"
+              onClick={() => setIsSidebarOpen(true)}
+              className="flex items-center gap-1.5 text-sm font-medium text-white/70 hover:text-white"
+            >
+              <ListVideo size={16} /> Episode List
+            </button>
+          )}
+        </div>
 
-            <div className="flex flex-wrap items-center justify-between gap-4">
-              <div className="flex min-w-0 flex-wrap items-center gap-3 text-sm text-white/60">
-                <span className="flex items-center gap-1">
-                  <RatingStarIcon width={14} height={13} /> {movie.rating}
-                </span>
-                <span className="flex items-center gap-1">
-                  <Clock size={14} /> {formatDuration(movie.duration)}
-                </span>
-                <span>{formatYear(movie.releaseDate)}</span>
-                {movie.isPremium && (
-                  <span className="flex items-center gap-1 text-red-500">
-                    <Crown size={14} /> VIP
-                  </span>
-                )}
+        {/* Right column — title, meta, actions, genres, description and the
+         * episode list all live here, next to the video. `panelMaxHeight`
+         * (measured off the video column above) pins this whole panel to the
+         * video's height, with `overflow-y-auto` on the panel itself so
+         * expanding the description scrolls the panel in place instead of
+         * growing it or the page. */}
+        <div
+          className="flex flex-col gap-6 overflow-y-auto rounded-2xl bg-white/5 p-6"
+          style={panelMaxHeight ? { height: panelMaxHeight } : undefined}
+        >
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-3.5">
+              <div className="flex flex-col gap-3">
+                <h1 className="font-display text-[28px] leading-9 font-semibold text-white sm:text-[32px] sm:leading-10">
+                  {movie.title}
+                </h1>
+
+                {/* Below `sm`, the like/share icons sit on the rating/meta
+                 * row, pinned to the right, matching the compact mobile
+                 * design — the full pill buttons with text move to their own
+                 * row (hidden below) once there's room at `sm` and up. */}
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex flex-wrap items-center gap-4 text-base text-[#dbdbdb]">
+                    <span className="flex items-center gap-1">
+                      <RatingStarIcon width={16} height={15} /> {movie.rating}
+                    </span>
+                    <span className="flex items-center gap-1">
+                      <Clock size={16} /> {formatDuration(movie.duration)}
+                    </span>
+                    <span>{formatYear(movie.releaseDate)}</span>
+                    {movie.isPremium && (
+                      <span className="flex items-center gap-1 text-red-500">
+                        <Crown size={16} /> VIP
+                      </span>
+                    )}
+                  </div>
+                  <div className="shrink-0 sm:hidden">
+                    <LikeShareBar movie={movie} />
+                  </div>
+                </div>
               </div>
-              <div className="shrink-0">
+
+              <div className="hidden sm:block">
                 <LikeShareBar movie={movie} />
               </div>
             </div>
 
             <motion.div
-              className="flex flex-wrap gap-2"
+              className="flex flex-wrap gap-3"
               initial="hidden"
               animate="show"
               variants={{ hidden: {}, show: { transition: { staggerChildren: 0.05 } } }}
@@ -251,43 +332,29 @@ export function MovieDetailView({ slug }: { slug: string }) {
                 <motion.span
                   key={genre}
                   variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0 } }}
-                  className="rounded-md bg-white/10 px-3 py-1 text-xs font-medium text-white/80"
+                  className="rounded-lg bg-[#2c2c2c] px-2 py-1 text-base text-[#dbdbdb]"
                 >
                   {genre}
                 </motion.span>
               ))}
             </motion.div>
+
+            <MovieDescription description={movie.description} />
           </div>
 
-          <MovieDescription description={movie.description} />
-
-          {/* Below `lg`, the episode list renders inline here (between the
-           * description and Rating & Reviews) instead of as a sidebar. */}
-          {!isDesktopLayout && hasEpisodes && isSidebarOpen && movie.episodes && (
+          {hasEpisodes && isSidebarOpen && movie.episodes && (
             <EpisodeSidebar
               slug={movie.slug}
-              title={movie.title}
               episodes={movie.episodes}
               onClose={() => setIsSidebarOpen(false)}
             />
           )}
-
-          <RatingReviewsCard movieId={movie.id} />
-
-          <CommentSection movieId={movie.id} />
         </div>
-
-        {/* Right column (`lg` and up only) — episode sidebar, naturally
-         * shorter than the left column's full content stack. */}
-        {isDesktopLayout && hasEpisodes && isSidebarOpen && movie.episodes && (
-          <EpisodeSidebar
-            slug={movie.slug}
-            title={movie.title}
-            episodes={movie.episodes}
-            onClose={() => setIsSidebarOpen(false)}
-          />
-        )}
       </div>
+
+      <RatingReviewsCard movieId={movie.id} />
+
+      <CommentSection movieId={movie.id} />
 
       <SimilarMoviesSection slug={movie.slug} />
     </motion.div>

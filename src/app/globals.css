@@ -11,11 +11,18 @@
   --color-brand: #ff6a3d;
   --color-brand-dark: #e2551f;
   --color-brand-light: #ff9466;
-  /* Plus Jakarta Sans is the site's typeface everywhere except one place:
-   * `--font-rank` (TrendingRow's big rank number, `.font-rank`) is Merienda instead. */
+  /* Plus Jakarta Sans is the site's typeface everywhere except two places:
+   * `--font-rank` (TrendingRow's big rank number, `.font-rank`) is Merienda,
+   * and `--font-display` (Unbounded — the Liquid-Glass Button label and the
+   * movie-detail hero title, per the SOFIN Figma) is Unbounded. Scoped to its
+   * own token instead of repointing `--font-heading` so the 24-odd other
+   * call sites that already rely on `font-heading` resolving to Jakarta
+   * (nav, pagination, admin, auth forms, …) don't shift typeface as a side
+   * effect. */
   --font-sans: var(--font-jakarta);
   --font-mono: var(--font-jakarta);
   --font-heading: var(--font-jakarta);
+  --font-display: var(--font-unbounded);
   --font-rank: var(--font-merienda);
 }
 
@@ -59,11 +66,13 @@ body {
   }
 
   .btn-glass-primary {
-    background: radial-gradient(
-      circle at 50% 0%,
-      color-mix(in srgb, var(--color-brand-light) 80%, transparent),
-      color-mix(in srgb, var(--color-brand-dark) 80%, transparent)
-    );
+    /* Exact background from the Figma spec — an 80%-opacity #FF824D →
+     * #FE4C00 radial base plus a 10%-opacity white corner sheen blended
+     * `plus-lighter`. */
+    background:
+      radial-gradient(100% 50% at 50% 0%, rgba(255, 130, 77, 1) 0%, rgba(254, 76, 0, 0.9) 20%),
+      radial-gradient(78.85% 78.85% at 13.35% 16.4%, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 100%);
+    background-blend-mode: normal, plus-lighter;
   }
 
   .btn-glass-secondary {

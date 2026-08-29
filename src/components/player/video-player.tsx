@@ -5,7 +5,6 @@ import Image from "next/image";
 import { Maximize, Minimize, Pause, Play, Volume2, VolumeX } from "lucide-react";
 import { usePlayerStore } from "@/store/player.store";
 import { useHlsVideo } from "@/hooks/use-hls-video";
-import { useMediaQuery } from "@/hooks/use-media-query";
 import { cn } from "@/utils/cn";
 import { formatCountdown } from "@/utils/format";
 
@@ -13,9 +12,19 @@ interface VideoPlayerProps {
   src: string;
   poster?: string;
   onEnded?: () => void;
+  onNextEpisode?: () => void;
+  onPrevEpisode?: () => void;
+  onAspectRatioChange?: (aspectRatio: number) => void;
 }
 
-export function VideoPlayer({ src, poster, onEnded }: VideoPlayerProps) {
+export function VideoPlayer({
+  src,
+  poster,
+  onEnded,
+  onNextEpisode,
+  onPrevEpisode,
+  onAspectRatioChange,
+}: VideoPlayerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const { isPlaying, volume, resume, pause, setVolume } = usePlayerStore();
@@ -24,17 +33,11 @@ export function VideoPlayer({ src, poster, onEnded }: VideoPlayerProps) {
   const [duration, setDuration] = useState(0);
   const [buffered, setBuffered] = useState(0);
   // Read straight off the actual playing element once its real pixel size is
-  // known — no backend metadata involved. On desktop the player frame never
-  // resizes for a portrait video; only the fit mode changes, exactly like a
-  // native player (Windows Movies & TV, VLC, ...) pillarboxing it inside a
-  // fixed-size window instead of stretching/cropping it to fill. On mobile
-  // that fixed wide frame is the problem, not the fix — a portrait video in
-  // a landscape-shaped box reads as two dead black bars either side — so
-  // there the frame instead reshapes to the video's own aspect ratio.
-  const [isPortrait, setIsPortrait] = useState(false);
+  // known — no backend metadata involved. The player frame always reshapes
+  // to the video's own aspect ratio (portrait or landscape alike) instead of
+  // pillar/letterboxing it inside a fixed-size box.
   const [aspectRatio, setAspectRatio] = useState<number | null>(null);
-  const isDesktop = useMediaQuery("(min-width: 640px)");
-  const fitsNaturalAspect = isPortrait && !isDesktop && aspectRatio;
+  const fitsNaturalAspect = aspectRatio !== null;
   // True while the video is stalled waiting on more data — surfaces network/
   // server-side buffering stalls as a visible spinner instead of a silent
   // freeze, so "did it crash" vs "is it just buffering" is no longer a guess.
@@ -106,8 +109,9 @@ export function VideoPlayer({ src, poster, onEnded }: VideoPlayerProps) {
   function handleLoadedMetadata(e: SyntheticEvent<HTMLVideoElement>) {
     const { videoWidth, videoHeight } = e.currentTarget;
     if (videoWidth > 0 && videoHeight > 0) {
-      setIsPortrait(videoHeight > videoWidth);
-      setAspectRatio(videoWidth / videoHeight);
+      const ratio = videoWidth / videoHeight;
+      setAspectRatio(ratio);
+      onAspectRatioChange?.(ratio);
     }
   }
 
@@ -119,7 +123,7 @@ export function VideoPlayer({ src, poster, onEnded }: VideoPlayerProps) {
       ref={containerRef}
       style={fitsNaturalAspect ? { aspectRatio } : undefined}
       className={cn(
-        "group relative w-full overflow-hidden rounded-lg bg-black",
+        "group relative mx-auto w-full max-h-[70vh] overflow-hidden rounded-lg bg-black lg:max-h-140",
         !fitsNaturalAspect && "h-65 sm:h-156.75"
       )}
     >
@@ -127,7 +131,7 @@ export function VideoPlayer({ src, poster, onEnded }: VideoPlayerProps) {
         ref={videoRef}
         poster={poster}
         preload="auto"
-        className={cn("h-full w-full", isPortrait && !fitsNaturalAspect ? "object-contain" : "object-cover")}
+        className="h-full w-full object-contain"
         onClick={toggle}
         onLoadedMetadata={handleLoadedMetadata}
         onTimeUpdate={(e) => setCurrentTime(e.currentTarget.currentTime)}
@@ -155,6 +159,29 @@ export function VideoPlayer({ src, poster, onEnded }: VideoPlayerProps) {
             className="transition-transform hover:scale-110"
           />
         </button>
+      )}
+
+      {(onPrevEpisode || onNextEpisode) && (
+        <div className="absolute top-1/2 right-3 flex -translate-y-1/2 flex-col gap-2">
+          <button
+            type="button"
+            onClick={onPrevEpisode}
+            disabled={!onPrevEpisode}
+            aria-label="Previous episode"
+            className="flex h-9 w-9 items-center justify-center transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:opacity-30"
+          >
+            <Image src="/image/ic_up.png" alt="" width={36} height={36} className="h-full w-full" />
+          </button>
+          <button
+            type="button"
+            onClick={onNextEpisode}
+            disabled={!onNextEpisode}
+            aria-label="Next episode"
+            className="flex h-9 w-9 items-center justify-center transition-opacity hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-30 disabled:hover:opacity-30"
+          >
+            <Image src="/image/ic_down.png" alt="" width={36} height={36} className="h-full w-full" />
+          </button>
+        </div>
       )}
 
       {/* Visible by default on mobile — a hover-only reveal would leave the

@@ -23,11 +23,11 @@ export function LikeShareBar({ movie }: { movie: Movie }) {
   }
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-4">
       <Button
-        variant="outline"
+        variant="secondary"
         size="sm"
-        className="w-9 px-0 sm:w-auto sm:px-4"
+        className="w-9 px-0 normal-case sm:w-auto sm:px-4"
         onClick={() =>
           requireAuth(
             () => toggleFavorite.mutate({ movie, isFavorite: liked }),
@@ -39,9 +39,9 @@ export function LikeShareBar({ movie }: { movie: Movie }) {
         <span className="hidden sm:inline">Like</span>
       </Button>
       <Button
-        variant="outline"
+        variant="secondary"
         size="sm"
-        className="w-9 px-0 sm:w-auto sm:px-4"
+        className="w-9 px-0 normal-case sm:w-auto sm:px-4"
         onClick={() => requireAuth(share, "Sign in to share this movie.")}
       >
         <Share2 size={16} />

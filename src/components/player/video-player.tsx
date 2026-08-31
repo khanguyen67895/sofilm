@@ -29,6 +29,14 @@ export function VideoPlayer({
   const videoRef = useRef<HTMLVideoElement>(null);
   const { isPlaying, volume, resume, pause, setVolume } = usePlayerStore();
   const [isFullscreen, setIsFullscreen] = useState(false);
+  // In fullscreen, controls (progress bar + buttons) auto-hide 3s after the
+  // last interaction so the video can be watched without any UI on top —
+  // mirrors the outside-fullscreen hover-to-reveal behavior, but driven by a
+  // timer since fullscreen is the one mode where mouse movement should bring
+  // controls back even without a persistent hover target (and touch has no
+  // hover at all, so a tap has to do the same job there).
+  const [showControls, setShowControls] = useState(true);
+  const hideControlsTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [buffered, setBuffered] = useState(0);
@@ -64,6 +72,8 @@ export function VideoPlayer({
     const container = containerRef.current;
     function handleFullscreenChange() {
       setIsFullscreen(Boolean(document.fullscreenElement));
+      setShowControls(true);
+      armHideControlsTimer();
     }
     document.addEventListener("fullscreenchange", handleFullscreenChange);
     return () => {
@@ -78,6 +88,48 @@ export function VideoPlayer({
         document.exitFullscreen().catch(() => {});
       }
     };
+    // `armHideControlsTimer` reads live DOM/store state rather than closing
+    // over props/state, so it's intentionally omitted here.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  function clearHideControlsTimer() {
+    if (hideControlsTimeoutRef.current) {
+      clearTimeout(hideControlsTimeoutRef.current);
+      hideControlsTimeoutRef.current = null;
+    }
+  }
+
+  // Reads live truth off the DOM/store rather than the component's own
+  // `isFullscreen`/`isPlaying` closure variables, so it's safe to call from
+  // callbacks registered once on mount (the fullscreenchange listener, the
+  // store subscription below) without going stale.
+  function armHideControlsTimer() {
+    clearHideControlsTimer();
+    if (document.fullscreenElement && usePlayerStore.getState().isPlaying) {
+      hideControlsTimeoutRef.current = setTimeout(() => setShowControls(false), 3000);
+    }
+  }
+
+  function revealControls() {
+    setShowControls(true);
+    armHideControlsTimer();
+  }
+
+  // Bring controls back and restart the countdown whenever play state
+  // changes — including externally (e.g. the parent auto-advancing to the
+  // next episode), not just from a local click. Subscribing to the store
+  // directly instead of reacting to the `isPlaying` destructured above keeps
+  // the setState call inside the subscription callback rather than the
+  // effect body itself.
+  useEffect(() => {
+    return usePlayerStore.subscribe((state, prevState) => {
+      if (state.isPlaying !== prevState.isPlaying) {
+        setShowControls(true);
+        armHideControlsTimer();
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   function toggle() {
@@ -122,9 +174,13 @@ export function VideoPlayer({
     <div
       ref={containerRef}
       style={fitsNaturalAspect ? { aspectRatio } : undefined}
+      onMouseMove={revealControls}
+      onClick={revealControls}
+      onTouchStart={revealControls}
       className={cn(
         "group relative mx-auto w-full max-h-[70vh] overflow-hidden rounded-lg bg-black lg:max-h-140",
-        !fitsNaturalAspect && "h-65 sm:h-156.75"
+        !fitsNaturalAspect && "h-65 sm:h-156.75",
+        isFullscreen && !showControls && "cursor-none"
       )}
     >
       <video
@@ -162,7 +218,12 @@ export function VideoPlayer({
       )}
 
       {(onPrevEpisode || onNextEpisode) && (
-        <div className="absolute top-1/2 right-3 flex -translate-y-1/2 flex-col gap-2">
+        <div
+          className={cn(
+            "absolute top-1/2 right-3 flex -translate-y-1/2 flex-col gap-2 transition-opacity",
+            isFullscreen && !showControls && "pointer-events-none opacity-0"
+          )}
+        >
           <button
             type="button"
             onClick={onPrevEpisode}
@@ -186,8 +247,18 @@ export function VideoPlayer({
 
       {/* Visible by default on mobile — a hover-only reveal would leave the
        * fullscreen button (and every other control) permanently unreachable
-       * on a touchscreen, which has no hover state at all. */}
-      <div className="absolute inset-x-0 bottom-0 space-y-2 bg-linear-to-t from-black/80 to-transparent p-4 opacity-100 transition-opacity sm:opacity-0 sm:group-hover:opacity-100">
+       * on a touchscreen, which has no hover state at all. In fullscreen,
+       * `showControls` overrides this with a 3s auto-hide timer instead (see
+       * `revealControls`), since fullscreen has room for a fully clean frame
+       * and both mouse movement and taps are available to bring it back. */}
+      <div
+        className={cn(
+          "absolute inset-x-0 bottom-0 space-y-2 bg-linear-to-t from-black/80 to-transparent p-4 transition-opacity",
+          isFullscreen
+            ? cn("opacity-100", !showControls && "pointer-events-none opacity-0")
+            : "opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
+        )}
+      >
         <div className="relative flex h-3 w-full items-center">
           <div className="relative h-1 w-full overflow-hidden rounded-full bg-white/20">
             <div

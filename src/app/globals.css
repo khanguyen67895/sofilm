@@ -11,19 +11,14 @@
   --color-brand: #ff6a3d;
   --color-brand-dark: #e2551f;
   --color-brand-light: #ff9466;
-  /* Plus Jakarta Sans is the site's typeface everywhere except two places:
-   * `--font-rank` (TrendingRow's big rank number, `.font-rank`) is Merienda,
-   * and `--font-display` (Unbounded — the Liquid-Glass Button label and the
-   * movie-detail hero title, per the SOFIN Figma) is Unbounded. Scoped to its
-   * own token instead of repointing `--font-heading` so the 24-odd other
-   * call sites that already rely on `font-heading` resolving to Jakarta
-   * (nav, pagination, admin, auth forms, …) don't shift typeface as a side
-   * effect. */
+  /* Plus Jakarta Sans is the site's only typeface — every font token below
+   * resolves to it, including `--font-display` and `--font-rank`, which
+   * previously pointed at Unbounded/Merienda. */
   --font-sans: var(--font-jakarta);
   --font-mono: var(--font-jakarta);
   --font-heading: var(--font-jakarta);
-  --font-display: var(--font-unbounded);
-  --font-rank: var(--font-merienda);
+  --font-display: var(--font-jakarta);
+  --font-rank: var(--font-jakarta);
 }
 
 :root[data-theme="light"],

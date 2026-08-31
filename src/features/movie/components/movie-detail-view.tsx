@@ -352,9 +352,11 @@ export function MovieDetailView({ slug }: { slug: string }) {
         </div>
       </div>
 
-      <RatingReviewsCard movieId={movie.id} />
-
-      <CommentSection movieId={movie.id} />
+      <CommentSection
+        movieId={movie.id}
+        sidebar={<RatingReviewsCard movieId={movie.id} />}
+        columnsClassName={isPortraitVideo ? "lg:grid-cols-2" : "lg:grid-cols-[6fr_4fr]"}
+      />
 
       <SimilarMoviesSection slug={movie.slug} />
     </motion.div>

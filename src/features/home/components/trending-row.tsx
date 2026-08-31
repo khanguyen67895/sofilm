@@ -81,8 +81,17 @@ export function TrendingRow({ movies }: { movies: Movie[] }) {
                     fill
                     sizes="(max-width: 640px) 160px, 208px"
                     quality={90}
-                    className="object-cover transition-transform duration-300 group-hover:scale-110"
+                    className="object-cover"
                   />
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/0 opacity-0 transition-all duration-200 group-hover:bg-black/40 group-hover:opacity-100">
+                    <Image
+                      src="/image/ic_play.png"
+                      alt=""
+                      width={80}
+                      height={80}
+                      className="scale-90 transition-transform duration-200 group-hover:scale-100"
+                    />
+                  </div>
                   <span
                     className="font-rank absolute -bottom-1 left-1.5 text-[56px] leading-normal font-normal text-white"
                     style={{ textShadow: "0 1px 20px #FFF" }}

@@ -229,12 +229,14 @@ export function MovieDetailView({ slug }: { slug: string }) {
           <div className="relative">
             {canWatch ? (
               videoSrc ? (
-                // Keyed by src so switching episodes fully remounts the
-                // player — its internal playback/scrubber state (currentTime,
-                // duration, buffered) resets for free instead of briefly
-                // showing the previous episode's progress.
+                // Not keyed by src — VideoPlayer stays mounted across
+                // episode switches (resetting its own scrubber state
+                // internally) so the browser Fullscreen element and gesture
+                // handlers survive the switch instead of exiting fullscreen,
+                // which is what remounting on every episode change used to
+                // do (its unmount cleanup force-exits fullscreen to dodge a
+                // Chromium bug — see VideoPlayer).
                 <VideoPlayer
-                  key={videoSrc}
                   src={videoSrc}
                   poster={resolveImageSrc(activeEpisode?.thumbnail || movie?.backdrop, PLACEHOLDER_IMAGE)}
                   onEnded={nextEpisode ? () => play(movie.slug, nextEpisode.episodeNumber) : undefined}

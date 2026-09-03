@@ -1,12 +1,30 @@
 "use client";
 
-import { useEffect, useRef, useState, type SyntheticEvent } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type SyntheticEvent,
+  type TouchEvent,
+  type PointerEvent as ReactPointerEvent,
+  type WheelEvent,
+} from "react";
 import Image from "next/image";
 import { Maximize, Minimize, Pause, Play, Volume2, VolumeX } from "lucide-react";
 import { usePlayerStore } from "@/store/player.store";
 import { useHlsVideo } from "@/hooks/use-hls-video";
 import { cn } from "@/utils/cn";
 import { formatCountdown } from "@/utils/format";
+
+// Vertical drag/scroll distance needed before a fullscreen gesture counts as
+// an episode swipe rather than an incidental tap or scroll jitter.
+const SWIPE_THRESHOLD_PX = 60;
+const WHEEL_THRESHOLD_PX = 40;
+const WHEEL_LOCK_MS = 600;
+// A mouse drag has to move at least this far before it's treated as a swipe
+// rather than a click — desktop has no touch events, so a click-and-drag on
+// the video is the closest equivalent to a touch swipe.
+const DRAG_CLICK_TOLERANCE_PX = 5;
 
 interface VideoPlayerProps {
   src: string;
@@ -50,8 +68,39 @@ export function VideoPlayer({
   // server-side buffering stalls as a visible spinner instead of a silent
   // freeze, so "did it crash" vs "is it just buffering" is no longer a guess.
   const [isBuffering, setIsBuffering] = useState(false);
+  // Fullscreen-only vertical swipe/wheel episode nav, mirroring the shorts
+  // feed's up/down gesture. There's no snapping list to scroll here (only one
+  // <video> is ever mounted for the component's lifetime), so this just
+  // reads the gesture and calls the same onPrevEpisode/onNextEpisode used by
+  // the arrow buttons and episode sidebar, rather than reimplementing
+  // navigation.
+  const touchStartYRef = useRef<number | null>(null);
+  const wheelLockedRef = useRef(false);
+  // Desktop has no touch events, so click-and-drag on the video is the swipe
+  // equivalent there. Uses Pointer Capture (not window-level listeners) so
+  // the drag keeps tracking even if the cursor leaves the video, without the
+  // stale-closure/cleanup bookkeeping manual window listeners would need.
+  // `dragMovedRef` disambiguates a drag from a plain click so dragging
+  // doesn't also toggle play/pause.
+  const mouseStartYRef = useRef<number | null>(null);
+  const dragMovedRef = useRef(false);
 
   useHlsVideo(videoRef, src);
+
+  // The component is no longer remounted per episode (see the play/pause
+  // effect below for why), so the scrubber has to be reset by hand instead
+  // of getting it "for free" from a fresh mount. Resetting during render
+  // (the React-endorsed "adjusting state when a prop changes" pattern)
+  // rather than in an effect avoids an extra render pass showing the
+  // previous episode's stale progress for one frame.
+  const [prevSrc, setPrevSrc] = useState(src);
+  if (src !== prevSrc) {
+    setPrevSrc(src);
+    setCurrentTime(0);
+    setDuration(0);
+    setBuffered(0);
+    setIsBuffering(false);
+  }
 
   useEffect(() => {
     const video = videoRef.current;
@@ -60,9 +109,15 @@ export function VideoPlayer({
     // element unmounts or its src changes (e.g. switching episodes) before
     // playback actually starts — an expected race, not a real failure, so it
     // must be caught or it surfaces as an unhandled rejection.
+    //
+    // `src` is a dependency (not just `isPlaying`) so that switching
+    // episodes while already playing re-triggers `.play()` on the new
+    // source — otherwise, since `isPlaying` itself doesn't change across an
+    // episode switch, this effect would never re-run and the next episode
+    // would load paused.
     if (isPlaying) video.play().catch(() => {});
     else video.pause();
-  }, [isPlaying]);
+  }, [isPlaying, src]);
 
   useEffect(() => {
     if (videoRef.current) videoRef.current.volume = volume;
@@ -137,6 +192,72 @@ export function VideoPlayer({
     else resume();
   }
 
+  function handleTouchStart(e: TouchEvent<HTMLDivElement>) {
+    revealControls();
+    touchStartYRef.current = e.touches[0]?.clientY ?? null;
+  }
+
+  function handleTouchEnd(e: TouchEvent<HTMLDivElement>) {
+    const startY = touchStartYRef.current;
+    touchStartYRef.current = null;
+    if (!isFullscreen || startY === null) return;
+    const endY = e.changedTouches[0]?.clientY;
+    if (endY === undefined) return;
+    const deltaY = startY - endY;
+    if (Math.abs(deltaY) < SWIPE_THRESHOLD_PX) return;
+    if (deltaY > 0) onNextEpisode?.();
+    else onPrevEpisode?.();
+  }
+
+  function handleWheel(e: WheelEvent<HTMLDivElement>) {
+    if (!isFullscreen || wheelLockedRef.current) return;
+    if (Math.abs(e.deltaY) < WHEEL_THRESHOLD_PX) return;
+    wheelLockedRef.current = true;
+    if (e.deltaY > 0) onNextEpisode?.();
+    else onPrevEpisode?.();
+    setTimeout(() => {
+      wheelLockedRef.current = false;
+    }, WHEEL_LOCK_MS);
+  }
+
+  function handleVideoPointerDown(e: ReactPointerEvent<HTMLVideoElement>) {
+    if (!isFullscreen || e.pointerType !== "mouse" || e.button !== 0) return;
+    mouseStartYRef.current = e.clientY;
+    dragMovedRef.current = false;
+    // Keeps pointermove/pointerup routed to this element even once the
+    // cursor moves outside it mid-drag.
+    e.currentTarget.setPointerCapture(e.pointerId);
+  }
+
+  function handleVideoPointerMove(e: ReactPointerEvent<HTMLVideoElement>) {
+    if (mouseStartYRef.current === null) return;
+    if (Math.abs(e.clientY - mouseStartYRef.current) > DRAG_CLICK_TOLERANCE_PX) {
+      dragMovedRef.current = true;
+    }
+  }
+
+  function handleVideoPointerUp(e: ReactPointerEvent<HTMLVideoElement>) {
+    const startY = mouseStartYRef.current;
+    mouseStartYRef.current = null;
+    if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    }
+    if (!isFullscreen || startY === null) return;
+    const deltaY = startY - e.clientY;
+    if (Math.abs(deltaY) < SWIPE_THRESHOLD_PX) return;
+    if (deltaY > 0) onNextEpisode?.();
+    else onPrevEpisode?.();
+  }
+
+  function handleVideoClick() {
+    // A drag that ended as a swipe shouldn't also toggle play/pause.
+    if (dragMovedRef.current) {
+      dragMovedRef.current = false;
+      return;
+    }
+    toggle();
+  }
+
   function toggleFullscreen() {
     if (document.fullscreenElement) {
       void document.exitFullscreen();
@@ -176,7 +297,9 @@ export function VideoPlayer({
       style={fitsNaturalAspect ? { aspectRatio } : undefined}
       onMouseMove={revealControls}
       onClick={revealControls}
-      onTouchStart={revealControls}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+      onWheel={handleWheel}
       className={cn(
         "group relative mx-auto w-full max-h-[70vh] overflow-hidden rounded-lg bg-black lg:max-h-140",
         !fitsNaturalAspect && "h-65 sm:h-156.75",
@@ -188,7 +311,10 @@ export function VideoPlayer({
         poster={poster}
         preload="auto"
         className="h-full w-full object-contain"
-        onClick={toggle}
+        onClick={handleVideoClick}
+        onPointerDown={handleVideoPointerDown}
+        onPointerMove={handleVideoPointerMove}
+        onPointerUp={handleVideoPointerUp}
         onLoadedMetadata={handleLoadedMetadata}
         onTimeUpdate={(e) => setCurrentTime(e.currentTarget.currentTime)}
         onDurationChange={(e) => setDuration(e.currentTarget.duration || 0)}

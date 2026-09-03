@@ -1,6 +1,6 @@
 import { apiClient, ENDPOINTS } from "@/services/api";
 import type { ApiResponse, PaginatedResponse } from "@/types/api";
-import type { CreateReviewPayload, Review, ReviewSummary } from "@/types/review";
+import type { CreateReplyPayload, CreateReviewPayload, Review, ReviewSummary } from "@/types/review";
 
 /** Shape returned by the backend's shared `paginate()` helper — uses `limit`,
  * not `pageSize` like the frontend's own `PaginatedResponse`. */
@@ -30,7 +30,10 @@ export const reviewService = {
     );
     const backendPage = data.data;
     return {
-      items: backendPage.items,
+      // `replies`/`replyCount` default here so the UI doesn't crash reading
+      // `review.replies.length` against a backend deployed before this
+      // field existed — safe to keep even once every backend is current.
+      items: backendPage.items.map((r) => ({ ...r, replies: r.replies ?? [], replyCount: r.replyCount ?? 0 })),
       page: backendPage.page,
       pageSize: backendPage.limit,
       total: backendPage.total,
@@ -49,6 +52,14 @@ export const reviewService = {
   async toggleLike(movieId: string, reviewId: string): Promise<{ likesCount: number; likedByMe: boolean }> {
     const { data } = await apiClient.post<ApiResponse<{ likesCount: number; likedByMe: boolean }>>(
       ENDPOINTS.reviews.like(movieId, reviewId)
+    );
+    return data.data;
+  },
+
+  async submitReply(movieId: string, commentId: string, payload: CreateReplyPayload): Promise<Review> {
+    const { data } = await apiClient.post<ApiResponse<Review>>(
+      ENDPOINTS.reviews.reply(movieId, commentId),
+      payload
     );
     return data.data;
   },

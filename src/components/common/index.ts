@@ -7,3 +7,4 @@ export * from "./contact-icons";
 export * from "./favorite-icons";
 export * from "./rating-star-icon";
 export * from "./reveal";
+export * from "./share-menu";

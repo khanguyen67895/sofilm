@@ -30,6 +30,7 @@ export const ENDPOINTS = {
     summary: (movieId: string) => `/movies/${movieId}/reviews/summary`,
     submit: (movieId: string) => `/movies/${movieId}/reviews`,
     like: (movieId: string, reviewId: string) => `/movies/${movieId}/reviews/${reviewId}/like`,
+    reply: (movieId: string, commentId: string) => `/movies/${movieId}/reviews/${commentId}/replies`,
   },
   episodes: {
     list: (movieId: string) => `/movies/${movieId}/episodes`,

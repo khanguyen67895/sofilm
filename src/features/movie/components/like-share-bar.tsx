@@ -1,7 +1,8 @@
 "use client";
 
-import { Heart, Share2 } from "lucide-react";
+import { Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ShareMenu } from "@/components/common/share-menu";
 import { useFavoriteIds } from "@/hooks/use-favorite-ids";
 import { useToggleFavorite } from "@/hooks/use-toggle-favorite";
 import { useRequireAuth } from "@/hooks/use-require-auth";
@@ -12,15 +13,6 @@ export function LikeShareBar({ movie }: { movie: Movie }) {
   const liked = Boolean(useFavoriteIds().data?.has(movie.id));
   const toggleFavorite = useToggleFavorite();
   const requireAuth = useRequireAuth();
-
-  async function share() {
-    const url = window.location.href;
-    if (navigator.share) {
-      navigator.share({ title: movie.title, url }).catch(() => {});
-      return;
-    }
-    await navigator.clipboard.writeText(url);
-  }
 
   return (
     <div className="flex items-center gap-4">
@@ -38,15 +30,10 @@ export function LikeShareBar({ movie }: { movie: Movie }) {
         <Heart size={16} className={cn(liked && "fill-brand text-brand")} />
         <span className="hidden sm:inline">Like</span>
       </Button>
-      <Button
-        variant="secondary"
-        size="sm"
-        className="w-9 px-0 normal-case sm:w-auto sm:px-4"
-        onClick={() => requireAuth(share, "Sign in to share this movie.")}
-      >
-        <Share2 size={16} />
-        <span className="hidden sm:inline">Share</span>
-      </Button>
+      <ShareMenu
+        variant="pill"
+        onOpenGuard={(open) => requireAuth(open, "Sign in to share this movie.")}
+      />
       {toggleFavorite.isError && (
         <span className="text-xs text-red-500">Action failed, please try again.</span>
       )}

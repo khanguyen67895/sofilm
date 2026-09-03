@@ -8,3 +8,4 @@ export * from "./hooks/use-review-summary";
 export * from "./hooks/use-movie-reviews";
 export * from "./hooks/use-submit-review";
 export * from "./hooks/use-toggle-review-like";
+export * from "./hooks/use-submit-reply";

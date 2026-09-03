@@ -11,6 +11,9 @@ export interface Review {
   createdAt: string;
   likesCount: number;
   likedByMe: boolean;
+  /** Direct replies, single level only — always `[]` on a reply itself. */
+  replies: Review[];
+  replyCount: number;
   user: ReviewUser;
 }
 
@@ -26,4 +29,8 @@ export interface ReviewSummary {
 export interface CreateReviewPayload {
   rating?: number;
   comment?: string;
+}
+
+export interface CreateReplyPayload {
+  text: string;
 }

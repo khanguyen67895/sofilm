@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useLayoutEffect, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { Button } from "@/components/ui/button";
 import { Avatar } from "@/components/ui/avatar";
@@ -13,6 +13,10 @@ import { useMovieReviews } from "../hooks/use-movie-reviews";
 import { useReviewSummary } from "../hooks/use-review-summary";
 import { useSubmitReview } from "../hooks/use-submit-review";
 import { CommentItem } from "./comment-item";
+
+/** Comments visible before "View all comments" is pressed — a small,
+ * fixed-size peek rather than the paginated page size. */
+const PREVIEW_COUNT = 3;
 
 interface CommentSectionProps {
   movieId: string;
@@ -45,7 +49,47 @@ export function CommentSection({
   // cramped). Scale both down below `sm` where that spec was never tested.
   const isDesktop = useMediaQuery("(min-width: 640px)");
 
+  // Collapsed by default: the list caps to the Rating & Reviews card's own
+  // rendered height (measured, not guessed) and shows only a peek of
+  // comments, matching that sidebar card visually. "View all comments" lifts
+  // both limits at once, same as the `panelMaxHeight` measure-in-JS pattern
+  // `MovieDetailView` already uses for its own two-column row, but scoped
+  // locally here since `sidebar` is just a rendered node, not something the
+  // parent already measures for us.
+  const [expanded, setExpanded] = useState(false);
+  const sidebarRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
+  const [sidebarHeight, setSidebarHeight] = useState<number | undefined>(undefined);
+
+  useLayoutEffect(() => {
+    const el = sidebarRef.current;
+    if (!el) return;
+
+    const mql = window.matchMedia("(min-width: 1024px)");
+    function update() {
+      setSidebarHeight(mql.matches ? el!.getBoundingClientRect().height : undefined);
+    }
+
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(el);
+    mql.addEventListener("change", update);
+    return () => {
+      observer.disconnect();
+      mql.removeEventListener("change", update);
+    };
+  }, []);
+
   const reviews = data?.pages.flatMap((page) => page.items) ?? [];
+  const visibleReviews = expanded ? reviews : reviews.slice(0, PREVIEW_COUNT);
+  const hasMoreToReveal = !expanded && (reviews.length > PREVIEW_COUNT || hasNextPage);
+
+  function handleViewAll() {
+    setExpanded(true);
+    requestAnimationFrame(() => {
+      listRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    });
+  }
 
   function handlePost() {
     if (!comment.trim()) return;
@@ -102,14 +146,13 @@ export function CommentSection({
               ))}
             </div>
           ) : (
-            <div>
-              {reviews.map((review) => (
-                <CommentItem
-                  key={review.id}
-                  movieId={movieId}
-                  review={review}
-                  onReply={() => inputRef.current?.focus()}
-                />
+            <div
+              ref={listRef}
+              style={!expanded && sidebarHeight ? { maxHeight: sidebarHeight } : undefined}
+              className={cn(!expanded && sidebarHeight && "overflow-y-auto")}
+            >
+              {visibleReviews.map((review) => (
+                <CommentItem key={review.id} movieId={movieId} review={review} />
               ))}
               {reviews.length === 0 && (
                 <p className="py-6 text-center text-sm text-white/50">No comments yet.</p>
@@ -117,7 +160,15 @@ export function CommentSection({
             </div>
           )}
 
-          {hasNextPage && (
+          {hasMoreToReveal && (
+            <div className="flex justify-center">
+              <Button variant="outline" size="sm" onClick={handleViewAll}>
+                View all comments
+              </Button>
+            </div>
+          )}
+
+          {expanded && hasNextPage && (
             <div className="flex justify-center">
               <Button
                 variant="outline"
@@ -131,7 +182,7 @@ export function CommentSection({
           )}
         </div>
 
-        {sidebar}
+        <div ref={sidebarRef}>{sidebar}</div>
       </div>
     </div>
   );

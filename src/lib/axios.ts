@@ -66,13 +66,21 @@ apiClient.interceptors.response.use(
       });
     }
 
+    const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
+    // No refresh token means there was never a session to refresh — a guest,
+    // or someone who already signed out — not a session that just expired.
+    // Reject and let the caller show its own "sign in required" state
+    // instead of hard-redirecting a logged-out user away from whatever page
+    // they're just browsing; the catch block below is for a real session
+    // that failed to refresh, which does warrant sending them to login.
+    if (!refreshToken) {
+      return Promise.reject(error);
+    }
+
     originalRequest._retry = true;
     isRefreshing = true;
 
     try {
-      const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
-      if (!refreshToken) throw error;
-
       const { data } = await axios.post<ApiResponse<AuthTokens>>(
         `${API_CONFIG.baseURL}/auth/refresh`,
         { refreshToken }

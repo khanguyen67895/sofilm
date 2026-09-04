@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 import { AppProviders } from "@/providers/app-providers";
 import { Header } from "@/components/layout/header";
@@ -32,6 +33,12 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${jakarta.variable} h-full antialiased`}
     >
+      <Script
+        async
+        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-3028002964472605"
+        crossOrigin="anonymous"
+        strategy="beforeInteractive"
+      />
       <body className="min-h-full flex flex-col bg-black">
         <AppProviders>
           <Header />

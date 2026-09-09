@@ -1,15 +1,21 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { ChevronDown, ChevronUp } from "lucide-react";
-import { Virtuoso } from "react-virtuoso";
 import { Spinner } from "@/components/ui/spinner";
 import { EmptyState } from "@/components/common/empty-state";
 import { useEnsureBackFallback } from "@/hooks/use-ensure-back-fallback";
 import { useShortsFeed } from "../hooks/use-shorts-feed";
 import { ShortItem } from "./short-item";
+
+// How many items on each side of the active one keep their video source
+// attached (hls.js loading/buffering) — everything further away just shows
+// its poster image. The feed itself is a plain scroll-snap container (see
+// below), not virtualized, so this is the only thing keeping a 20-item feed
+// from opening 20 concurrent HLS streams at once.
+const PRELOAD_RADIUS = 1;
 
 export function ShortsFeed() {
   useEnsureBackFallback();
@@ -19,14 +25,66 @@ export function ShortsFeed() {
   // Only covers the newest 50 shorts the feed itself fetches; an older saved
   // short simply won't be found here (findIndex falls back to -1 → 0).
   const initialShortId = useSearchParams().get("id");
-  // The actual scrollable element Virtuoso renders internally — grabbed via
-  // scrollerRef instead of VirtuosoHandle.scrollToIndex(), because Virtuoso's
-  // own index-based scroll math fights the CSS `snap-y snap-mandatory` this
-  // feed relies on for the swipe gesture (it can compute an offset that
-  // lands mid-snap, so the button visibly does nothing). A plain native
-  // scrollBy() of one viewport height plays nicely with scroll-snap instead.
-  const scrollerRef = useRef<HTMLElement | null>(null);
+  // A plain native-scroll container rather than react-virtuoso: Virtuoso
+  // positions its item wrappers with `position: absolute` for virtualization,
+  // which CSS `scroll-snap-align` doesn't reliably apply to — every browser
+  // needs the snapped element to be a normal-flow child of the scroll
+  // container. That mismatch is why swiping here didn't snap cleanly between
+  // videos. A short feed page is small (20 items, see the backend's default
+  // page size), so plain unvirtualized DOM nodes cost nothing — the only
+  // thing that actually needs limiting is which items load real video
+  // (PRELOAD_RADIUS above), not how many `<div>`s exist.
+  const scrollerRef = useRef<HTMLDivElement | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
+  const didInitialScroll = useRef(false);
+  const wheelLockedRef = useRef(false);
+
+  useEffect(() => {
+    if (!shorts || shorts.length === 0 || didInitialScroll.current) return;
+    didInitialScroll.current = true;
+    const index = initialShortId
+      ? Math.max(0, shorts.findIndex((s) => s.id === initialShortId))
+      : 0;
+    setActiveIndex(index);
+    const scroller = scrollerRef.current;
+    if (scroller && index > 0) scroller.scrollTop = index * scroller.clientHeight;
+  }, [shorts, initialShortId]);
+
+  // A mouse wheel sends small, discrete deltas — against `scroll-snap-type:
+  // mandatory` that reads as "stuck": each tick is rarely enough distance to
+  // carry the snap past its threshold, so the view springs right back and
+  // scrolling looks broken. Touch swipes don't have this problem (one
+  // gesture easily covers a full viewport height), which is why this only
+  // shows up on desktop. The fix every wheel-driven TikTok/Douyin-style feed
+  // uses: intercept the wheel and page exactly one video per gesture
+  // ourselves instead of letting the browser's native snap-scroll handle it.
+  // Needs a real (non-React) listener — React's synthetic `onWheel` is
+  // passive by default, so `preventDefault()` inside it is silently ignored.
+  useEffect(() => {
+    const scroller = scrollerRef.current;
+    if (!scroller) return;
+
+    function handleWheel(e: WheelEvent) {
+      if (Math.abs(e.deltaY) < 2) return;
+      e.preventDefault();
+      if (wheelLockedRef.current) return;
+      wheelLockedRef.current = true;
+      scroller!.scrollBy({ top: (e.deltaY > 0 ? 1 : -1) * scroller!.clientHeight, behavior: "smooth" });
+      window.setTimeout(() => {
+        wheelLockedRef.current = false;
+      }, 650);
+    }
+
+    scroller.addEventListener("wheel", handleWheel, { passive: false });
+    return () => scroller.removeEventListener("wheel", handleWheel);
+  }, [shorts]);
+
+  function handleScroll() {
+    const scroller = scrollerRef.current;
+    if (!scroller || scroller.clientHeight === 0) return;
+    const index = Math.round(scroller.scrollTop / scroller.clientHeight);
+    setActiveIndex((current) => (current === index ? current : index));
+  }
 
   function goTo(direction: 1 | -1) {
     const scroller = scrollerRef.current;
@@ -59,19 +117,20 @@ export function ShortsFeed() {
         </div>
       ) : (
         <>
-          <Virtuoso
-            scrollerRef={(ref) => {
-              scrollerRef.current = ref instanceof HTMLElement ? ref : null;
-            }}
+          <div
+            ref={scrollerRef}
+            onScroll={handleScroll}
             style={{ height: "100dvh" }}
-            data={shorts}
-            className="scrollbar-none snap-y snap-mandatory [&::-webkit-scrollbar]:hidden"
-            itemContent={(_, short) => <ShortItem short={short} />}
-            rangeChanged={(range) => setActiveIndex(range.startIndex)}
-            initialTopMostItemIndex={
-              initialShortId ? Math.max(0, shorts.findIndex((s) => s.id === initialShortId)) : 0
-            }
-          />
+            className="snap-y snap-mandatory overflow-y-scroll scrollbar-none [&::-webkit-scrollbar]:hidden"
+          >
+            {shorts.map((short, index) => (
+              <ShortItem
+                key={short.id}
+                short={short}
+                preload={Math.abs(index - activeIndex) <= PRELOAD_RADIUS}
+              />
+            ))}
+          </div>
 
           {/* Prev/next controls — desktop only, mirrors the up/down arrow
            * pair every other shorts platform (TikTok/Douyin/Reels web)

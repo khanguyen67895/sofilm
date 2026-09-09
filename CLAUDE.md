@@ -11,7 +11,7 @@
 - **Socket.io Client** — realtime (`src/lib/socket.ts` + `src/providers/socket-provider.tsx`), connects only when authenticated
 - **Framer Motion** — micro-interactions (hero banner, movie card hover)
 - **next-themes** — dark/light theme, default `dark`, class-based (`attribute="class"`)
-- **React Virtuoso** — virtualized lists: `VirtuosoGrid` for movie grids/search, `Virtuoso` for the vertical shorts feed
+- **React Virtuoso** — `VirtuosoGrid` for movie grids/search. The vertical shorts feed does *not* use `Virtuoso`: its item wrappers are `position: absolute` for virtualization, which CSS `scroll-snap-align` doesn't reliably apply to — the feed is a plain native-scroll `snap-y snap-mandatory` container instead (see `ShortsFeed`)
 - **Zustand** — client state (`src/store/`): `auth.store.ts` (persisted), `ui.store.ts`, `player.store.ts`
 - **lucide-react**, **clsx** + **tailwind-merge** (`cn()` helper)
 
@@ -42,7 +42,7 @@ src/
 │   ├── home/                   # hero-banner (slider), trending-row, all-movies-section, home-view
 │   ├── movie/                    # movie-detail-view, movie-catalog-view (/category), episode-list
 │   ├── search/                    # search-view (debounced), use-search-movies
-│   ├── shorts/                     # shorts-feed (Virtuoso), short-item, use-shorts-feed
+│   ├── shorts/                     # shorts-feed (plain scroll-snap, not Virtuoso), short-item, use-shorts-feed
 │   ├── subscription/                # subscription-view, plan-card, use-plans, use-checkout
 │   └── profile/                      # profile-view, use-favorites
 │

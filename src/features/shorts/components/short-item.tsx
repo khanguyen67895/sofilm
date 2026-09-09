@@ -28,7 +28,16 @@ import { resolveImageSrc } from "@/utils/image";
 
 const DOUBLE_TAP_MS = 300;
 
-export function ShortItem({ short }: { short: Short }) {
+interface ShortItemProps {
+  short: Short;
+  /** False for items scrolled far from the active one — skips attaching a
+   * video source (and the hls.js instance it brings) entirely, so a 20-item
+   * unvirtualized feed doesn't open 20 concurrent HLS streams. See
+   * `PRELOAD_RADIUS` in `ShortsFeed`. */
+  preload: boolean;
+}
+
+export function ShortItem({ short, preload }: ShortItemProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const lastTapRef = useRef(0);
@@ -53,7 +62,7 @@ export function ShortItem({ short }: { short: Short }) {
   const toggleSave = useToggleShortSave();
   const shareShort = useShareShort();
 
-  useHlsVideo(videoRef, short.videoUrl || undefined);
+  useHlsVideo(videoRef, preload ? short.videoUrl || undefined : undefined);
 
   // Active-only playback — play only once this item is meaningfully in view,
   // pause the moment it scrolls away (Virtuoso's overscan can keep neighbors

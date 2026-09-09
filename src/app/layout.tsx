@@ -33,12 +33,6 @@ export default function RootLayout({
       suppressHydrationWarning
       className={`${jakarta.variable} h-full antialiased`}
     >
-      <Script
-        async
-        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7219800880647637"
-        crossOrigin="anonymous"
-        strategy="beforeInteractive"
-      />
       <body className="min-h-full flex flex-col bg-black">
         <AppProviders>
           <Header />
@@ -48,6 +42,12 @@ export default function RootLayout({
           <Footer />
           <LoginRequiredModal />
         </AppProviders>
+        <Script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7219800880647637"
+          crossOrigin="anonymous"
+          strategy="beforeInteractive"
+        />
       </body>
     </html>
   );

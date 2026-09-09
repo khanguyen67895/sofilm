@@ -1,16 +1,27 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import { motion } from "framer-motion";
 import { LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ROUTES } from "@/constants/routes";
 import { useAuthStore } from "@/store/auth.store";
 import { useHydrated } from "@/hooks/use-hydrated";
+import { cn } from "@/utils/cn";
 import { FavoritesSection } from "./favorites-section";
+import { SavedShortsSection } from "./saved-shorts-section";
+
+type ProfileTab = "favorites" | "saved-shorts";
+
+const TABS: { id: ProfileTab; label: string }[] = [
+  { id: "favorites", label: "Yêu thích" },
+  { id: "saved-shorts", label: "Video đã lưu" },
+];
 
 export function ProfileView() {
   const { user, isAuthenticated, clearSession } = useAuthStore();
+  const [tab, setTab] = useState<ProfileTab>("favorites");
   // `isAuthenticated`/`user` come from a localStorage-persisted store, which
   // is unavailable during SSR — gate on hydration so the client's first
   // render matches the server's logged-out shape instead of hydration-mismatching.
@@ -55,7 +66,23 @@ export function ProfileView() {
         <LogOut size={16} /> Sign Out
       </Button>
 
-      <FavoritesSection />
+      <div className="flex gap-2">
+        {TABS.map((t) => (
+          <button
+            key={t.id}
+            type="button"
+            onClick={() => setTab(t.id)}
+            className={cn(
+              "rounded-full px-4 py-1.5 text-sm font-medium transition-colors",
+              tab === t.id ? "bg-brand text-white" : "bg-white/10 text-white/70 hover:text-white"
+            )}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {tab === "favorites" ? <FavoritesSection /> : <SavedShortsSection />}
     </motion.div>
   );
 }

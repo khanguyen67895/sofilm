@@ -4,20 +4,25 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import {
+  Bookmark,
   Heart,
   MessageCircle,
   Pause,
   Play,
-  Share2,
   Volume2,
   VolumeX,
 } from "lucide-react";
 import { useHlsVideo } from "@/hooks/use-hls-video";
+import { useRequireAuth } from "@/hooks/use-require-auth";
 import { cn } from "@/utils/cn";
 import { formatViews } from "@/utils/format";
 import { PLACEHOLDER_IMAGE } from "@/constants/config";
 import { ROUTES } from "@/constants/routes";
-import { movieService } from "@/services/movie/movie.service";
+import { ShareMenu } from "@/components/common/share-menu";
+import { useToggleShortLike } from "../hooks/use-toggle-short-like";
+import { useToggleShortSave } from "../hooks/use-toggle-short-save";
+import { useShareShort } from "../hooks/use-share-short";
+import { ShortCommentsSheet } from "./short-comments-sheet";
 import type { Short } from "@/types/shorts";
 import { resolveImageSrc } from "@/utils/image";
 
@@ -35,14 +40,18 @@ export function ShortItem({ short }: { short: Short }) {
   // retry play() the moment the browser is actually ready for it.
   const shouldPlayRef = useRef(false);
 
-  const [isLiked, setIsLiked] = useState(short.isLiked);
-  const [likes, setLikes] = useState(short.likes);
   const [isMuted, setIsMuted] = useState(true);
   const [isPaused, setIsPaused] = useState(false);
   const [showPlayState, setShowPlayState] = useState(false);
   const [progress, setProgress] = useState(0);
   const [burstHeart, setBurstHeart] = useState(false);
-  const [likeError, setLikeError] = useState(false);
+  const [actionError, setActionError] = useState(false);
+  const [commentsOpen, setCommentsOpen] = useState(false);
+
+  const requireAuth = useRequireAuth();
+  const toggleLike = useToggleShortLike();
+  const toggleSave = useToggleShortSave();
+  const shareShort = useShareShort();
 
   useHlsVideo(videoRef, short.videoUrl || undefined);
 
@@ -109,28 +118,33 @@ export function ShortItem({ short }: { short: Short }) {
     flashPlayState();
   }
 
-  function toggleLike() {
-    const wasLiked = isLiked;
-    setIsLiked(!wasLiked);
-    setLikes((prev) => (wasLiked ? prev - 1 : prev + 1));
-    setLikeError(false);
+  function flashActionError() {
+    setActionError(true);
+    window.setTimeout(() => setActionError(false), 2500);
+  }
 
-    const request = wasLiked
-      ? movieService.unlikeShort(short.id)
-      : movieService.likeShort(short.id);
+  function handleToggleLike() {
+    requireAuth(() => {
+      toggleLike.mutate(
+        { shortId: short.id, isLiked: short.isLiked },
+        { onError: flashActionError }
+      );
+    }, "Sign in to like videos.");
+  }
 
-    request.catch(() => {
-      setIsLiked(wasLiked);
-      setLikes((prev) => (wasLiked ? prev + 1 : prev - 1));
-      setLikeError(true);
-      window.setTimeout(() => setLikeError(false), 2500);
-    });
+  function handleToggleSave() {
+    requireAuth(() => {
+      toggleSave.mutate(
+        { shortId: short.id, isSaved: short.isSaved },
+        { onError: flashActionError }
+      );
+    }, "Sign in to save videos.");
   }
 
   function handleVideoTap() {
     const now = Date.now();
     if (now - lastTapRef.current < DOUBLE_TAP_MS) {
-      if (!isLiked) toggleLike();
+      if (!short.isLiked) handleToggleLike();
       setBurstHeart(true);
       window.setTimeout(() => setBurstHeart(false), 700);
     } else {
@@ -139,16 +153,10 @@ export function ShortItem({ short }: { short: Short }) {
     lastTapRef.current = now;
   }
 
-  async function handleShare() {
-    const url = short.movieSlug
-      ? `${window.location.origin}${ROUTES.movie(short.movieSlug)}`
-      : window.location.href;
-    if (navigator.share) {
-      navigator.share({ title: short.title, url }).catch(() => {});
-      return;
-    }
-    await navigator.clipboard.writeText(url);
-  }
+  const shareUrl =
+    typeof window !== "undefined"
+      ? `${window.location.origin}${ROUTES.short(short.id)}`
+      : undefined;
 
   return (
     <div
@@ -222,7 +230,7 @@ export function ShortItem({ short }: { short: Short }) {
         </AnimatePresence>
 
         <AnimatePresence>
-          {likeError && (
+          {actionError && (
             <motion.div
               initial={{ opacity: 0, y: -8 }}
               animate={{ opacity: 1, y: 0 }}
@@ -269,46 +277,69 @@ export function ShortItem({ short }: { short: Short }) {
             type="button"
             onClick={(e) => {
               e.stopPropagation();
-              toggleLike();
+              handleToggleLike();
             }}
             whileTap={{ scale: 0.8 }}
             className="flex flex-col items-center gap-1 text-white"
           >
             <motion.span
-              key={isLiked ? "liked" : "unliked"}
+              key={short.isLiked ? "liked" : "unliked"}
               initial={{ scale: 0.6 }}
               animate={{ scale: 1 }}
               transition={{ type: "spring", stiffness: 500, damping: 15 }}
             >
               <Heart
                 size={26}
-                className={cn(isLiked && "fill-red-600 text-red-600")}
+                className={cn(short.isLiked && "fill-red-600 text-red-600")}
               />
             </motion.span>
-            <span className="text-xs">{formatViews(likes)}</span>
+            <span className="text-xs">{formatViews(short.likes)}</span>
           </motion.button>
 
           <button
             type="button"
-            onClick={(e) => e.stopPropagation()}
+            onClick={(e) => {
+              e.stopPropagation();
+              setCommentsOpen(true);
+            }}
             className="flex flex-col items-center gap-1 text-white"
           >
             <MessageCircle size={26} />
             <span className="text-xs">{formatViews(short.comments)}</span>
           </button>
 
-          <button
+          <motion.button
             type="button"
             onClick={(e) => {
               e.stopPropagation();
-              void handleShare();
+              handleToggleSave();
             }}
+            whileTap={{ scale: 0.8 }}
             className="flex flex-col items-center gap-1 text-white"
           >
-            <Share2 size={24} />
-            <span className="text-xs">Share</span>
-          </button>
+            <Bookmark
+              size={24}
+              className={cn(short.isSaved && "fill-brand text-brand")}
+            />
+          </motion.button>
+
+          <div onClick={(e) => e.stopPropagation()}>
+            <ShareMenu
+              variant="rail"
+              url={shareUrl}
+              shareCount={short.shares}
+              onOpenGuard={(open) => requireAuth(open, "Sign in to share videos.")}
+              onShared={() => shareShort.mutate(short.id)}
+            />
+          </div>
         </div>
+
+        <ShortCommentsSheet
+          shortId={short.id}
+          commentsCount={short.comments}
+          open={commentsOpen}
+          onClose={() => setCommentsOpen(false)}
+        />
       </div>
     </div>
   );

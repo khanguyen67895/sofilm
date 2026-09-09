@@ -7,7 +7,21 @@ export interface Short {
   movieSlug?: string;
   likes: number;
   comments: number;
+  shares: number;
+  saves: number;
   isLiked: boolean;
+  isSaved: boolean;
+}
+
+export interface ShortComment {
+  id: string;
+  text: string;
+  createdAt: string;
+  user: {
+    userId: string;
+    displayName: string;
+    avatar?: string;
+  };
 }
 
 export interface AdminShortItem {

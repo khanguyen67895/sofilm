@@ -7,6 +7,8 @@ export const QUERY_KEYS = {
   movieSearch: (query: string) => ["movie", "search", query] as const,
   moviePage: ["movie", "page"] as const,
   shortsFeed: ["shorts", "feed"] as const,
+  savedShorts: ["shorts", "saved"] as const,
+  shortComments: (shortId: string) => ["shorts", "comments", shortId] as const,
   invoice: (invoiceId: string) => ["subscription", "invoice", invoiceId] as const,
   profile: ["profile", "me"] as const,
   favorites: ["profile", "favorites"] as const,

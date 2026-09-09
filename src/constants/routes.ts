@@ -3,6 +3,7 @@ export const ROUTES = {
   category: "/category",
   search: "/search",
   shorts: "/shorts",
+  short: (id: string) => `/shorts?id=${id}`,
   subscription: "/subscription",
   subscriptionCheckout: (planId: string) => `/subscription/checkout?planId=${planId}`,
   subscriptionSuccess: (invoiceId: string) => `/subscription/success?invoiceId=${invoiceId}`,

@@ -2,10 +2,11 @@ export function formatDuration(minutes: number): string {
   return `${minutes} min`;
 }
 
-export function formatViews(views: number): string {
-  if (views >= 1_000_000) return `${(views / 1_000_000).toFixed(1)}M`;
-  if (views >= 1_000) return `${(views / 1_000).toFixed(1)}K`;
-  return `${views}`;
+export function formatViews(views: number | undefined | null): string {
+  const value = views ?? 0;
+  if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M`;
+  if (value >= 1_000) return `${(value / 1_000).toFixed(1)}K`;
+  return `${value}`;
 }
 
 export function formatYear(dateString: string): string {

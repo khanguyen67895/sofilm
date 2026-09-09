@@ -1,6 +1,7 @@
 import axios, { AxiosError, type InternalAxiosRequestConfig } from "axios";
 import { API_CONFIG, AUTH_TOKEN_KEY, REFRESH_TOKEN_KEY } from "@/constants/config";
 import { ENDPOINTS } from "@/constants/endpoints";
+import { useAuthStore } from "@/store/auth.store";
 import type { ApiResponse } from "@/types/api";
 import type { AuthTokens } from "@/types/user";
 
@@ -74,6 +75,11 @@ apiClient.interceptors.response.use(
     // they're just browsing; the catch block below is for a real session
     // that failed to refresh, which does warrant sending them to login.
     if (!refreshToken) {
+      // Zustand's persisted isAuthenticated can be stale-true (e.g. leftover
+      // from a session against a different API backend) even with no tokens
+      // on hand — resync it so useRequireAuth() gates correctly next time
+      // instead of silently letting the caller hit 401 again.
+      if (useAuthStore.getState().isAuthenticated) useAuthStore.getState().clearSession();
       return Promise.reject(error);
     }
 
@@ -94,8 +100,7 @@ apiClient.interceptors.response.use(
 
       return apiClient(originalRequest);
     } catch (refreshError) {
-      localStorage.removeItem(AUTH_TOKEN_KEY);
-      localStorage.removeItem(REFRESH_TOKEN_KEY);
+      useAuthStore.getState().clearSession();
       window.location.href = window.location.pathname.startsWith("/admin")
         ? "/admin/login"
         : "/auth/login";

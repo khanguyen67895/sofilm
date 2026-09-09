@@ -60,9 +60,14 @@ export function Header() {
           />
         </Link>
 
-        <div className="pointer-events-auto hidden flex-1 justify-center md:flex">
-          <HeaderNav pathname={pathname} />
-        </div>
+        {/* Dropped on /shorts — a full-screen TikTok-style feed reads as a
+         * single continuous surface, not a page with its own nav tabs
+         * floating on top of the video. */}
+        {!isShorts && (
+          <div className="pointer-events-auto hidden flex-1 justify-center md:flex">
+            <HeaderNav pathname={pathname} />
+          </div>
+        )}
 
         <div className="pointer-events-auto flex items-center gap-2 sm:gap-6">
           <HeaderSearch />

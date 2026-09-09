@@ -54,3 +54,35 @@ export function MessengerIcon(props: SVGProps<SVGSVGElement>) {
     </svg>
   );
 }
+
+export function ZaloIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" {...props}>
+      <path d="M6 6h12v2.4l-7.9 8.2H18V19H6v-2.4l7.9-8.2H6V6Z" />
+    </svg>
+  );
+}
+
+export function WhatsappIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" {...props}>
+      <path d="M12 2a10 10 0 0 0-8.62 15.06L2 22l5.06-1.33A10 10 0 1 0 12 2Zm0 18.2a8.16 8.16 0 0 1-4.16-1.14l-.3-.18-3.09.81.83-3.02-.2-.31A8.2 8.2 0 1 1 12 20.2Zm4.49-6.14c-.25-.12-1.46-.72-1.68-.8-.23-.08-.39-.12-.56.12-.16.25-.64.8-.78.96-.14.16-.29.18-.53.06-.25-.12-1.04-.38-1.98-1.22-.73-.65-1.22-1.45-1.37-1.7-.14-.25-.01-.38.11-.5.11-.11.25-.29.37-.43.12-.15.16-.25.24-.41.08-.16.04-.31-.02-.43-.06-.12-.56-1.35-.77-1.85-.2-.48-.41-.42-.56-.42h-.48c-.16 0-.43.06-.65.31-.23.25-.86.84-.86 2.04s.88 2.37 1 2.53c.13.16 1.74 2.66 4.22 3.73.59.25 1.05.4 1.41.52.59.19 1.13.16 1.55.1.47-.07 1.46-.6 1.67-1.17.2-.58.2-1.08.14-1.18-.06-.1-.22-.16-.47-.28Z" />
+    </svg>
+  );
+}
+
+export function TelegramIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" {...props}>
+      <path d="M21.05 3.76 2.99 10.86c-1.24.5-1.23 1.19-.23 1.5l4.63 1.44 1.8 5.49c.22.56.11.78.7.78.46 0 .66-.21.91-.46l2.18-2.12 4.53 3.34c.83.46 1.43.22 1.64-.77l2.97-14c.31-1.23-.47-1.78-1.27-1.3Zm-3.86 3.9-6.9 6.24-.28 3-1.4-4.6 8.58-4.64Z" />
+    </svg>
+  );
+}
+
+export function XSocialIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" {...props}>
+      <path d="M13.6 10.6 20.4 3h-2l-5.6 6.6L8.3 3H3l7 9.9L3 21h2l5.9-7 5 7h5.3l-7.2-10.1Zm-2.1 2.4-.7-1L5.1 4.4h2.1l4.4 6.2.7 1 5.8 8.1H16l-4.7-6.5Z" />
+    </svg>
+  );
+}

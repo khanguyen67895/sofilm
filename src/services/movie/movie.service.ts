@@ -2,7 +2,7 @@ import { apiClient, ENDPOINTS } from "@/services/api";
 import { useAuthStore } from "@/store/auth.store";
 import type { ApiResponse, PaginatedResponse } from "@/types/api";
 import type { Episode, Movie, MovieRow } from "@/types/movie";
-import type { Short } from "@/types/shorts";
+import type { Short, ShortComment } from "@/types/shorts";
 
 export interface BackendEpisode {
   id: string;
@@ -201,6 +201,52 @@ export const movieService = {
 
   async unlikeShort(id: string): Promise<void> {
     await apiClient.delete(ENDPOINTS.shorts.unlike(id));
+  },
+
+  async saveShort(id: string): Promise<void> {
+    await apiClient.post(ENDPOINTS.shorts.save(id));
+  },
+
+  async unsaveShort(id: string): Promise<void> {
+    await apiClient.delete(ENDPOINTS.shorts.unsave(id));
+  },
+
+  async getSavedShorts(): Promise<Short[]> {
+    const { data } = await apiClient.get<ApiResponse<BackendPage<Short>>>(
+      ENDPOINTS.shorts.saved,
+      { params: { limit: 50 } }
+    );
+    return data.data.items;
+  },
+
+  async shareShort(id: string): Promise<{ shares: number }> {
+    const { data } = await apiClient.post<ApiResponse<{ shares: number }>>(
+      ENDPOINTS.shorts.share(id)
+    );
+    return data.data;
+  },
+
+  async getShortComments(id: string, page = 1): Promise<PaginatedResponse<ShortComment>> {
+    const { data } = await apiClient.get<ApiResponse<BackendPage<ShortComment>>>(
+      ENDPOINTS.shorts.comments(id),
+      { params: { page, limit: 20 } }
+    );
+    const backendPage = data.data;
+    return {
+      items: backendPage.items,
+      page: backendPage.page,
+      pageSize: backendPage.limit,
+      total: backendPage.total,
+      hasMore: backendPage.hasMore,
+    };
+  },
+
+  async postShortComment(id: string, text: string): Promise<ShortComment> {
+    const { data } = await apiClient.post<ApiResponse<ShortComment>>(
+      ENDPOINTS.shorts.comments(id),
+      { text }
+    );
+    return data.data;
   },
 
   async getFavorites(): Promise<Movie[]> {

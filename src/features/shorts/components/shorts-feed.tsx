@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { Virtuoso } from "react-virtuoso";
@@ -13,6 +14,11 @@ import { ShortItem } from "./short-item";
 export function ShortsFeed() {
   useEnsureBackFallback();
   const { data: shorts, isLoading, isError } = useShortsFeed();
+  // Deep-link from the profile's saved-shorts grid ("/shorts?id=...") — jump
+  // straight to that item instead of always starting at the top of the feed.
+  // Only covers the newest 50 shorts the feed itself fetches; an older saved
+  // short simply won't be found here (findIndex falls back to -1 → 0).
+  const initialShortId = useSearchParams().get("id");
   // The actual scrollable element Virtuoso renders internally — grabbed via
   // scrollerRef instead of VirtuosoHandle.scrollToIndex(), because Virtuoso's
   // own index-based scroll math fights the CSS `snap-y snap-mandatory` this
@@ -62,6 +68,9 @@ export function ShortsFeed() {
             className="scrollbar-none snap-y snap-mandatory [&::-webkit-scrollbar]:hidden"
             itemContent={(_, short) => <ShortItem short={short} />}
             rangeChanged={(range) => setActiveIndex(range.startIndex)}
+            initialTopMostItemIndex={
+              initialShortId ? Math.max(0, shorts.findIndex((s) => s.id === initialShortId)) : 0
+            }
           />
 
           {/* Prev/next controls — desktop only, mirrors the up/down arrow

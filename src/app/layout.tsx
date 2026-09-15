@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
-import Script from "next/script";
 import "./globals.css";
 import { AppProviders } from "@/providers/app-providers";
 import { Header } from "@/components/layout/header";
 import { Footer } from "@/components/layout/footer";
 import { PageTransition } from "@/components/layout/page-transition";
 import { LoginRequiredModal } from "@/components/common/login-required-modal";
+import { AdSenseScript } from "@/components/common/adsense-script";
 import { SITE_CONFIG } from "@/constants/config";
 
 /** Plus Jakarta Sans is the site's only typeface — every font token in
@@ -42,12 +42,7 @@ export default function RootLayout({
           <Footer />
           <LoginRequiredModal />
         </AppProviders>
-        <Script
-          async
-          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7219800880647637"
-          crossOrigin="anonymous"
-          strategy="beforeInteractive"
-        />
+        <AdSenseScript />
       </body>
     </html>
   );

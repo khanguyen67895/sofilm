@@ -83,8 +83,19 @@ export function Footer() {
         <div className="flex items-center justify-center gap-4 sm:hidden">{socialLinks}</div>
       </Reveal>
 
-      <div className="relative pb-6 text-center text-sm text-white/40">
-        © {new Date().getFullYear()} {SITE_CONFIG.name.toUpperCase()} all rights reserved.
+      <div className="relative flex flex-col items-center gap-3 pb-6 text-center text-sm text-white/40">
+        <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2">
+          <Link href={ROUTES.privacyPolicy} className="transition-colors hover:text-white/80">
+            Chính sách quyền riêng tư
+          </Link>
+          <span className="text-white/20">•</span>
+          <Link href={ROUTES.termsOfService} className="transition-colors hover:text-white/80">
+            Điều khoản sử dụng
+          </Link>
+        </div>
+        <div>
+          © {new Date().getFullYear()} {SITE_CONFIG.name.toUpperCase()} all rights reserved.
+        </div>
       </div>
     </footer>
   );

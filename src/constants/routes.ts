@@ -10,6 +10,8 @@ export const ROUTES = {
   profile: "/profile",
   login: "/auth/login",
   register: "/auth/register",
+  privacyPolicy: "/privacy-policy",
+  termsOfService: "/terms-of-service",
   adminLogin: "/admin/login",
   movie: (slug: string) => `/movie/${slug}`,
   watch: (slug: string, episode?: number) =>
@@ -35,4 +37,12 @@ export function isChromeLessRoute(pathname: string): boolean {
     pathname.startsWith(ROUTES.admin) ||
     pathname.startsWith(ROUTES.shorts)
   );
+}
+
+/** Screens with no publisher-facing content — the internal admin CMS and the
+ * bare auth forms. AdSense policy forbids serving ads on back-office/nav-only
+ * screens, so `AdSenseScript` skips loading on these instead of the global
+ * root-layout script covering every route. */
+export function isAdsExcludedRoute(pathname: string): boolean {
+  return pathname.startsWith("/auth/") || pathname.startsWith(ROUTES.admin);
 }

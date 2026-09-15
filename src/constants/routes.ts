@@ -12,6 +12,7 @@ export const ROUTES = {
   register: "/auth/register",
   privacyPolicy: "/privacy-policy",
   termsOfService: "/terms-of-service",
+  faq: "/faq",
   adminLogin: "/admin/login",
   movie: (slug: string) => `/movie/${slug}`,
   watch: (slug: string, episode?: number) =>

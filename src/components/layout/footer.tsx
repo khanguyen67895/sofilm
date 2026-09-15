@@ -92,6 +92,10 @@ export function Footer() {
           <Link href={ROUTES.termsOfService} className="transition-colors hover:text-white/80">
             Điều khoản sử dụng
           </Link>
+          <span className="text-white/20">•</span>
+          <Link href={ROUTES.faq} className="transition-colors hover:text-white/80">
+            Câu hỏi thường gặp
+          </Link>
         </div>
         <div>
           © {new Date().getFullYear()} {SITE_CONFIG.name.toUpperCase()} all rights reserved.

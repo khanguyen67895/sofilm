@@ -79,7 +79,10 @@ export const ENDPOINTS = {
     checkout: "/payments/checkout",
     history: "/payments/history",
     verify: (id: string) => `/payments/verify/${id}`,
-    confirm: (invoiceId: string) => `/payments/confirm/${invoiceId}`,
+    status: (invoiceId: string) => `/payments/${invoiceId}/status`,
+    adminUnmatched: "/payments/admin/bank-transactions",
+    adminApprove: (refCode: string) => `/payments/admin/bank-transactions/${refCode}/approve`,
+    adminScan: "/payments/admin/bank-transactions/scan",
   },
   users: {
     me: "/users/me",

@@ -10,6 +10,8 @@ export const QUERY_KEYS = {
   savedShorts: ["shorts", "saved"] as const,
   shortComments: (shortId: string) => ["shorts", "comments", shortId] as const,
   invoice: (invoiceId: string) => ["subscription", "invoice", invoiceId] as const,
+  paymentStatus: (invoiceId: string) => ["subscription", "payment-status", invoiceId] as const,
+  adminUnmatchedPayments: ["admin", "payments", "unmatched"] as const,
   profile: ["profile", "me"] as const,
   favorites: ["profile", "favorites"] as const,
   watchHistory: ["profile", "watch-history"] as const,

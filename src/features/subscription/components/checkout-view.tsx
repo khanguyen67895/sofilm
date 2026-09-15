@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Building2, Check, Clock, CreditCard, Crown, Smartphone, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -11,82 +12,94 @@ import { useUiStore } from "@/store/ui.store";
 import { useHydrated } from "@/hooks/use-hydrated";
 import { cn } from "@/utils/cn";
 import { formatBillingCycle, formatCountdown, formatCurrency } from "@/utils/format";
-import type { PaymentProvider, SubscriptionPlan } from "@/types/subscription";
+import type { CheckoutResult, SubscriptionPlan } from "@/types/subscription";
 import { PLANS } from "../constants";
 import { useCheckout } from "../hooks/use-checkout";
-import { useConfirmPayment } from "../hooks/use-confirm-payment";
-
-const QR_COUNTDOWN_SECONDS = 336; // 05:36, matching the reference design
+import { usePaymentStatus } from "../hooks/use-payment-status";
 
 interface PaymentMethodOption {
   id: string;
-  provider: PaymentProvider;
   label: string;
   description: string;
   icon: typeof Smartphone;
   color: string;
-  showQr?: boolean;
+  disabled?: boolean;
 }
 
-// Only 4 real gateways exist on the backend (payment-provider.factory.ts) — Bank
-// Transfer has no dedicated provider in Vietnam's ecosystem here, so it rides on
-// VNPay same as the VNPay option itself, just with different on-screen copy.
+// Bank transfer (SePay + VietQR) is the only real payment rail today — the
+// rest are shown for parity with the reference design but disabled, matching
+// taothao_ai_training's own checkout ("Sắp ra mắt" on every method but bank).
 const PAYMENT_METHODS: PaymentMethodOption[] = [
   {
+    id: "bank-transfer",
+    label: "Bank Transfer",
+    description: "Scan the QR code with your banking app",
+    icon: Building2,
+    color: "bg-brand",
+  },
+  {
     id: "momo",
-    provider: "momo",
     label: "MoMo",
-    description: "Scan QR code",
+    description: "Coming soon",
     icon: Smartphone,
     color: "bg-pink-500",
-    showQr: true,
+    disabled: true,
   },
   {
     id: "vnpay",
-    provider: "vnpay",
     label: "VNPay",
-    description: "Domestic ATM · Visa · Mastercard",
+    description: "Coming soon",
     icon: CreditCard,
     color: "bg-blue-500",
-  },
-  {
-    id: "bank-transfer",
-    provider: "vnpay",
-    label: "Bank Transfer",
-    description: "Vietcombank · BIDV, ...",
-    icon: Building2,
-    color: "bg-slate-500",
+    disabled: true,
   },
   {
     id: "card",
-    provider: "stripe",
     label: "International Credit Card",
-    description: "Visa · Mastercard · JCB",
+    description: "Coming soon",
     icon: Wallet,
     color: "bg-indigo-500",
+    disabled: true,
   },
   {
     id: "zalopay",
-    provider: "zalopay",
     label: "ZaloPay",
-    description: "Linked ZaloPay Wallet",
+    description: "Coming soon",
     icon: Smartphone,
     color: "bg-sky-500",
+    disabled: true,
   },
 ];
+
+function useCountdown(expiresAt: string | undefined) {
+  const [secondsLeft, setSecondsLeft] = useState(0);
+
+  useEffect(() => {
+    if (!expiresAt) return;
+    const target = new Date(expiresAt).getTime();
+    const tick = () => setSecondsLeft(Math.max(0, Math.round((target - Date.now()) / 1000)));
+    tick();
+    const interval = setInterval(tick, 1000);
+    return () => clearInterval(interval);
+  }, [expiresAt]);
+
+  return secondsLeft;
+}
 
 export function CheckoutView() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const checkout = useCheckout();
-  const confirmPayment = useConfirmPayment();
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated);
   const mounted = useHydrated();
   const openLoginPrompt = useUiStore((s) => s.openLoginPrompt);
 
   const [selectedPlanId, setSelectedPlanId] = useState(searchParams.get("planId") ?? "");
   const [selectedMethodId, setSelectedMethodId] = useState(PAYMENT_METHODS[0].id);
-  const [secondsLeft, setSecondsLeft] = useState(QR_COUNTDOWN_SECONDS);
+  const [session, setSession] = useState<CheckoutResult | null>(null);
+
+  const paymentStatus = usePaymentStatus(session?.invoiceId);
+  const secondsLeft = useCountdown(session?.expiresAt);
 
   // Guests can only land here by typing the URL directly (the normal entry
   // point, choosing a plan on /subscription, is already gated) — bounce
@@ -97,46 +110,41 @@ export function CheckoutView() {
     router.replace(ROUTES.subscription);
   }, [mounted, isAuthenticated, router, openLoginPrompt]);
 
+  useEffect(() => {
+    if (paymentStatus.data?.status === "PAID" && session) {
+      router.push(ROUTES.subscriptionSuccess(session.invoiceId));
+    }
+  }, [paymentStatus.data?.status, session, router]);
+
   const selectedPlan = PLANS.find((p) => p.id === selectedPlanId) ?? PLANS[0];
   const selectedMethod =
     PAYMENT_METHODS.find((m) => m.id === selectedMethodId) ?? PAYMENT_METHODS[0];
-  const isPending = checkout.isPending || confirmPayment.isPending;
-  const hasError = checkout.isError || confirmPayment.isError;
-
-  // Ticking down is a legitimate effect (subscribing to an external timer);
-  // resetting the count on method change happens in selectMethod below
-  // instead, synchronously with the click that causes it.
-  useEffect(() => {
-    if (!selectedMethod.showQr) return;
-    const interval = setInterval(() => setSecondsLeft((s) => Math.max(0, s - 1)), 1000);
-    return () => clearInterval(interval);
-  }, [selectedMethodId, selectedMethod.showQr]);
+  const isExpiredOrFailed =
+    paymentStatus.data?.status === "FAILED" || (Boolean(session) && secondsLeft === 0 && paymentStatus.data?.status === "PENDING");
 
   function selectPlan(plan: SubscriptionPlan) {
     setSelectedPlanId(plan.id);
   }
 
   function selectMethod(method: PaymentMethodOption) {
+    if (method.disabled) return;
     setSelectedMethodId(method.id);
-    if (method.showQr) setSecondsLeft(QR_COUNTDOWN_SECONDS);
+  }
+
+  function retry() {
+    setSession(null);
+    checkout.reset();
   }
 
   if (mounted && !isAuthenticated) return null;
 
   async function handleCompletePayment() {
-    if (!selectedPlan) return;
+    if (!selectedPlan || selectedMethod.disabled) return;
     try {
-      const { invoiceId } = await checkout.mutateAsync({
-        planId: selectedPlan.id,
-        provider: selectedMethod.provider,
-      });
-      // No provider here has real credentials configured, so no webhook will
-      // ever arrive on its own — this simulates the provider confirming the
-      // payment (see PaymentService.confirmPayment on the backend).
-      await confirmPayment.mutateAsync(invoiceId);
-      router.push(ROUTES.subscriptionSuccess(invoiceId));
+      const result = await checkout.mutateAsync({ planId: selectedPlan.id });
+      setSession(result);
     } catch {
-      // surfaced via hasError below
+      // surfaced via checkout.isError below
     }
   }
 
@@ -158,9 +166,10 @@ export function CheckoutView() {
             <button
               key={plan.id}
               type="button"
+              disabled={Boolean(session)}
               onClick={() => selectPlan(plan)}
               className={cn(
-                "rounded-lg border p-4 text-left transition-colors",
+                "rounded-lg border p-4 text-left transition-colors disabled:opacity-50",
                 isSelected ? "border-brand bg-brand/10" : "border-white/10 bg-white/5"
               )}
             >
@@ -194,19 +203,26 @@ export function CheckoutView() {
               <div key={method.id}>
                 <button
                   type="button"
+                  disabled={method.disabled || Boolean(session)}
                   onClick={() => selectMethod(method)}
                   className={cn(
                     "flex w-full items-center gap-3 rounded-lg border p-4 text-left transition-colors",
-                    isSelected ? "border-brand bg-brand/10" : "border-white/10 bg-white/5"
+                    method.disabled
+                      ? "cursor-not-allowed border-white/5 bg-white/5 opacity-50"
+                      : isSelected
+                        ? "border-brand bg-brand/10"
+                        : "border-white/10 bg-white/5 disabled:opacity-50"
                   )}
                 >
                   <span
                     className={cn(
                       "flex h-4 w-4 shrink-0 items-center justify-center rounded-full border-2",
-                      isSelected ? "border-brand" : "border-white/40"
+                      isSelected && !method.disabled ? "border-brand" : "border-white/40"
                     )}
                   >
-                    {isSelected && <span className="h-2 w-2 rounded-full bg-brand" />}
+                    {isSelected && !method.disabled && (
+                      <span className="h-2 w-2 rounded-full bg-brand" />
+                    )}
                   </span>
                   <span
                     className={cn(
@@ -216,25 +232,45 @@ export function CheckoutView() {
                   >
                     <Icon size={20} />
                   </span>
-                  <span>
+                  <span className="flex-1">
                     <p className="text-sm font-medium text-white">{method.label}</p>
                     <p className="text-xs text-white/50">{method.description}</p>
                   </span>
+                  {method.disabled && (
+                    <span className="rounded-full bg-white/10 px-2 py-1 text-[10px] uppercase text-white/50">
+                      Coming soon
+                    </span>
+                  )}
                 </button>
 
-                {isSelected && method.showQr && (
+                {isSelected && !method.disabled && session && (
                   <div className="mt-2 flex flex-col items-center gap-3 rounded-lg border border-brand/40 bg-white/5 p-4 sm:flex-row sm:items-start sm:text-left">
-                    <div className="h-32 w-32 shrink-0 rounded-md bg-white/10" />
+                    <div className="relative h-32 w-32 shrink-0 overflow-hidden rounded-md bg-white">
+                      <Image src={session.qrUrl} alt="Bank transfer QR code" fill className="object-contain" />
+                    </div>
                     <div className="space-y-2">
                       <ol className="list-inside list-decimal space-y-1 text-xs text-white/60">
-                        <li>Open the MoMo app on your phone</li>
-                        <li>Select &quot;Scan QR Code&quot;</li>
+                        <li>Open your banking app</li>
                         <li>Scan the QR code on the left</li>
-                        <li>Confirm the amount and complete the payment</li>
+                        <li>
+                          Or transfer manually to{" "}
+                          <span className="text-white/80">{session.bankAccount}</span> (
+                          {session.bankAccountName}, {session.bankName})
+                        </li>
+                        <li>
+                          Keep the transfer note exactly:{" "}
+                          <span className="font-mono text-white/80">{session.refCode}</span>
+                        </li>
                       </ol>
-                      <div className="flex items-center gap-1.5 text-xs text-white/50">
-                        <Clock size={12} /> {formatCountdown(secondsLeft)} QR code expires in
-                      </div>
+                      {isExpiredOrFailed ? (
+                        <p className="text-xs text-red-400">
+                          This QR code has expired. Please try again.
+                        </p>
+                      ) : (
+                        <div className="flex items-center gap-1.5 text-xs text-white/50">
+                          <Clock size={12} /> {formatCountdown(secondsLeft)} QR code expires in
+                        </div>
+                      )}
                       <p className="text-[11px] text-white/40">
                         After payment, your account will be automatically activated within 1-2
                         minutes.
@@ -278,10 +314,20 @@ export function CheckoutView() {
                   {formatCurrency(selectedPlan.price, selectedPlan.currency)}
                 </span>
               </div>
-              <Button onClick={handleCompletePayment} disabled={isPending} className="w-full">
-                {isPending ? "Processing..." : "Complete Payment"}
-              </Button>
-              {hasError && (
+              {isExpiredOrFailed ? (
+                <Button onClick={retry} className="w-full">
+                  Try Again
+                </Button>
+              ) : session ? (
+                <Button disabled className="w-full">
+                  Waiting for payment...
+                </Button>
+              ) : (
+                <Button onClick={handleCompletePayment} disabled={checkout.isPending} className="w-full">
+                  {checkout.isPending ? "Processing..." : "Complete Payment"}
+                </Button>
+              )}
+              {checkout.isError && (
                 <p className="text-center text-xs text-red-500">
                   Payment failed. Please try again.
                 </p>

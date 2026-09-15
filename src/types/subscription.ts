@@ -9,24 +9,41 @@ export interface SubscriptionPlan {
   isPopular?: boolean;
 }
 
-/** Actual gateway the backend knows how to talk to (payment-provider.factory.ts) —
- * the on-screen payment method list has more options than this because a couple
- * of them (bank transfer, international card) route through one of these same
- * providers under a different label. */
-export type PaymentProvider = "momo" | "vnpay" | "zalopay" | "stripe";
-
 export interface CheckoutPayload {
   planId: string;
-  provider: PaymentProvider;
   couponCode?: string;
 }
 
+/** Bank-transfer (SePay/VietQR) checkout session — the only real payment
+ * method today (see checkout-view.tsx's PAYMENT_METHODS). */
 export interface CheckoutResult {
   invoiceId: string;
-  redirectUrl: string;
+  refCode: string;
+  qrUrl: string;
+  bankAccount: string;
+  bankAccountName: string;
+  bankName: string;
+  expiresAt: string;
 }
 
 export type InvoiceStatus = "PENDING" | "PAID" | "FAILED" | "REFUNDED";
+
+export interface PaymentStatusResult extends CheckoutResult {
+  status: InvoiceStatus;
+}
+
+/** An uncredited bank transaction observed via SePay (webhook or scan) that
+ * couldn't be auto-matched to a pending invoice — admin reviews these at
+ * /admin/payments. */
+export interface BankTransaction {
+  id: string;
+  amount: number;
+  description: string;
+  referenceCode?: string;
+  transactionDate: string;
+  credited: boolean;
+  createdAt: string;
+}
 
 export interface Invoice {
   id: string;
